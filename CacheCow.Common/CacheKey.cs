@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace CacheCow.Common
@@ -11,6 +12,7 @@ namespace CacheCow.Common
 		private readonly IEnumerable<string> _headerValues;
 		private readonly string _toString;
 		private readonly string _routePattern;
+		private readonly byte[] _hash;
 
 		private const string CacheKeyFormat = "{0}-{1}";
 
@@ -38,6 +40,10 @@ namespace CacheCow.Common
 			_headerValues = headerValues.ToList();
 			_resourceUri = resourceUri;
 			_toString = string.Format(CacheKeyFormat, resourceUri, string.Join("-", headerValues));
+			using (var sha1 = new SHA1CryptoServiceProvider())
+			{
+				_hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(_toString));
+			}
 		}
 
 		public string ResourceUri
@@ -48,6 +54,11 @@ namespace CacheCow.Common
 		public string RoutePattern
 		{
 			get { return _routePattern; }
+		}
+
+		public byte[] Hash
+		{
+			get { return _hash; }
 		}
 
 		public override string ToString()

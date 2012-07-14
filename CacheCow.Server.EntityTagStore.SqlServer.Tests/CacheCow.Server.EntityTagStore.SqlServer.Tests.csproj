@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{535A9638-9C46-4B32-822C-4AB6D442FD0D}</ProjectGuid>
+    <ProjectGuid>{69933472-B520-453B-8AC3-DCDE5F7995D8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CacheCow.Server.EntityTagStore.SqlServer</RootNamespace>
-    <AssemblyName>CacheCow.Server.EntityTagStore.SqlServer</AssemblyName>
+    <RootNamespace>CacheCow.Server.EntityTagStore.SqlServer.Tests</RootNamespace>
+    <AssemblyName>CacheCow.Server.EntityTagStore.SqlServer.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -34,8 +34,13 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.7\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.0.12054\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Rhino.Mocks">
+      <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.0.20505.0\lib\net40\System.Net.Http.dll</HintPath>
@@ -56,25 +61,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ColumnNames.cs" />
+    <Compile Include="IntegrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlServerEntityTagStore.cs" />
-    <Compile Include="StoredProcedureNames.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj">
       <Project>{88E170E4-B857-42FE-963C-0505502B548C}</Project>
       <Name>CacheCow.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CacheCow.Server.EntityTagStore.SqlServer\CacheCow.Server.EntityTagStore.SqlServer.csproj">
+      <Project>{535A9638-9C46-4B32-822C-4AB6D442FD0D}</Project>
+      <Name>CacheCow.Server.EntityTagStore.SqlServer</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Scripts\AddUpdateCache.sp" />
-    <None Include="Scripts\CacheState.tbl" />
-    <None Include="Scripts\DeleteCacheById.sp.sp" />
-    <None Include="Scripts\DeleteCacheByRoutePattern.sp" />
-    <None Include="Scripts\GetCache.sp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

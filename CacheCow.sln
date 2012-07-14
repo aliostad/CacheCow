@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Tests", "CacheCow.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.SqlServer", "CacheCow.Server.EntityTagStore.SqlServer\CacheCow.Server.EntityTagStore.SqlServer.csproj", "{535A9638-9C46-4B32-822C-4AB6D442FD0D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.SqlServer.Tests", "CacheCow.Server.EntityTagStore.SqlServer.Tests\CacheCow.Server.EntityTagStore.SqlServer.Tests.csproj", "{69933472-B520-453B-8AC3-DCDE5F7995D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{535A9638-9C46-4B32-822C-4AB6D442FD0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{535A9638-9C46-4B32-822C-4AB6D442FD0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{535A9638-9C46-4B32-822C-4AB6D442FD0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69933472-B520-453B-8AC3-DCDE5F7995D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69933472-B520-453B-8AC3-DCDE5F7995D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69933472-B520-453B-8AC3-DCDE5F7995D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69933472-B520-453B-8AC3-DCDE5F7995D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
