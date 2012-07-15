@@ -39,8 +39,21 @@ namespace CacheCow.Client
 			{
 				varyHeaders = DefaultVaryHeaders;
 			}
-			
-			// TODO: ..... REST
+			var cacheKey = new CacheKey(uri, 
+				request.Headers.Where(x=> varyHeaders.Any(y=> y.Equals(x.Key, 
+					StringComparison.CurrentCultureIgnoreCase)))
+					.SelectMany(z=>z.Value)
+				);
+
+			HttpResponseMessage response;
+			if(_cacheStore.TryGetValue(cacheKey, out response))
+			{
+				response.RequestMessage = request;
+				var taskCompletionSource = new TaskCompletionSource<HttpResponseMessage>();
+				taskCompletionSource.SetResult(response);
+				return taskCompletionSource.Task;
+			}
+			// TODO: ..... REST)
 
 
 			return base.SendAsync(request, cancellationToken);
