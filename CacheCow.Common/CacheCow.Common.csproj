@@ -60,6 +60,7 @@
     <Compile Include="Helpers\HttpResponseMessageExtensions.cs" />
     <Compile Include="HttpHeaderNames.cs" />
     <Compile Include="Http\NotModifiedResponse.cs" />
+    <Compile Include="ICacheStore.cs" />
     <Compile Include="IEntityTagStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TimedEntityTagHeader.cs" />
