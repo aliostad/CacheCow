@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B1901128-F84A-46CE-B8FD-E863465F94C2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{039FAC3C-D681-4028-ADB3-A382C695F7E9}"
-	ProjectSection(SolutionItems) = preProject
-		CacheCow.msbuild = CacheCow.msbuild
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{141CEBF7-F872-4181-8B16-1E0FAE517D59}"
 EndProject
@@ -22,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Tests", "test\Cach
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.SqlServer.Tests", "test\CacheCow.Server.EntityTagStore.SqlServer.Tests\CacheCow.Server.EntityTagStore.SqlServer.Tests.csproj", "{69933472-B520-453B-8AC3-DCDE5F7995D8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6F0D8000-DCAB-4C2C-9C24-378891248A2D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{CF657B96-FC94-4C8D-82FE-8F17958FCBC7}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.targets = .nuget\NuGet.targets

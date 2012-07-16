@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         ToolsVersion="4.0"
+         DefaultTargets="Default">
+
+  <PropertyGroup Condition="'$(Configuration)' == ''">
+    <Configuration>Debug</Configuration>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <BuildArtifactsDir Include=".\artifacts\" />
+    <PackageOutputDir Include=".\artifacts\packages" />
+    <Solutionfile Include=".\CacheCow.sln" />
+    <AppProjFiles Include=".\src\**\*.csproj" />
+    <TestProjFiles Include=".\test\**\*.csproj" />
+    <ScriptsDir Include=".\scripts\" />
+    <NugetExeDir Include=".\.nuget\" />
+  </ItemGroup>
+
+  <Target Name="Default" DependsOnTargets="Compile" />
+
+  <Target Name="Clean">
+    <RemoveDir Directories="@(BuildArtifactsDir)" />
+  </Target>
+  <Target Name="Init" DependsOnTargets="Clean">
+    <MakeDir Directories="@(BuildArtifactsDir);@(PackageOutputDir)" />
+  </Target>
+  <Target Name="Compile" DependsOnTargets="Init">
+    <MSBuild Projects="@(AppProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration)" />
+  </Target>
+  
+</Project>
