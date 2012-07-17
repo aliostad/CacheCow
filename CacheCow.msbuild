@@ -19,7 +19,8 @@
   </ItemGroup>
 
   <Target Name="Default" DependsOnTargets="Compile; Package" />
-
+  <Target Name="DefaultCI" DependsOnTargets="Compile; Package; Publish" />
+  
   <Target Name="Clean">
     <RemoveDir Directories="@(BuildArtifactsDir)" />
   </Target>
@@ -33,5 +34,8 @@
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Server\CacheCow.Server.csproj -OutputDirectory ..\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Common\CacheCow.Common.csproj -OutputDirectory ..\artifacts\packages" />
   </Target>
-  
+  <Target Name="Publish">
+    <Exec WorkingDirectory="%(ScriptsDir.FullPath)" Command="powershell -file .\publish.ps1" />
+  </Target>
+
 </Project>
