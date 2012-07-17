@@ -18,7 +18,7 @@
     <NugetExeDir Include=".\.nuget\" />
   </ItemGroup>
 
-  <Target Name="Default" DependsOnTargets="Compile" />
+  <Target Name="Default" DependsOnTargets="Compile; Package" />
 
   <Target Name="Clean">
     <RemoveDir Directories="@(BuildArtifactsDir)" />
@@ -28,6 +28,10 @@
   </Target>
   <Target Name="Compile" DependsOnTargets="Init">
     <MSBuild Projects="@(AppProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
+  </Target>
+  <Target Name="Package">
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Server\CacheCow.Server.csproj -OutputDirectory ..\artifacts\packages" />
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Common\CacheCow.Common.csproj -OutputDirectory ..\artifacts\packages" />
   </Target>
   
 </Project>
