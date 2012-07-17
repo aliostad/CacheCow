@@ -31,8 +31,8 @@
     <MSBuild Projects="@(AppProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
   </Target>
   <Target Name="Package">
-    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Server\CacheCow.Server.csproj -OutputDirectory ..\artifacts\packages" />
-    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Common\CacheCow.Common.csproj -OutputDirectory ..\artifacts\packages" />
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Server\CacheCow.Server.csproj -Build -OutputDirectory ..\artifacts\packages" />
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Common\CacheCow.Common.csproj -Build -OutputDirectory ..\artifacts\packages" />
   </Target>
   <Target Name="Publish">
     <Exec WorkingDirectory="%(ScriptsDir.FullPath)" Command="powershell -file .\publish.ps1" />
