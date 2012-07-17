@@ -3,8 +3,9 @@
          ToolsVersion="4.0"
          DefaultTargets="Default">
 
-  <PropertyGroup Condition="'$(Configuration)' == ''">
-    <Configuration>Debug</Configuration>
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <SolutionDir Condition=" '$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)</SolutionDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +27,7 @@
     <MakeDir Directories="@(BuildArtifactsDir);@(PackageOutputDir)" />
   </Target>
   <Target Name="Compile" DependsOnTargets="Init">
-    <MSBuild Projects="@(AppProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration)" />
+    <MSBuild Projects="@(AppProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
   </Target>
   
 </Project>
