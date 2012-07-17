@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B1901128-F84A-46CE-B8FD-E863465F94C2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{039FAC3C-D681-4028-ADB3-A382C695F7E9}"
+	ProjectSection(SolutionItems) = preProject
+		CacheCow.msbuild = CacheCow.msbuild
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{141CEBF7-F872-4181-8B16-1E0FAE517D59}"
 EndProject
