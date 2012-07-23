@@ -58,6 +58,8 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CachingHandler.cs" />
+    <Compile Include="DefaultHttpResponseMessageSerializer.cs" />
+    <Compile Include="IHttpResponseMessageSerializer.cs" />
     <Compile Include="InMemoryCacheStore.cs" />
     <Compile Include="InMemoryVaryHeaderStore.cs" />
     <Compile Include="IVaryHeaderStore.cs" />
