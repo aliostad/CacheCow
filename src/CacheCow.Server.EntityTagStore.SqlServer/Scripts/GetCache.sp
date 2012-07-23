@@ -10,7 +10,7 @@ GO
 -- =============================================
 -- Author:		Ali Kheyrollahi
 -- Create date: 2012-07-12
--- Description:	Adds or updates cache entry
+-- Description:	returns cache entry by its Id
 -- =============================================
 CREATE PROCEDURE GetCache
 	@cacheKeyHash		BINARY(20)

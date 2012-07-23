@@ -73,12 +73,17 @@
     <None Include="packages.config" />
     <None Include="Scripts\AddUpdateCache.sp" />
     <None Include="Scripts\CacheState.tbl" />
-    <None Include="Scripts\DeleteCacheById.sp.sp" />
+    <None Include="Scripts\combine_scripts.bat" />
+    <None Include="Scripts\DeleteCacheById.sp" />
     <None Include="Scripts\DeleteCacheByRoutePattern.sp" />
     <None Include="Scripts\GetCache.sp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>cd $(ProjectDir)\scripts
+$(ProjectDir)\scripts\combine_scripts.bat</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

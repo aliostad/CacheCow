@@ -33,3 +33,4 @@ docs/
 nuget/
 packages/
 artifacts/
+script.sql
