@@ -51,6 +51,8 @@ namespace CacheCow.Tests.Client
 			Assert.AreEqual(httpResponseMessage.Headers.ToString(), httpResponseMessage2.Headers.ToString(), "Headers.ToString()");
 			Assert.AreEqual(httpResponseMessage.Content.ReadAsStringAsync().Result, 
 				httpResponseMessage2.Content.ReadAsStringAsync().Result, "Content");
+			Assert.AreEqual(httpResponseMessage.Content.Headers.ToString(),
+				httpResponseMessage2.Content.Headers.ToString(), "Headers.ToString()");
 
 		}
 
