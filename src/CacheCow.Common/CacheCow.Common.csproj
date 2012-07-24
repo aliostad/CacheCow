@@ -62,6 +62,7 @@
     </Compile>
     <Compile Include="CacheKey.cs" />
     <Compile Include="Helpers\BasicExtensions.cs" />
+    <Compile Include="Helpers\HttpHeadersExtensions.cs" />
     <Compile Include="Helpers\HttpResponseMessageExtensions.cs" />
     <Compile Include="HttpHeaderNames.cs" />
     <Compile Include="Http\NotModifiedResponse.cs" />
