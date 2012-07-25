@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -23,6 +24,37 @@ namespace CacheCow.Client
 			_cacheStore = cacheStore;
 			VaryHeaderStore = new InMemoryVaryHeaderStore();
 			DefaultVaryHeaders = new string[]{"Accept"};
+			CachedMessageValidator = (response) =>
+			    {
+					if (!response.IsSuccessStatusCode || response.Headers.CacheControl == null ||
+						response.Headers.CacheControl.NoStore || response.Headers.CacheControl.NoCache)
+						return CacheValidationResult.Invalid;
+
+					response.Headers.Date = response.Headers.Date ?? DateTimeOffset.UtcNow; // this also helps in cache creation
+			        var dateTimeOffset = response.Headers.Date;
+
+					if (response.Headers.CacheControl.MustRevalidate)
+						return CacheValidationResult.MustRevalidate;
+
+					if (response.Content.Headers.Expires != null &&
+						response.Content.Headers.Expires < DateTimeOffset.UtcNow)
+						return CacheValidationResult.Stale;
+
+					if (response.Headers.CacheControl.MaxAge == null &&
+						response.Headers.CacheControl.SharedMaxAge == null)
+						return CacheValidationResult.Invalid;
+
+					if (response.Headers.CacheControl.MaxAge != null &&
+						DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.MaxAge.Value))
+						return CacheValidationResult.Stale;
+
+					if (response.Headers.CacheControl.SharedMaxAge != null &&
+						DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.SharedMaxAge.Value))
+						return CacheValidationResult.Stale;
+
+
+			        return CacheValidationResult.OK;
+			    };
 		}
 
 		public IVaryHeaderStore VaryHeaderStore { get; set; }
@@ -30,6 +62,8 @@ namespace CacheCow.Client
 		public string[] DefaultVaryHeaders { get; set; }
 
 		public string[] StarVaryHeaders { get; set; } // TODO: populate and use
+
+		public Func<HttpResponseMessage, CacheValidationResult> CachedMessageValidator { get; set; }
 
 		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
@@ -58,5 +92,7 @@ namespace CacheCow.Client
 
 			return base.SendAsync(request, cancellationToken);
 		}
+
+
 	}
 }
