@@ -1,15 +1,11 @@
-USE [EntityTagStore]
-GO
 
-/****** Object:  Table [dbo].[CacheState]    Script Date: 07/14/2012 11:01:40 ******/
+/****** Object:  Table [dbo].[CacheState]    Script Date: 07/25/2012 13:38:35 ******/
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CacheState]') AND type in (N'U'))
 DROP TABLE [dbo].[CacheState]
 GO
 
-USE [EntityTagStore]
-GO
 
-/****** Object:  Table [dbo].[CacheState]    Script Date: 07/14/2012 11:01:40 ******/
+/****** Object:  Table [dbo].[CacheState]    Script Date: 07/25/2012 13:38:35 ******/
 SET ANSI_NULLS ON
 GO
 

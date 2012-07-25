@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CacheCow.Common;
+using CacheCow.Common.Helpers;
 
 namespace CacheCow.Client
 {
@@ -14,6 +15,8 @@ namespace CacheCow.Client
 	{
 
 		private readonly ICacheStore _cacheStore;
+		private Func<HttpRequestMessage, bool> _ignoreRequest;
+
 
 		public CachingHandler():this(new InMemoryCacheStore())
 		{
@@ -55,6 +58,15 @@ namespace CacheCow.Client
 
 			        return CacheValidationResult.OK;
 			    };
+
+			_ignoreRequest = (request) =>
+			    {
+
+					if (!request.Method.IsIn(HttpMethod.Get, HttpMethod.Post))
+						return true;
+
+			        return false;
+			    };
 		}
 
 		public IVaryHeaderStore VaryHeaderStore { get; set; }
@@ -79,6 +91,8 @@ namespace CacheCow.Client
 					.SelectMany(z=>z.Value)
 				);
 
+			
+
 			HttpResponseMessage response;
 			if(_cacheStore.TryGetValue(cacheKey, out response))
 			{
@@ -90,8 +104,18 @@ namespace CacheCow.Client
 			// TODO: ..... REST)
 
 
-			return base.SendAsync(request, cancellationToken);
+			return base.SendAsync(request, cancellationToken)
+				.ContinueWith(task=>
+				              	{
+				              		var serverResponse =  task.Result;
+				              		var validationResult = CachedMessageValidator(serverResponse);
+
+				              		return serverResponse;
+				              	}
+				);
 		}
+
+
 
 
 	}

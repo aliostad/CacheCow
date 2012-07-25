@@ -306,8 +306,7 @@ namespace CacheCow.Server
 			return task =>
 			{
 				var response = task.Result;
-				int statusCode = (int)response.StatusCode;
-				if (statusCode >= 300 || statusCode < 200) // only if successful carry on processing
+				if (!response.IsSuccessStatusCode) // only if successful carry on processing
 					return response;
 
 				string uri = UriTrimmer(request.RequestUri);

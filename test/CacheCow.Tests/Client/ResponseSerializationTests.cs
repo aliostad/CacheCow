@@ -38,8 +38,10 @@ namespace CacheCow.Tests.Client
 		[Ignore]
 		public void IntegrationTest_Serialize_Deserialize()
 		{
+			
 			var httpClient = new HttpClient();
 			var httpResponseMessage = httpClient.GetAsync("http://google.com").Result;
+			var contentLength = httpResponseMessage.Content.Headers.ContentLength; // access to make sure 
 			var memoryStream = new MemoryStream();
 			var defaultHttpResponseMessageSerializer = new DefaultHttpResponseMessageSerializer();
 			defaultHttpResponseMessageSerializer.Serialize(httpResponseMessage, memoryStream);
