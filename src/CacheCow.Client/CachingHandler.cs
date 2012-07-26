@@ -86,6 +86,18 @@ namespace CacheCow.Client
 
 			        return false;
 			    };
+
+			ResponseStoragePreparation = (response) =>
+			    {
+					// 14.9.3
+					// If a response includes both an Expires header and a max-age directive, 
+					// the max-age directive overrides the Expires header, even if the Expires header is more restrictive.
+					if(response.Content.Headers.Expires!=null &&
+						(response.Headers.CacheControl.MaxAge != null || response.Headers.CacheControl.SharedMaxAge!=null))
+					{
+						response.Content.Headers.Expires = null;
+					}
+			    };
 		}
 
 		public IVaryHeaderStore VaryHeaderStore { get; set; }
@@ -101,7 +113,18 @@ namespace CacheCow.Client
 		/// </summary>
 		public bool UseConditionalPut { get; set; }
 
+		/// <summary>
+		/// Inspects the response and returns ResponseValidationResult
+		/// based on the rules defined
+		/// </summary>
 		public Func<HttpResponseMessage, ResponseValidationResult> ResponseValidator { get; set; }
+
+		/// <summary>
+		/// Applies a few rules and prepares the response
+		/// for storage in the CacheStore
+		/// </summary>
+		public Action<HttpResponseMessage> ResponseStoragePreparationRules { get; set; } 
+
 
 		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
@@ -123,32 +146,59 @@ namespace CacheCow.Client
 					.SelectMany(z=>z.Value)
 				);
 
-			// _____________________________
-			// TODO: Do PUT stuff here
-			// check if UseValidation and add headers and let things run normally, no continuation
-			// _________________
-
-
-			// here onward is only GET
+			// get from cache and verify response
 			HttpResponseMessage cachedResponse;
 			ResponseValidationResult validationResultForCachedResponse = ResponseValidationResult.NotExist;
 			if(_cacheStore.TryGetValue(cacheKey, out cachedResponse))
 			{
 				cachedResponse.RequestMessage = request;
-
 				validationResultForCachedResponse = ResponseValidator(cachedResponse);
-				if(validationResultForCachedResponse ==ResponseValidationResult.OK)
-					return TaskHelpers.FromResult(cachedResponse); // EXIT !! ____________________________
-
 			}
 
+			// PUT validation
+			if (request.Method == HttpMethod.Put && validationResultForCachedResponse.IsIn(
+				 ResponseValidationResult.OK, ResponseValidationResult.MustRevalidate))
+			{
+				// add headers for a cache validation. First check ETag since is better 
+				if (UseConditionalPut)
+				{
+					if (cachedResponse.Headers.ETag != null)
+					{
+						request.Headers.Add(HttpHeaderNames.IfMatch,
+							cachedResponse.Headers.ETag.ToString());
+					}
+					else if (cachedResponse.Content.Headers.LastModified != null)
+					{
+						request.Headers.Add(HttpHeaderNames.IfUnmodifiedSince,
+							cachedResponse.Content.Headers.LastModified.Value.ToString("r"));
+					}
+				}
+				return base.SendAsync(request, cancellationToken); // EXIT !! _____________________________
+			}
+
+			// here onward is only GET only. See if cache OK and if it is then return
+			if (validationResultForCachedResponse == ResponseValidationResult.OK)
+				return TaskHelpers.FromResult(cachedResponse); // EXIT !! ____________________________
+
+			// cache validation for GET
 			if(validationResultForCachedResponse == ResponseValidationResult.MustRevalidate)
 			{
-				// TODO: 
-				// add headers for a cache validation 
+
+				// add headers for a cache validation. First check ETag since is better 
+				if(cachedResponse.Headers.ETag!=null)
+				{
+					request.Headers.Add(HttpHeaderNames.IfNoneMatch,
+						cachedResponse.Headers.ETag.ToString());					
+				}
+				else if(cachedResponse.Content.Headers.LastModified!=null)
+				{
+					request.Headers.Add(HttpHeaderNames.IfModifiedSince,
+						cachedResponse.Content.Headers.LastModified.Value.ToString("r"));
+				}
+
 			}
 
-			
+			// _______________________________ RESPONSE only GET  ___________________________________________
 
 			return base.SendAsync(request, cancellationToken)
 				.ContinueWith(
@@ -169,9 +219,21 @@ namespace CacheCow.Client
 						var validationResult = ResponseValidator(serverResponse);
 						switch (validationResult)
 						{
-							// TODO: Here just store. 
-							// If invalid and exists in store then clear it!
-							//case ResponseValidationResult.
+							case ResponseValidationResult.OK:
+
+								// prepare
+								ResponseStoragePreparationRules(serverResponse);
+
+								// store the cache
+								_cacheStore.AddOrUpdate(cacheKey, serverResponse); 
+
+								// if there is a vary header, store it
+								if(serverResponse.Headers.Vary!=null)
+									VaryHeaderStore.AddOrUpdate(uri, serverResponse.Headers.Vary);
+								break;
+							default:
+								_cacheStore.TryRemove(cacheKey);
+								break;
 						}
 						return serverResponse;
 					}
