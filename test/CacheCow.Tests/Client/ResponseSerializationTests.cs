@@ -41,7 +41,7 @@ namespace CacheCow.Tests.Client
 			
 			var httpClient = new HttpClient();
 			var httpResponseMessage = httpClient.GetAsync("http://google.com").Result;
-			var contentLength = httpResponseMessage.Content.Headers.ContentLength; // access to make sure 
+			var contentLength = httpResponseMessage.Content.Headers.ContentLength; // access to make sure is populated http://aspnetwebstack.codeplex.com/discussions/388196
 			var memoryStream = new MemoryStream();
 			var defaultHttpResponseMessageSerializer = new DefaultHttpResponseMessageSerializer();
 			defaultHttpResponseMessageSerializer.Serialize(httpResponseMessage, memoryStream);

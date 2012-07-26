@@ -64,6 +64,7 @@
     <Compile Include="Helpers\BasicExtensions.cs" />
     <Compile Include="Helpers\HttpHeadersExtensions.cs" />
     <Compile Include="Helpers\HttpResponseMessageExtensions.cs" />
+    <Compile Include="Helpers\TaskHelpers.cs" />
     <Compile Include="HttpHeaderNames.cs" />
     <Compile Include="Http\NotModifiedResponse.cs" />
     <Compile Include="ICacheStore.cs" />

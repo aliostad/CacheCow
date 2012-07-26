@@ -5,8 +5,10 @@ using System.Text;
 
 namespace CacheCow.Client
 {
-	public enum CacheValidationResult
+	public enum ResponseValidationResult
 	{
+		None,
+		NotExist,
 		OK,
 		Stale,
 		MustRevalidate,
