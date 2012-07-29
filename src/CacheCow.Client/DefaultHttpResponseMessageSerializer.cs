@@ -22,6 +22,7 @@ namespace CacheCow.Client
 
 		public void Serialize(HttpResponseMessage response, Stream stream)
 		{
+			var result = response.Content.ReadAsByteArrayAsync().Result; // make sure it is buffered
 			var httpMessageContent = new HttpMessageContent(response);
 			var buffer = httpMessageContent.ReadAsByteArrayAsync().Result;
 			stream.Write(buffer, 0, buffer.Length);

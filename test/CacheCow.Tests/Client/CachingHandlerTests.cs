@@ -29,7 +29,7 @@ namespace CacheCow.Tests.Client
 			_cacheStore = _mockRepository.StrictMock<ICacheStore>();
 			_messageHandler = new DummyMessageHandler();
 			_client = new HttpClient(
-				new CachingHandler()
+				new CachingHandler(_cacheStore)
 					{
 						InnerHandler = _messageHandler
 					});
@@ -50,7 +50,7 @@ namespace CacheCow.Tests.Client
 		}
 
 		[Test]
-		public void With_NoStore_Ignored()
+		public void NoStore_Ignored()
 		{
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			request.Headers.CacheControl = new CacheControlHeaderValue();
@@ -66,7 +66,7 @@ namespace CacheCow.Tests.Client
 		}
 
 		[Test]
-		public void With_NoCache_Ignored()
+		public void NoCache_Ignored()
 		{
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			request.Headers.CacheControl = new CacheControlHeaderValue();
@@ -82,9 +82,39 @@ namespace CacheCow.Tests.Client
 		}
 
 		[Test]
-		public void With_Get_Does_not_Exist_InCache()
+		public void Get_OK_But_Not_In_Cache_To_Insert_In_Cache()
 		{
+			// setup 
+			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
+			var response = GetOkMessage();
+			_messageHandler.Response = response;
+			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
+			      out Arg<HttpResponseMessage>.Out(null).Dummy)).Return(false);
+			_cacheStore.Expect(x => x.AddOrUpdate(Arg<CacheKey>.Is.Anything,
+				  Arg<HttpResponseMessage>.Is.Same(response)));
 
+			_mockRepository.ReplayAll();
+
+			// run
+			var task = _client.SendAsync(request);
+			var responseReturned = task.Result;
+
+			// verify
+			_mockRepository.VerifyAll();
+		}
+
+		private HttpResponseMessage GetOkMessage()
+		{
+			var response = new HttpResponseMessage(HttpStatusCode.OK);
+			response.Headers.CacheControl = new CacheControlHeaderValue()
+			{
+				Public = true,
+				MaxAge = TimeSpan.FromSeconds(200),
+				MustRevalidate = false
+			};
+			response.Headers.Date = DateTimeOffset.UtcNow;
+			response.Content = new ByteArrayContent(new byte[256]);
+			return response;
 		}
 	}
 }

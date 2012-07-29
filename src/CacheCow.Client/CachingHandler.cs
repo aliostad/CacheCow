@@ -6,6 +6,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CacheCow.Client.Headers;
+using CacheCow.Client.Internal;
 using CacheCow.Common;
 using CacheCow.Common.Helpers;
 
@@ -17,6 +19,7 @@ namespace CacheCow.Client
 		private readonly ICacheStore _cacheStore;
 		private Func<HttpRequestMessage, bool> _ignoreRequestRules;
 		
+
 		// 13.4: A response received with a status code of 200, 203, 206, 300, 301 or 410 MAY be stored 
 		// TODO: Implement caching statuses other than 2xx
 		private static HttpStatusCode[] _cacheableStatuses = new HttpStatusCode[]
@@ -139,6 +142,7 @@ namespace CacheCow.Client
 
 		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
+			var cacheCowHeader = new CacheCowHeader();
 			string uri = request.RequestUri.ToString();
 
 			// check if needs to be ignored
@@ -160,11 +164,13 @@ namespace CacheCow.Client
 			// get from cache and verify response
 			HttpResponseMessage cachedResponse;
 			ResponseValidationResult validationResultForCachedResponse = ResponseValidationResult.NotExist;
-			if(_cacheStore.TryGetValue(cacheKey, out cachedResponse))
+			cacheCowHeader.DidNotExist = !_cacheStore.TryGetValue(cacheKey, out cachedResponse);
+			if (!cacheCowHeader.DidNotExist.Value)
 			{
 				cachedResponse.RequestMessage = request;
 				validationResultForCachedResponse = ResponseValidator(cachedResponse);
 			}
+						
 
 			// PUT validation
 			if (request.Method == HttpMethod.Put && validationResultForCachedResponse.IsIn(
@@ -173,6 +179,7 @@ namespace CacheCow.Client
 				// add headers for a cache validation. First check ETag since is better 
 				if (UseConditionalPut)
 				{
+					cacheCowHeader.CacheValidationApplied = true;
 					if (cachedResponse.Headers.ETag != null)
 					{
 						request.Headers.Add(HttpHeaderNames.IfMatch,
@@ -189,11 +196,22 @@ namespace CacheCow.Client
 
 			// here onward is only GET only. See if cache OK and if it is then return
 			if (validationResultForCachedResponse == ResponseValidationResult.OK)
-				return TaskHelpers.FromResult(cachedResponse); // EXIT !! ____________________________
+			{
+				cacheCowHeader.RetrievedFromCache = true;
+				return TaskHelpers.FromResult(cachedResponse.AddCacheCowHeader(cacheCowHeader)); // EXIT !! ____________________________				
+			}
+			
+			// if stale
+			else if(validationResultForCachedResponse == ResponseValidationResult.Stale)
+			{
+				cacheCowHeader.WasStale = true;
+				_cacheStore.TryRemove(cacheKey);
+			}
 
 			// cache validation for GET
-			if(validationResultForCachedResponse == ResponseValidationResult.MustRevalidate)
+			else if(validationResultForCachedResponse == ResponseValidationResult.MustRevalidate)
 			{
+				cacheCowHeader.CacheValidationApplied = true;
 
 				// add headers for a cache validation. First check ETag since is better 
 				if(cachedResponse.Headers.ETag!=null)
@@ -244,9 +262,10 @@ namespace CacheCow.Client
 								break;
 							default:
 								_cacheStore.TryRemove(cacheKey);
+								cacheCowHeader.NotCacheable = true;
 								break;
 						}
-						return serverResponse;
+						return serverResponse.AddCacheCowHeader(cacheCowHeader);
 					}
 				);
 		}
