@@ -60,7 +60,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client\CachingHandlerTests.cs" />
     <Compile Include="Client\ResponseSerializationTests.cs" />
+    <Compile Include="Client\ResponseValidatorTests.cs" />
+    <Compile Include="Helper\DummyMessageHandler.cs" />
     <Compile Include="Helper\ResponseHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\CachingHandlerRulesTests.cs" />

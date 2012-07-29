@@ -18,6 +18,7 @@ namespace CacheCow.Client
 		private Func<HttpRequestMessage, bool> _ignoreRequestRules;
 		
 		// 13.4: A response received with a status code of 200, 203, 206, 300, 301 or 410 MAY be stored 
+		// TODO: Implement caching statuses other than 2xx
 		private static HttpStatusCode[] _cacheableStatuses = new HttpStatusCode[]
 		    {
 				HttpStatusCode.OK, HttpStatusCode.NonAuthoritativeInformation,
@@ -37,20 +38,30 @@ namespace CacheCow.Client
 			DefaultVaryHeaders = new string[]{"Accept"};
 			ResponseValidator = (response) =>
 			    {
+					// 13.4
+					//Unless specifically constrained by a cache-control (section 14.9) directive, a caching system MAY always store 
+					// a successful response (see section 13.8) as a cache entry, MAY return it without validation if it 
+					// is fresh, and MAY return it after successful validation. If there is neither a cache validator nor an 
+					// explicit expiration time associated with a response, we do not expect it to be cached, but certain caches MAY violate this expectation 
+					// (for example, when little or no network connectivity is available).
+
+					if (!response.StatusCode.IsIn(_cacheableStatuses))
+						return ResponseValidationResult.NotCacheable;
+
 					if (!response.IsSuccessStatusCode || response.Headers.CacheControl == null ||
 						response.Headers.CacheControl.NoStore || response.Headers.CacheControl.NoCache)
-						return ResponseValidationResult.Invalid;
+						return ResponseValidationResult.NotCacheable;
 
 					response.Headers.Date = response.Headers.Date ?? DateTimeOffset.UtcNow; // this also helps in cache creation
 			        var dateTimeOffset = response.Headers.Date;
 
 					if(response.Content == null)
-						return ResponseValidationResult.Invalid;
+						return ResponseValidationResult.NotCacheable;
 
 					if (response.Headers.CacheControl.MaxAge == null &&
 						response.Headers.CacheControl.SharedMaxAge == null &&
 						response.Content.Headers.Expires == null)
-						return ResponseValidationResult.Invalid;
+						return ResponseValidationResult.NotCacheable;
 
 					if (response.Content.Headers.Expires != null &&
 						response.Content.Headers.Expires < DateTimeOffset.UtcNow)
@@ -87,7 +98,7 @@ namespace CacheCow.Client
 			        return false;
 			    };
 
-			ResponseStoragePreparation = (response) =>
+			ResponseStoragePreparationRules = (response) =>
 			    {
 					// 14.9.3
 					// If a response includes both an Expires header and a max-age directive, 

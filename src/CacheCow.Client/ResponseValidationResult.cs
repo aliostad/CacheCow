@@ -12,6 +12,6 @@ namespace CacheCow.Client
 		OK,
 		Stale,
 		MustRevalidate,
-		Invalid
+		NotCacheable
 	}
 }
