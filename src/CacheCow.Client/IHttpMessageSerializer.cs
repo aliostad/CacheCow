@@ -7,9 +7,11 @@ using System.Text;
 
 namespace CacheCow.Client
 {
-	public interface IHttpResponseMessageSerializer
+	public interface IHttpMessageSerializer
 	{
 		void Serialize(HttpResponseMessage response, Stream stream);
-		HttpResponseMessage Deserialize(Stream stream);
+		void Serialize(HttpRequestMessage request, Stream stream);
+		HttpResponseMessage DeserializeToResponse(Stream stream);
+		HttpResponseMessage DeserializeToRequest(Stream stream);
 	}
 }

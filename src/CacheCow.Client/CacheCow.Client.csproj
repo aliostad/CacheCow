@@ -62,8 +62,8 @@
     <Compile Include="Internal\HttpResponseMessageExtensions.cs" />
     <Compile Include="ResponseValidationResult.cs" />
     <Compile Include="CachingHandler.cs" />
-    <Compile Include="DefaultHttpResponseMessageSerializer.cs" />
-    <Compile Include="IHttpResponseMessageSerializer.cs" />
+    <Compile Include="MessageContentHttpMessageSerializer.cs" />
+    <Compile Include="IHttpMessageSerializer.cs" />
     <Compile Include="InMemoryCacheStore.cs" />
     <Compile Include="InMemoryVaryHeaderStore.cs" />
     <Compile Include="IVaryHeaderStore.cs" />

@@ -12,7 +12,7 @@ namespace CacheCow.Client
 	public class InMemoryCacheStore : ICacheStore
 	{
 		private readonly ConcurrentDictionary<CacheKey, byte[]> _responseCache = new ConcurrentDictionary<CacheKey, byte[]>();
-		private DefaultHttpResponseMessageSerializer _responseMessageSerializer = new DefaultHttpResponseMessageSerializer();
+		private MessageContentHttpMessageSerializer _messageSerializer = new MessageContentHttpMessageSerializer(true);
 
 		public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
 		{
@@ -21,7 +21,7 @@ namespace CacheCow.Client
 			var result = _responseCache.TryGetValue(key, out buffer);
 			if (result)
 			{
-				response = _responseMessageSerializer.Deserialize(new MemoryStream(buffer));
+				response = _messageSerializer.DeserializeToResponse(new MemoryStream(buffer));
 			}
 			return result;
 		}
@@ -31,7 +31,7 @@ namespace CacheCow.Client
 			// removing reference to request so that the request can get GCed
 			response.RequestMessage = null;
 			var memoryStream = new MemoryStream();
-			_responseMessageSerializer.Serialize(response, memoryStream);
+			_messageSerializer.Serialize(response, memoryStream);
 
 			_responseCache.AddOrUpdate(key, memoryStream.ToArray(), (ky, old) => memoryStream.ToArray());
 		}
