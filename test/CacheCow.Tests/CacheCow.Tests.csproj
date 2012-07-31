@@ -63,6 +63,7 @@
     <Compile Include="Client\CacheCowHeaderTests.cs" />
     <Compile Include="Client\CachingHandlerTests.cs" />
     <Compile Include="Client\IntegrationTests.cs" />
+    <Compile Include="Client\RequestSerializationTests.cs" />
     <Compile Include="Client\ResponseSerializationTests.cs" />
     <Compile Include="Client\ResponseValidatorTests.cs" />
     <Compile Include="Helper\DummyMessageHandler.cs" />

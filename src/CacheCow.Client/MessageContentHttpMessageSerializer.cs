@@ -62,14 +62,14 @@ namespace CacheCow.Client
 			return response.Content.ReadAsHttpResponseMessageAsync().Result;
 		}
 
-		public HttpResponseMessage DeserializeToRequest(Stream stream)
+		public HttpRequestMessage DeserializeToRequest(Stream stream)
 		{
 			var request = new HttpRequestMessage();
 			var memoryStream = new MemoryStream();
 			stream.CopyTo(memoryStream);
 			request.Content = new ByteArrayContent(memoryStream.ToArray());
 			request.Content.Headers.Add("Content-Type", "application/http;msgtype=request");
-			return request.Content.ReadAsHttpResponseMessageAsync().Result;
+			return request.Content.ReadAsHttpRequestMessageAsync().Result;
 		}
 	}
 }
