@@ -33,6 +33,7 @@
   <Target Name="Package">
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Server\CacheCow.Server.csproj -Build -OutputDirectory ..\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Common\CacheCow.Common.csproj -Build -OutputDirectory ..\artifacts\packages" />
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Client\CacheCow.Client.csproj -Build -OutputDirectory ..\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Server.EntityTagStore.SqlServer\CacheCow.Server.EntityTagStore.SqlServer.csproj -Build -OutputDirectory ..\artifacts\packages" />
   </Target>
   <Target Name="Publish">
