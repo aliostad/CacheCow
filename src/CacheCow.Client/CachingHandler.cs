@@ -88,7 +88,7 @@ namespace CacheCow.Client
 			_ignoreRequestRules = (request) =>
 			    {
 
-					if (!request.Method.IsIn(HttpMethod.Get, HttpMethod.Post))
+					if (!request.Method.IsIn(HttpMethod.Get, HttpMethod.Put))
 						return true;
 
 					// client can tell CachingHandler not to do caching for a particular request
@@ -165,7 +165,7 @@ namespace CacheCow.Client
 			HttpResponseMessage cachedResponse;
 			ResponseValidationResult validationResultForCachedResponse = ResponseValidationResult.NotExist;
 			cacheCowHeader.DidNotExist = !_cacheStore.TryGetValue(cacheKey, out cachedResponse);
-			if (!cacheCowHeader.DidNotExist.Value)
+			if (!cacheCowHeader.DidNotExist.Value) // so if it EXISTS in cache
 			{
 				cachedResponse.RequestMessage = request;
 				validationResultForCachedResponse = ResponseValidator(cachedResponse);
@@ -242,7 +242,7 @@ namespace CacheCow.Client
 							serverResponse.StatusCode == HttpStatusCode.NotModified)
 						{
 							cachedResponse.RequestMessage = request;
-							return cachedResponse; // EXIT !! _______________
+							return cachedResponse.AddCacheCowHeader(cacheCowHeader); // EXIT !! _______________
 						}
 
 						var validationResult = ResponseValidator(serverResponse);
