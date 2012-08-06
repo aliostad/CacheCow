@@ -249,6 +249,7 @@ namespace CacheCow.Client
 						switch (validationResult)
 						{
 							case ResponseValidationResult.OK:
+							case ResponseValidationResult.MustRevalidate:
 
 								// prepare
 								ResponseStoragePreparationRules(serverResponse);
