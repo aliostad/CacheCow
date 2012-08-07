@@ -242,14 +242,15 @@ namespace CacheCow.Client
 							serverResponse.StatusCode == HttpStatusCode.NotModified)
 						{
 							cachedResponse.RequestMessage = request;
+							cacheCowHeader.RetrievedFromCache = true;					
 							return cachedResponse.AddCacheCowHeader(cacheCowHeader); // EXIT !! _______________
 						}
 
 						var validationResult = ResponseValidator(serverResponse);
 						switch (validationResult)
 						{
-							case ResponseValidationResult.OK:
 							case ResponseValidationResult.MustRevalidate:
+							case ResponseValidationResult.OK:
 
 								// prepare
 								ResponseStoragePreparationRules(serverResponse);

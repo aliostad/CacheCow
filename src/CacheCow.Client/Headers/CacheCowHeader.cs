@@ -44,7 +44,7 @@ namespace CacheCow.Client.Headers
 			AddToStringBuilder(sb, NotCacheable, ExtensionNames.NotCacheable);
 			AddToStringBuilder(sb, DidNotExist, ExtensionNames.DidNotExist);
 			AddToStringBuilder(sb, CacheValidationApplied, ExtensionNames.CacheValidationApplied);
-			AddToStringBuilder(sb,RetrievedFromCache, ExtensionNames.RetrievedFromCache);
+			AddToStringBuilder(sb, RetrievedFromCache, ExtensionNames.RetrievedFromCache);
 			return sb.ToString();
 		}
 
