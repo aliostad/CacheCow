@@ -412,7 +412,7 @@ namespace CacheCow.Server
 
 				TimedEntityTagHeaderValue actualEtag = null;
 
-				bool isModified = false;
+				bool isModified = true;
 				if (_entityTagStore.TryGetValue(entityTagKey, out actualEtag))
 				{
 					isModified = actualEtag.LastModified > modifiedInQuestion;
@@ -444,7 +444,7 @@ namespace CacheCow.Server
 				var entityTagKey = CacheKeyGenerator(resource, headers);
 				TimedEntityTagHeaderValue actualEtag = null;
 
-				bool isModified = false;
+				bool isModified = true;
 				if (_entityTagStore.TryGetValue(entityTagKey, out actualEtag))
 				{
 					isModified = actualEtag.LastModified > modifiedInQuestion;
