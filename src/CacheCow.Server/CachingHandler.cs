@@ -161,7 +161,7 @@ namespace CacheCow.Server
 
 			if (task == null)
 				return base.SendAsync(request, cancellationToken)
-					.ContinueWith(GetCachingContinuation(request));
+					.ContinueWith(GetCachingContinuation(request), TaskScheduler.FromCurrentSynchronizationContext());
 			else
 				return task;
 		}
@@ -416,12 +416,10 @@ namespace CacheCow.Server
 				if (_entityTagStore.TryGetValue(entityTagKey, out actualEtag))
 				{
 					isModified = actualEtag.LastModified > modifiedInQuestion;
+					if (isModified ^ ifModified)
+						return new NotModifiedResponse(actualEtag.ToEntityTagHeaderValue()).ToTask();
 				}
-
-				return isModified ^ ifModified
-						? new NotModifiedResponse(actualEtag.ToEntityTagHeaderValue()).ToTask()
-						: null;
-
+				return null;
 			};
 		}
 
