@@ -199,7 +199,7 @@ namespace CacheCow.Client
 			{
 				cacheCowHeader.RetrievedFromCache = true;
 				return TaskHelpers.FromResult(cachedResponse.AddCacheCowHeader(cacheCowHeader)); // EXIT !! ____________________________				
-			}
+			} 
 			
 			// if stale
 			else if(validationResultForCachedResponse == ResponseValidationResult.Stale)

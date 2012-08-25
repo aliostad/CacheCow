@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CacheCow.Common;
 
 namespace CacheCow.Tests.Helper
 {
