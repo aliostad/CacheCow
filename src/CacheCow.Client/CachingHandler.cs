@@ -230,10 +230,10 @@ namespace CacheCow.Client
 			// _______________________________ RESPONSE only GET  ___________________________________________
 
 			return base.SendAsync(request, cancellationToken)
-				.ContinueWith(
-				task =>			
+				.Then(
+				serverResponse =>			
 					{
-						var serverResponse = task.Result;
+						
 						if (request.Method != HttpMethod.Get) // only interested here if it is a GET
 							return serverResponse;
 

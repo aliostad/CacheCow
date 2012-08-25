@@ -161,7 +161,7 @@ namespace CacheCow.Server
 
 			if (task == null)
 				return base.SendAsync(request, cancellationToken)
-					.ContinueWith(GetCachingContinuation(request));
+					.Then(GetCachingContinuation(request));
 			else
 				return task;
 		}
@@ -301,11 +301,10 @@ namespace CacheCow.Server
 
 		}
 
-		internal Func<Task<HttpResponseMessage>, HttpResponseMessage> GetCachingContinuation(HttpRequestMessage request)
+		internal Func<HttpResponseMessage, HttpResponseMessage> GetCachingContinuation(HttpRequestMessage request)
 		{
-			return task =>
+			return response =>
 			{
-				var response = task.Result;
 				if (!response.IsSuccessStatusCode) // only if successful carry on processing
 					return response;
 
