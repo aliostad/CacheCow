@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using CacheCow.Client;
+using CacheCow.Common;
 using NUnit.Framework;
 
 namespace CacheCow.Tests.Client
@@ -20,9 +21,9 @@ namespace CacheCow.Tests.Client
 			requestMessage.Headers.Range = new RangeHeaderValue(0, 1) { Unit = "custom" };
 			var serializer = new MessageContentHttpMessageSerializer();
 			var memoryStream = new MemoryStream();
-			serializer.Serialize(requestMessage, memoryStream);
+			serializer.SerializeAsync(requestMessage, memoryStream).Wait();
 			memoryStream.Position = 0;
-			var request = serializer.DeserializeToRequest(memoryStream);
+			var request = serializer.DeserializeToRequestAsync(memoryStream).Result;
 			Assert.AreEqual(requestMessage.Headers.Range.Unit, request.Headers.Range.Unit);
 		}
 	}

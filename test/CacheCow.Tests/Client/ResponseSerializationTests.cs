@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using CacheCow.Client;
+using CacheCow.Common;
 using NUnit.Framework;
 
 namespace CacheCow.Tests.Client
@@ -21,7 +22,7 @@ namespace CacheCow.Tests.Client
 			Console.WriteLine(httpResponseMessage.Headers.ToString());
 			var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
 			var fileStream = new FileStream("msg.bin", FileMode.Create);
-			defaultHttpResponseMessageSerializer.Serialize(httpResponseMessage, fileStream);
+			defaultHttpResponseMessageSerializer.SerializeAsync(TaskHelpers.FromResult(httpResponseMessage), fileStream).Wait();
 			fileStream.Close();
 		}
 
@@ -30,7 +31,7 @@ namespace CacheCow.Tests.Client
 		public void IntegrationTest_Deserialize()
 		{	var fileStream = new FileStream("msg.bin", FileMode.Open);
 			var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
-			var httpResponseMessage = defaultHttpResponseMessageSerializer.DeserializeToResponse(fileStream);
+			var httpResponseMessage = defaultHttpResponseMessageSerializer.DeserializeToResponseAsync(fileStream).Result;
 			fileStream.Close();
 		}
 
@@ -44,9 +45,9 @@ namespace CacheCow.Tests.Client
 			var contentLength = httpResponseMessage.Content.Headers.ContentLength; // access to make sure is populated http://aspnetwebstack.codeplex.com/discussions/388196
 			var memoryStream = new MemoryStream();
 			var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
-			defaultHttpResponseMessageSerializer.Serialize(httpResponseMessage, memoryStream);
+			defaultHttpResponseMessageSerializer.SerializeAsync(TaskHelpers.FromResult(httpResponseMessage), memoryStream).Wait();
 			memoryStream.Position = 0;
-			var httpResponseMessage2 = defaultHttpResponseMessageSerializer.DeserializeToResponse(memoryStream);
+			var httpResponseMessage2 = defaultHttpResponseMessageSerializer.DeserializeToResponseAsync(memoryStream).Result;
 			Assert.AreEqual(httpResponseMessage.StatusCode, httpResponseMessage2.StatusCode, "StatusCode");
 			Assert.AreEqual(httpResponseMessage.ReasonPhrase, httpResponseMessage2.ReasonPhrase, "ReasonPhrase");
 			Assert.AreEqual(httpResponseMessage.Version, httpResponseMessage2.Version, "Version");

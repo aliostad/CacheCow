@@ -59,6 +59,7 @@
     </Compile>
     <Compile Include="Headers\CacheCowHeader.cs" />
     <Compile Include="Headers\HttpResponseHeadersExtensions.cs" />
+    <Compile Include="IHttpMessageSerializerAsync.cs" />
     <Compile Include="Internal\HttpResponseMessageExtensions.cs" />
     <Compile Include="ResponseValidationResult.cs" />
     <Compile Include="CachingHandler.cs" />

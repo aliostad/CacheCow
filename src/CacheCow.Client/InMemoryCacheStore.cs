@@ -21,7 +21,7 @@ namespace CacheCow.Client
 			var result = _responseCache.TryGetValue(key, out buffer);
 			if (result)
 			{
-				response = _messageSerializer.DeserializeToResponse(new MemoryStream(buffer));
+				response = _messageSerializer.DeserializeToResponseAsync(new MemoryStream(buffer)).Result;
 			}
 			return result;
 		}
@@ -31,7 +31,7 @@ namespace CacheCow.Client
 			// removing reference to request so that the request can get GCed
 			response.RequestMessage = null;
 			var memoryStream = new MemoryStream();
-			_messageSerializer.Serialize(response, memoryStream);
+			_messageSerializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream).Wait();
 
 			_responseCache.AddOrUpdate(key, memoryStream.ToArray(), (ky, old) => memoryStream.ToArray());
 		}
