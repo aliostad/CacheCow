@@ -57,8 +57,12 @@
     <Compile Include="..\Common\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CacheItemMetadata.cs" />
+    <Compile Include="CacheStoreQuotaManager.cs" />
+    <Compile Include="CacheStoreSettings.cs" />
     <Compile Include="Headers\CacheCowHeader.cs" />
     <Compile Include="Headers\HttpResponseHeadersExtensions.cs" />
+    <Compile Include="ICacheMetadataProvider.cs" />
     <Compile Include="IHttpMessageSerializerAsync.cs" />
     <Compile Include="Internal\HttpResponseMessageExtensions.cs" />
     <Compile Include="ResponseValidationResult.cs" />
