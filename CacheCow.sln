@@ -31,6 +31,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{CF657B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.FileCacheStore", "src\CacheCow.Client.FileCacheStore\CacheCow.Client.FileCacheStore.csproj", "{2F0D9026-336B-4677-B34E-CB8595CB98E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.FileCacheStore.Tests", "test\CacheCow.Client.FileCacheStore.Tests\CacheCow.Client.FileCacheStore.Tests.csproj", "{ABF4138F-70C4-4C76-8D62-A2A410AE4CFC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{2F0D9026-336B-4677-B34E-CB8595CB98E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F0D9026-336B-4677-B34E-CB8595CB98E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F0D9026-336B-4677-B34E-CB8595CB98E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABF4138F-70C4-4C76-8D62-A2A410AE4CFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABF4138F-70C4-4C76-8D62-A2A410AE4CFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABF4138F-70C4-4C76-8D62-A2A410AE4CFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABF4138F-70C4-4C76-8D62-A2A410AE4CFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,5 +83,6 @@ Global
 		{2F0D9026-336B-4677-B34E-CB8595CB98E4} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 		{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{69933472-B520-453B-8AC3-DCDE5F7995D8} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
+		{ABF4138F-70C4-4C76-8D62-A2A410AE4CFC} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 	EndGlobalSection
 EndGlobal

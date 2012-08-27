@@ -14,13 +14,19 @@ namespace CacheCow.Client
 		private CacheStoreSettings _settings;
 		private ICacheMetadataProvider _metadataProvider;
 		private Action<byte[]> _remover;
-		private ConcurrentDictionary<string, long> _storageMetadata = new ConcurrentDictionary<string, long>();
+		internal ConcurrentDictionary<string, long> StorageMetadata = new ConcurrentDictionary<string, long>();
 		private object _lock = new object();
-		private long _grandTotal = 0;
+		internal long GrandTotal = 0;
 		private bool _doingHousekeeping = false;
 		private bool _needsGrandTotalHouseKeeping = false;
 		private bool _needsPerDomainHouseKeeping = false;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="metadataProvider">Most likely implemented by the cache store itself</param>
+		/// <param name="remover">This is a method most likely on the cache store which does not call
+		/// back on ItemRemoved. This is very important.</param>
 		public CacheStoreQuotaManager(ICacheMetadataProvider metadataProvider, Action<Byte[]> remover)
 			: this(metadataProvider, remover, new CacheStoreSettings())
 		{
@@ -42,14 +48,14 @@ namespace CacheCow.Client
 
 		public virtual void ItemAdded(CacheItemMetadata metadata)
 		{
-			_storageMetadata.AddOrUpdate(metadata.Domain, metadata.Size, (d, l) => l + metadata.Size);
-			var total = _storageMetadata[metadata.Domain];
+			StorageMetadata.AddOrUpdate(metadata.Domain, metadata.Size, (d, l) => l + metadata.Size);
+			var total = StorageMetadata[metadata.Domain];
 			lock (_lock)
 			{
-				_grandTotal += total;
+				GrandTotal += metadata.Size;
 			}
 
-			if(_needsGrandTotalHouseKeeping && _grandTotal>_settings.TotalQuota)
+			if(_needsGrandTotalHouseKeeping && GrandTotal>_settings.TotalQuota)
 				DoHouseKeepingAsync();
 
 			if (_needsPerDomainHouseKeeping && total > _settings.PerDomainQuota)
@@ -60,11 +66,10 @@ namespace CacheCow.Client
 		public virtual void ItemRemoved(CacheItemMetadata metadata)
 		{
 
-			_storageMetadata.AddOrUpdate(metadata.Domain, metadata.Size, (d, l) => l - metadata.Size);
-			var total = _storageMetadata[metadata.Domain];
+			StorageMetadata.AddOrUpdate(metadata.Domain, metadata.Size, (d, l) => l - metadata.Size);
 			lock (_lock)
 			{
-				_grandTotal += total;
+				GrandTotal -= metadata.Size;
 			}
 		}
 
@@ -75,10 +80,10 @@ namespace CacheCow.Client
 				         	{
 				         		long domainSize = _metadataProvider.GetItemsMetadata(domain)
 				         			.Sum(item => item.Size);
-				         		_storageMetadata.AddOrUpdate(domain, domainSize, (s, l) => domainSize);
+				         		StorageMetadata.AddOrUpdate(domain, domainSize, (s, l) => domainSize);
 				         		lock (_lock)
 				         		{
-				         			_grandTotal += domainSize;
+				         			GrandTotal += domainSize;
 				         		}
 				         	}
 				);
@@ -86,6 +91,15 @@ namespace CacheCow.Client
 
 		private void DoHouseKeeping()
 		{
+			while (GrandTotal > _settings.TotalQuota)
+			{
+				var item = _metadataProvider.GetLastAccessedItem();
+				if(item!=null)
+				{
+					_remover(item.Key);
+					ItemRemoved(item);
+				}
+			}
 			
 		}
 
@@ -103,7 +117,15 @@ namespace CacheCow.Client
 		private void DoDomainHouseKeeping(object domain)
 		{
 			var dom = (string) domain;
-
+			while (StorageMetadata[dom] > _settings.PerDomainQuota)
+			{
+				var item = _metadataProvider.GetLastAccessedItem(dom);
+				if (item != null)
+				{
+					_remover(item.Key);
+					ItemRemoved(item);
+				}
+			}
 		}
 
 
