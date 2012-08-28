@@ -81,18 +81,15 @@ namespace CacheCow.Client
 
 		private void BuildStorageMetadata()
 		{
-			_metadataProvider.GetDomains().ToList()
-				.ForEach(domain =>
-				         	{
-				         		long domainSize = _metadataProvider.GetItemsMetadata(domain)
-				         			.Sum(item => item.Size);
-				         		StorageMetadata.AddOrUpdate(domain, domainSize, (s, l) => domainSize);
-				         		lock (_lock)
-				         		{
-				         			GrandTotal += domainSize;
-				         		}
-				         	}
-				);
+			var domainSizes = _metadataProvider.GetDomainSizes();
+			foreach (var domainSize in domainSizes)
+			{
+				lock (_lock)
+				{
+					GrandTotal += domainSize.Value;
+				}
+				StorageMetadata.AddOrUpdate(domainSize.Key, domainSize.Value, (k, v) => domainSize.Value);
+			}
 		}
 
 		private void DoHouseKeeping()

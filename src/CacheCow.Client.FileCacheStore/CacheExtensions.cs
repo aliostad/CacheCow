@@ -28,6 +28,5 @@ namespace CacheCow.Client.FileCacheStore
 		{
 			return EnsureFolderAndGetFileName(metadata.Domain, metadata.Key, dataRoot);
 		}
-
 	}
 }

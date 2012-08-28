@@ -23,7 +23,7 @@ namespace CacheCow.Tests.Client
 		{
 			_mockRepository = new MockRepository();
 			_metadataProvider = _mockRepository.StrictMock<ICacheMetadataProvider>();
-			_metadataProvider.Expect(x => x.GetDomains()).Return(new string[0]);
+			_metadataProvider.Expect(x => x.GetDomainSizes()).Return(new Dictionary<string, long>());
 		}
 
 		[TearDown]

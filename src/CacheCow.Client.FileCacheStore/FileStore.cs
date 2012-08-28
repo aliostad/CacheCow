@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -20,6 +21,7 @@ namespace CacheCow.Client.FileCacheStore
 		private dynamic _database;
 		private CacheStoreQuotaManager _quotaManager;
 		private string _dataRoot;
+		private string _dbFileName;
 
 		private const string CacheTableScript =
 			@"CREATE TABLE `Cache`
@@ -38,11 +40,11 @@ namespace CacheCow.Client.FileCacheStore
 			if(!Directory.Exists(dataRoot))
 				Directory.CreateDirectory(dataRoot);
 
-			string dbFile = Path.Combine(dataRoot, CacheMetadataDbName);
-			if(!File.Exists(dbFile))
-				BuildDb(dbFile);
+			_dbFileName = Path.Combine(dataRoot, CacheMetadataDbName);
+			if (!File.Exists(_dbFileName))
+				BuildDb(_dbFileName);
 
-			_database = Database.OpenFile(dbFile);
+			_database = Database.OpenFile(_dbFileName);
 			_quotaManager = new CacheStoreQuotaManager(this, RemoveWithoutTellingQuotaManager);
 		}
 
@@ -69,8 +71,13 @@ namespace CacheCow.Client.FileCacheStore
 				}
 
 			}
-			
-			// TODO: update last access
+
+			_database.Cache
+				.UpdateByHash(new
+				              	{
+				              		Hash = Convert.ToBase64String(key.Hash),
+				              		LastAccessed = DateTime.Now
+				              	});
 
 
 
@@ -89,9 +96,18 @@ namespace CacheCow.Client.FileCacheStore
 			{
 				_serializer.SerializeAsync(TaskHelpers.FromResult(response), fs).Wait();
 			}
+			var info = new FileInfo(fileName);
 
-			
-			// TODO: Update database
+			// Update database
+			_database.Cache
+				.Insert(new CacheItem()
+				        	{
+				        		Domain = key.Domain,
+								Hash = Convert.ToBase64String(key.Hash),
+								LastAccessed = DateTime.Now,
+								LastUpdated = DateTime.Now,
+								Size = (int) info.Length								
+				        	});
 
 			// tell quota manager
 			_quotaManager.ItemAdded(new CacheItemMetadata()
@@ -99,7 +115,7 @@ namespace CacheCow.Client.FileCacheStore
 			                        		Domain = key.Domain,
 											Key = key.Hash,
 											LastAccessed = DateTime.Now,
-											Size = new FileInfo(fileName).Length
+											Size = info.Length
 			                        	});
 			
 		}
@@ -138,24 +154,25 @@ namespace CacheCow.Client.FileCacheStore
 		public void Clear()
 		{
 			_database.Cache.DeleteAll();
-		}
+		}	
 
-		public IEnumerable<string> GetDomains()
+		public IDictionary<string, long> GetDomainSizes()
 		{
-			 List<CacheItem> items = _database.Cache
-				.All()
-				.Select(_database.Cache.Domain)
-				.Distinct()
-				.ToList<CacheItem>();
-			return items.Select(x => x.Domain);
-		}
+			var dictionary = new Dictionary<string, long>();
+			using(var cn = new SQLiteConnection("data source=" + _dbFileName))
+			{
+				cn.Open();
+				var cm = cn.CreateCommand();
+				cm.CommandType = CommandType.Text;
+				cm.CommandText = "SELECT Domain, SUM(Size) FROM CACHE GROUP BY Domain";
+				var reader = cm.ExecuteReader();
+				while (reader.Read())
+				{
+					dictionary.Add((string) reader[0], (int) reader[1]);
+				}
+			}
 
-		public IEnumerable<CacheItemMetadata> GetItemsMetadata(string domain)
-		{
-			List<CacheItem> items = _database.Cache
-				.FindAllByDomain(domain)
-				.ToList<CacheItem>();
-			return items.Select(x => x.Metadata);
+			return dictionary;
 		}
 
 		public CacheItemMetadata GetLastAccessedItem(string domain)
