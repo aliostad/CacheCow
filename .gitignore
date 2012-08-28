@@ -34,4 +34,3 @@ nuget/
 packages/
 artifacts/
 script.sql
-SQLite.Interop.dll
