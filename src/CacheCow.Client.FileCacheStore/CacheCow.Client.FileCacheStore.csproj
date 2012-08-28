@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CacheItem.cs" />
+    <Compile Include="CacheExtensions.cs" />
     <Compile Include="FileStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

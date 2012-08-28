@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
 namespace CacheCow.Common.Helpers
 {
@@ -22,6 +23,19 @@ namespace CacheCow.Common.Helpers
 					action();
 			};
 		}
+
+		public static string ToHex(this byte[] data)
+		{
+			var shb = new SoapHexBinary(data);
+			return shb.ToString();
+		}
+
+		public static byte[] FromHex(this string data)
+		{
+			var shb = SoapHexBinary.Parse(data);
+			return shb.Value;
+		}
+
 	}
 
 }

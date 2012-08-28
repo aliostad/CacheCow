@@ -13,7 +13,7 @@ namespace CacheCow.Client
 	{
 		private CacheStoreSettings _settings;
 		private ICacheMetadataProvider _metadataProvider;
-		private Action<byte[]> _remover;
+		private Action<CacheItemMetadata> _remover;
 		internal ConcurrentDictionary<string, long> StorageMetadata = new ConcurrentDictionary<string, long>();
 		private object _lock = new object();
 		internal long GrandTotal = 0;
@@ -27,13 +27,13 @@ namespace CacheCow.Client
 		/// <param name="metadataProvider">Most likely implemented by the cache store itself</param>
 		/// <param name="remover">This is a method most likely on the cache store which does not call
 		/// back on ItemRemoved. This is very important.</param>
-		public CacheStoreQuotaManager(ICacheMetadataProvider metadataProvider, Action<Byte[]> remover)
+		public CacheStoreQuotaManager(ICacheMetadataProvider metadataProvider, Action<CacheItemMetadata> remover)
 			: this(metadataProvider, remover, new CacheStoreSettings())
 		{
 			
 		}
 
-		public CacheStoreQuotaManager(ICacheMetadataProvider metadataProvider, Action<Byte[]> remover, 
+		public CacheStoreQuotaManager(ICacheMetadataProvider metadataProvider, Action<CacheItemMetadata> remover, 
 			CacheStoreSettings settings)
 		{
 			_remover = remover;
@@ -44,6 +44,12 @@ namespace CacheCow.Client
 			BuildStorageMetadata();
 
 
+		}
+
+		public virtual void Clear()
+		{
+			StorageMetadata.Clear();
+			GrandTotal = 0;
 		}
 
 		public virtual void ItemAdded(CacheItemMetadata metadata)
@@ -96,7 +102,7 @@ namespace CacheCow.Client
 				var item = _metadataProvider.GetLastAccessedItem();
 				if(item!=null)
 				{
-					_remover(item.Key);
+					_remover(item);
 					ItemRemoved(item);
 				}
 			}
@@ -122,7 +128,7 @@ namespace CacheCow.Client
 				var item = _metadataProvider.GetLastAccessedItem(dom);
 				if (item != null)
 				{
-					_remover(item.Key);
+					_remover(item);
 					ItemRemoved(item);
 				}
 			}

@@ -13,6 +13,8 @@ namespace CacheCow.Common
 		private readonly string _toString;
 		private readonly string _routePattern;
 		private readonly byte[] _hash;
+		private readonly string _hashBase64;
+		private string _domain = null;
 
 		private const string CacheKeyFormat = "{0}-{1}";
 
@@ -44,6 +46,8 @@ namespace CacheCow.Common
 			{
 				_hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(_toString));
 			}
+			_hashBase64 = Convert.ToBase64String(_hash);
+
 		}
 
 		public string ResourceUri
@@ -59,6 +63,23 @@ namespace CacheCow.Common
 		public byte[] Hash
 		{
 			get { return _hash; }
+		}
+
+		public string HashBase64
+		{
+			get { return _hashBase64; }
+		}
+
+		public string Domain
+		{
+			get
+			{
+				if(_domain == null)
+				{
+					_domain = new Uri(_resourceUri).Host;
+				}
+				return _domain;
+			}
 		}
 
 		public override string ToString()

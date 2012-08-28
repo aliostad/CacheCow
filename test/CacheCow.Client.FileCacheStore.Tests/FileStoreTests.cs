@@ -96,5 +96,92 @@ namespace CacheCow.Client.FileCacheStore.Tests
 			Assert.AreEqual(dateTime.AddDays(-1), cacheItemMetadata.LastAccessed);
 		}
 
+		[Test]
+		public void Get_Domain_Test()
+		{
+			var database = Database.OpenFile(_dbFileName);
+			var dateTime = DateTime.Now;
+			database.Cache.Insert(new CacheItem()
+			{
+				Domain = "c",
+				Hash = Convert.ToBase64String(Guid.NewGuid().ToByteArray()),
+				LastAccessed = dateTime,
+				LastUpdated = dateTime,
+				Size = 50
+			});
+
+			database.Cache.Insert(new CacheItem()
+			{
+				Domain = "d",
+				Hash = Convert.ToBase64String(Guid.NewGuid().ToByteArray()),
+				LastAccessed = dateTime.AddDays(-1),
+				LastUpdated = dateTime.AddDays(-1),
+				Size = 100
+			});
+
+			var list = _store.GetDomains().ToList();
+			Assert.AreEqual(2, list.Count);
+			Assert.AreEqual(false, list[1] == "c" ^ list[0] == "d");
+
+		}
+
+		[Test]
+		public void GetItemsMetadata_Test()
+		{
+			var database = Database.OpenFile(_dbFileName);
+			var dateTime = DateTime.Now;
+			database.Cache.Insert(new CacheItem()
+			{
+				Domain = "d",
+				Hash = Convert.ToBase64String(Guid.NewGuid().ToByteArray()),
+				LastAccessed = dateTime,
+				LastUpdated = dateTime,
+				Size = 50
+			});
+
+			database.Cache.Insert(new CacheItem()
+			{
+				Domain = "d",
+				Hash = Convert.ToBase64String(Guid.NewGuid().ToByteArray()),
+				LastAccessed = dateTime.AddDays(-1),
+				LastUpdated = dateTime.AddDays(-1),
+				Size = 100
+			});
+
+			var list = _store.GetItemsMetadata("d").ToList();
+			Assert.AreEqual(2, list.Count);
+			Assert.AreEqual(true, list[1].Domain == "d" && list[0].Domain == "d");
+
+		}
+
+		[Test]
+		public void Clear_Test()
+		{
+			var database = Database.OpenFile(_dbFileName);
+			var dateTime = DateTime.Now;
+			database.Cache.Insert(new CacheItem()
+			{
+				Domain = "d",
+				Hash = Convert.ToBase64String(Guid.NewGuid().ToByteArray()),
+				LastAccessed = dateTime,
+				LastUpdated = dateTime,
+				Size = 50
+			});
+
+			database.Cache.Insert(new CacheItem()
+			{
+				Domain = "d",
+				Hash = Convert.ToBase64String(Guid.NewGuid().ToByteArray()),
+				LastAccessed = dateTime.AddDays(-1),
+				LastUpdated = dateTime.AddDays(-1),
+				Size = 100
+			});
+
+			_store.Clear();
+			var list = _store.GetItemsMetadata("d").ToList();
+			Assert.AreEqual(0, list.Count);
+
+		}
+
 	}
 }
