@@ -9,7 +9,7 @@ namespace CacheCow.Client.FileCacheStore
 	{
 		public string Hash { get; set; }
 		public string Domain { get; set; }
-		public int Size { get; set; }
+		public long Size { get; set; }
 		public DateTime LastUpdated { get; set; }
 		public DateTime LastAccessed { get; set; }
 		private CacheItemMetadata _metadata { get; set; }

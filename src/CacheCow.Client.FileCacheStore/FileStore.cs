@@ -65,9 +65,11 @@ namespace CacheCow.Client.FileCacheStore
 			string fileName = key.EnsureFolderAndGetFileName(_dataRoot);
 			if(File.Exists(fileName))
 			{
-				using (var fs = new FileStream(fileName, FileMode.Create))
+				using (var fs = new FileStream(fileName, FileMode.Open))
 				{
 					response = _serializer.DeserializeToResponseAsync(fs).Result;
+					if(response.Content!=null)
+						response.Content.LoadIntoBufferAsync().Wait();
 				}
 
 			}
@@ -106,7 +108,7 @@ namespace CacheCow.Client.FileCacheStore
 								Hash = Convert.ToBase64String(key.Hash),
 								LastAccessed = DateTime.Now,
 								LastUpdated = DateTime.Now,
-								Size = (int) info.Length								
+								Size = info.Length								
 				        	});
 
 			// tell quota manager
@@ -168,7 +170,7 @@ namespace CacheCow.Client.FileCacheStore
 				var reader = cm.ExecuteReader();
 				while (reader.Read())
 				{
-					dictionary.Add((string) reader[0], (int) reader[1]);
+					dictionary.Add((string) reader[0], (long) reader[1]);
 				}
 			}
 
