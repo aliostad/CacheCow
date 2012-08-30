@@ -72,6 +72,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Common\TraceWriter.cs">
+      <Link>Internal\TraceWriter.cs</Link>
+    </Compile>
     <Compile Include="CacheItem.cs" />
     <Compile Include="CacheExtensions.cs" />
     <Compile Include="FileStore.cs" />

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -67,21 +68,34 @@ namespace CacheCow.Client.FileCacheStore
 			{
 				using (var fs = new FileStream(fileName, FileMode.Open))
 				{
+					TraceWriter.WriteLine("TryGetValue - before DeserializeToResponseAsync", TraceLevel.Verbose);
 					response = _serializer.DeserializeToResponseAsync(fs).Result;
-					if(response.Content!=null)
-						response.Content.LoadIntoBufferAsync().Wait();
+					TraceWriter.WriteLine("TryGetValue - After DeserializeToResponseAsync", TraceLevel.Verbose);
+					if (response.Content != null)
+					{
+						var task = response.Content.LoadIntoBufferAsync();
+						task.Wait();
+
+						TraceWriter.WriteLine("TryGetValue - After  wait", TraceLevel.Verbose);
+					}
 				}
 
+				try
+				{
+					_database.Cache
+						.UpdateByHash(new
+						{
+							Hash = Convert.ToBase64String(key.Hash),
+							LastAccessed = DateTime.Now
+						});
+
+				}
+				catch (Exception e)
+				{					
+					TraceWriter.WriteLine(e.ToString(), TraceLevel.Error);
+					throw e;
+				}
 			}
-
-			_database.Cache
-				.UpdateByHash(new
-				              	{
-				              		Hash = Convert.ToBase64String(key.Hash),
-				              		LastAccessed = DateTime.Now
-				              	});
-
-
 
 			return response != null;
 		}
@@ -89,6 +103,7 @@ namespace CacheCow.Client.FileCacheStore
 		public void AddOrUpdate(CacheKey key, HttpResponseMessage response)
 		{
 			string fileName = key.EnsureFolderAndGetFileName(_dataRoot);
+			
 			if(File.Exists(fileName))
 			{
 				TryRemove(key);

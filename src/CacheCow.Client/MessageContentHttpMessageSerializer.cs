@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -38,14 +39,16 @@ namespace CacheCow.Client
 			{
 				if (r.Content != null)
 				{
+					TraceWriter.WriteLine("SerializeAsync - before load",TraceLevel.Verbose);
 					return r.Content.LoadIntoBufferAsync()
 						.Then(() =>
 						{
+							TraceWriter.WriteLine("SerializeAsync - afetr load", TraceLevel.Verbose);
 							var httpMessageContent = new HttpMessageContent(r);
 							// All in-memory and CPU-bound so no need to async
 							var buffer = httpMessageContent.ReadAsByteArrayAsync().Result;
 							return Task.Factory.FromAsync(stream.BeginWrite, stream.EndWrite,
-								buffer, 0, buffer.Length, null, TaskCreationOptions.None);
+								buffer, 0, buffer.Length, null, TaskCreationOptions.AttachedToParent);
 						});
 				}
 				else
@@ -54,7 +57,7 @@ namespace CacheCow.Client
 					// All in-memory and CPU-bound so no need to async
 					var buffer = httpMessageContent.ReadAsByteArrayAsync().Result;
 					return Task.Factory.FromAsync(stream.BeginWrite, stream.EndWrite,
-						buffer, 0, buffer.Length, null, TaskCreationOptions.None);
+						buffer, 0, buffer.Length, null, TaskCreationOptions.AttachedToParent);
 				}
 			}
 				);
@@ -71,7 +74,7 @@ namespace CacheCow.Client
 						// All in-memory and CPU-bound so no need to async
 						var buffer = httpMessageContent.ReadAsByteArrayAsync().Result;
 						return Task.Factory.FromAsync(stream.BeginWrite, stream.EndWrite,
-							buffer, 0, buffer.Length, null, TaskCreationOptions.None);
+							buffer, 0, buffer.Length, null, TaskCreationOptions.AttachedToParent);
 					});
 			}
 			else
@@ -80,7 +83,7 @@ namespace CacheCow.Client
 				// All in-memory and CPU-bound so no need to async
 				var buffer = httpMessageContent.ReadAsByteArrayAsync().Result;
 				return Task.Factory.FromAsync(stream.BeginWrite, stream.EndWrite,
-					buffer, 0, buffer.Length, null, TaskCreationOptions.None);
+					buffer, 0, buffer.Length, null, TaskCreationOptions.AttachedToParent);
 			}
 
 		}
