@@ -124,7 +124,9 @@ namespace CacheCow.Client.FileCacheStore
 				        		Domain = key.Domain,
 								Hash = Convert.ToBase64String(key.Hash),
 								LastAccessed = DateTime.Now,
-								LastUpdated = DateTime.Now,
+								LastUpdated = response.Content !=null && response.Content.Headers.LastModified.HasValue ?
+									response.Content.Headers.LastModified.Value.UtcDateTime : DateTime.Now
+								,
 								Size = info.Length								
 				        	});
 
