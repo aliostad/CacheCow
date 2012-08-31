@@ -89,6 +89,8 @@ namespace CacheCow.Client.FileCacheStore
 							LastAccessed = DateTime.Now
 						});
 
+					TraceWriter.WriteLine("After updating Last Accessed", TraceLevel.Verbose);
+					
 				}
 				catch (Exception e)
 				{					

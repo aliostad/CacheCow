@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -145,6 +146,9 @@ namespace CacheCow.Client
 			var cacheCowHeader = new CacheCowHeader();
 			string uri = request.RequestUri.ToString();
 
+			TraceWriter.WriteLine("{0} - Starting", TraceLevel.Verbose, request.RequestUri.ToString());
+
+
 			// check if needs to be ignored
 			if (_ignoreRequestRules(request))
 				return base.SendAsync(request, cancellationToken); // EXIT !! _________________
@@ -164,13 +168,21 @@ namespace CacheCow.Client
 			// get from cache and verify response
 			HttpResponseMessage cachedResponse;
 			ResponseValidationResult validationResultForCachedResponse = ResponseValidationResult.NotExist;
+
+			TraceWriter.WriteLine("{0} - Before TryGetValue", TraceLevel.Verbose, request.RequestUri.ToString());
+
 			cacheCowHeader.DidNotExist = !_cacheStore.TryGetValue(cacheKey, out cachedResponse);
+			TraceWriter.WriteLine("{0} - After TryGetValue", TraceLevel.Verbose, request.RequestUri.ToString());
+
 			if (!cacheCowHeader.DidNotExist.Value) // so if it EXISTS in cache
 			{
 				cachedResponse.RequestMessage = request;
 				validationResultForCachedResponse = ResponseValidator(cachedResponse);
 			}
-						
+
+			TraceWriter.WriteLine("{0} - After ResponseValidator {1}",
+				TraceLevel.Verbose, request.RequestUri, validationResultForCachedResponse);
+
 
 			// PUT validation
 			if (request.Method == HttpMethod.Put && validationResultForCachedResponse.IsIn(
@@ -206,6 +218,8 @@ namespace CacheCow.Client
 			{
 				cacheCowHeader.WasStale = true;
 				_cacheStore.TryRemove(cacheKey);
+				TraceWriter.WriteLine("{0} - after TryRemove ", TraceLevel.Verbose, request.RequestUri.ToString());
+
 			}
 
 			// cache validation for GET
@@ -233,8 +247,11 @@ namespace CacheCow.Client
 				.Then(
 				serverResponse =>			
 					{
+
+						TraceWriter.WriteLine("{0} - After getting response", TraceLevel.Verbose, request.RequestUri.ToString());
+
 						
-						if (request.Method != HttpMethod.Get) // only interested here if it is a GET
+						if (request.Method != HttpMethod.Get) // only interested here if it is a GET - this line really never called - only GET gets here
 							return serverResponse;
 
 						// in case of MustRevalidate with result 304
@@ -255,15 +272,22 @@ namespace CacheCow.Client
 								// prepare
 								ResponseStoragePreparationRules(serverResponse);
 
+								TraceWriter.WriteLine("{0} - Before AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
+
 								// store the cache
-								_cacheStore.AddOrUpdate(cacheKey, serverResponse); 
+								_cacheStore.AddOrUpdate(cacheKey, serverResponse);
+
+								TraceWriter.WriteLine("{0} - Before AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
 
 								// if there is a vary header, store it
 								if(serverResponse.Headers.Vary!=null)
 									VaryHeaderStore.AddOrUpdate(uri, serverResponse.Headers.Vary);
 								break;
 							default:
+								TraceWriter.WriteLine("{0} - Before TryRemove", TraceLevel.Verbose, request.RequestUri.ToString());
 								_cacheStore.TryRemove(cacheKey);
+								TraceWriter.WriteLine("{0} - After AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
+
 								cacheCowHeader.NotCacheable = true;
 								break;
 						}

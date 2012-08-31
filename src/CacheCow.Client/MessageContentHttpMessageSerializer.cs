@@ -39,7 +39,9 @@ namespace CacheCow.Client
 			{
 				if (r.Content != null)
 				{
-					TraceWriter.WriteLine("SerializeAsync - before load",TraceLevel.Verbose);
+					TraceWriter.WriteLine("SerializeAsync - before load",
+						TraceLevel.Verbose);
+
 					return r.Content.LoadIntoBufferAsync()
 						.Then(() =>
 						{
@@ -53,6 +55,9 @@ namespace CacheCow.Client
 				}
 				else
 				{
+					TraceWriter.WriteLine("Content NULL - before load",
+						TraceLevel.Verbose);
+
 					var httpMessageContent = new HttpMessageContent(r);
 					// All in-memory and CPU-bound so no need to async
 					var buffer = httpMessageContent.ReadAsByteArrayAsync().Result;
@@ -72,18 +77,26 @@ namespace CacheCow.Client
 					{
 						var httpMessageContent = new HttpMessageContent(request);
 						// All in-memory and CPU-bound so no need to async
-						var buffer = httpMessageContent.ReadAsByteArrayAsync().Result;
-						return Task.Factory.FromAsync(stream.BeginWrite, stream.EndWrite,
-							buffer, 0, buffer.Length, null, TaskCreationOptions.AttachedToParent);
+						httpMessageContent.ReadAsByteArrayAsync().Then(
+							buffer =>
+								{
+									return Task.Factory.FromAsync(stream.BeginWrite, stream.EndWrite,
+										buffer, 0, buffer.Length, null, TaskCreationOptions.AttachedToParent);
+								});
 					});
 			}
 			else
 			{
 				var httpMessageContent = new HttpMessageContent(request);
 				// All in-memory and CPU-bound so no need to async
-				var buffer = httpMessageContent.ReadAsByteArrayAsync().Result;
-				return Task.Factory.FromAsync(stream.BeginWrite, stream.EndWrite,
-					buffer, 0, buffer.Length, null, TaskCreationOptions.AttachedToParent);
+				return httpMessageContent.ReadAsByteArrayAsync().Then(
+					buffer =>
+						{
+							return Task.Factory.FromAsync(stream.BeginWrite, stream.EndWrite,
+							      buffer, 0, buffer.Length, null, TaskCreationOptions.AttachedToParent);
+						}
+					);
+
 			}
 
 		}
