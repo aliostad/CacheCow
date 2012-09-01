@@ -106,6 +106,8 @@ namespace CacheCow.Client
 			var response = new HttpResponseMessage();
 			response.Content = new StreamContent(stream);
 			response.Content.Headers.Add("Content-Type", "application/http;msgtype=response");
+			TraceWriter.WriteLine("before ReadAsHttpResponseMessageAsync",
+					TraceLevel.Verbose);
 			return response.Content.ReadAsHttpResponseMessageAsync();
 		}
 

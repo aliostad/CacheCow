@@ -61,14 +61,16 @@ namespace CacheCow.Tests.Client
 			var serializer = new MessageContentHttpMessageSerializer();
 			var response = serializer.DeserializeToResponseAsync(stream).Result;
 
-			var fileStream = new FileStream("response.tmp", FileMode.Create);
-			serializer.SerializeAsync(TaskHelpers.FromResult(response), fileStream).Wait();
+			using(var fileStream = new FileStream("response.tmp", FileMode.Create))
+			{
+				serializer.SerializeAsync(TaskHelpers.FromResult(response), fileStream).Wait();
 
-			fileStream.Position = 0;
-			var response2 = serializer.DeserializeToResponseAsync(fileStream).Result;
-			var result = DeepComparer.Compare(response, response2);
-			if (result.Count() > 0)
-				Assert.Fail(string.Join("\r\n", result));
+				fileStream.Position = 0;
+				var response2 = serializer.DeserializeToResponseAsync(fileStream).Result;
+				var result = DeepComparer.Compare(response, response2);
+				if (result.Count() > 0)
+					Assert.Fail(string.Join("\r\n", result));
+			}
 		}
 
 		[Test]
@@ -78,16 +80,17 @@ namespace CacheCow.Tests.Client
 			var serializer = new MessageContentHttpMessageSerializer();
 			var request = serializer.DeserializeToRequestAsync(stream).Result;
 
-			var fileStream = new FileStream("request.tmp", FileMode.Create);
-			serializer.SerializeAsync(request, fileStream).Wait();
+			using(var fileStream = new FileStream("request.tmp", FileMode.Create))
+			{
+				serializer.SerializeAsync(request, fileStream).Wait();
 
-			fileStream.Position = 0;
-			var request2 = serializer.DeserializeToRequestAsync(fileStream).Result;
-			var result = DeepComparer.Compare(request, request2);
+				fileStream.Position = 0;
+				var request2 = serializer.DeserializeToRequestAsync(fileStream).Result;
+				var result = DeepComparer.Compare(request, request2);
 
-			// !! Ignore this until RTM since this is fixed. See http://aspnetwebstack.codeplex.com/workitem/303
-			//if (result.Count() > 0)
-			//Assert.Fail(string.Join("\r\n", result));
+				if (result.Count() > 0)
+				Assert.Fail(string.Join("\r\n", result));
+			}
 		}
 	
 
