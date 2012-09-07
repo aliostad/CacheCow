@@ -244,11 +244,13 @@ namespace CacheCow.Client
 			// _______________________________ RESPONSE only GET  ___________________________________________
 
 			return base.SendAsync(request, cancellationToken)
-				.Then(
-				serverResponse =>			
+				.ContinueWith(
+				tt =>
+				//serverResponse =>
 					{
-
-						TraceWriter.WriteLine("{0} - After getting response", TraceLevel.Verbose, request.RequestUri.ToString());
+						var serverResponse = tt.Result;
+						TraceWriter.WriteLine("{0} - After getting response", 
+							TraceLevel.Verbose, request.RequestUri.ToString());
 
 						
 						if (request.Method != HttpMethod.Get) // only interested here if it is a GET - this line really never called - only GET gets here
@@ -259,7 +261,9 @@ namespace CacheCow.Client
 							serverResponse.StatusCode == HttpStatusCode.NotModified)
 						{
 							cachedResponse.RequestMessage = request;
-							cacheCowHeader.RetrievedFromCache = true;					
+							cacheCowHeader.RetrievedFromCache = true;
+							TraceWriter.WriteLine("{0} - NotModified",
+								TraceLevel.Verbose, request.RequestUri.ToString());
 							return cachedResponse.AddCacheCowHeader(cacheCowHeader); // EXIT !! _______________
 						}
 
@@ -268,6 +272,10 @@ namespace CacheCow.Client
 						{
 							case ResponseValidationResult.MustRevalidate:
 							case ResponseValidationResult.OK:
+
+								TraceWriter.WriteLine("{0} - ResponseValidationResult.OK or MustRevalidate",
+									TraceLevel.Verbose, request.RequestUri.ToString());
+
 
 								// prepare
 								ResponseStoragePreparationRules(serverResponse);
@@ -284,13 +292,21 @@ namespace CacheCow.Client
 									VaryHeaderStore.AddOrUpdate(uri, serverResponse.Headers.Vary);
 								break;
 							default:
-								TraceWriter.WriteLine("{0} - Before TryRemove", TraceLevel.Verbose, request.RequestUri.ToString());
+								TraceWriter.WriteLine("{0} - ResponseValidationResult. Other",
+									TraceLevel.Verbose, request.RequestUri.ToString());
+
+									TraceWriter.WriteLine("{0} - Before TryRemove", TraceLevel.Verbose, request.RequestUri.ToString());
 								_cacheStore.TryRemove(cacheKey);
 								TraceWriter.WriteLine("{0} - After AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
 
 								cacheCowHeader.NotCacheable = true;
+
+
 								break;
 						}
+						TraceWriter.WriteLine("{0} - Before returning response",
+							TraceLevel.Verbose, request.RequestUri.ToString());
+
 						return serverResponse.AddCacheCowHeader(cacheCowHeader);
 					}
 				);

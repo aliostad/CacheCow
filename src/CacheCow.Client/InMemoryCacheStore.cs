@@ -29,10 +29,11 @@ namespace CacheCow.Client
 		public void AddOrUpdate(CacheKey key, HttpResponseMessage response)
 		{
 			// removing reference to request so that the request can get GCed
+			var req = response.RequestMessage;
 			response.RequestMessage = null;
 			var memoryStream = new MemoryStream();
 			_messageSerializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream).Wait();
-
+			response.RequestMessage = req;
 			_responseCache.AddOrUpdate(key, memoryStream.ToArray(), (ky, old) => memoryStream.ToArray());
 		}
 
