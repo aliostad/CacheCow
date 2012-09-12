@@ -360,7 +360,8 @@ namespace CacheCow.Server
 					return null; // no etag
 
 				if (matchTags.Count > 0 && noneMatchTags.Count > 0) // both if-match and if-none-match exist
-					return new HttpResponseMessage(HttpStatusCode.BadRequest).ToTask();
+					return request.CreateResponse(HttpStatusCode.BadRequest)
+						.ToTask();
 
 				var isNoneMatch = noneMatchTags.Count > 0;
 				var etags = isNoneMatch ? noneMatchTags : matchTags;
@@ -381,7 +382,8 @@ namespace CacheCow.Server
 						matchFound = true;
 					}
 				}
-				return matchFound ^ isNoneMatch ? null : new NotModifiedResponse(actualEtag.ToEntityTagHeaderValue()).ToTask();
+				return matchFound ^ isNoneMatch ? null : new NotModifiedResponse(request,
+					actualEtag.ToEntityTagHeaderValue()).ToTask();
 			};
 
 		}
@@ -400,7 +402,8 @@ namespace CacheCow.Server
 					return null; // no etag
 
 				if (ifModifiedSince != null && ifUnmodifiedSince != null) // both exist
-					return new HttpResponseMessage(HttpStatusCode.BadRequest).ToTask();
+					return request.CreateResponse(HttpStatusCode.BadRequest)
+						.ToTask();
 				bool ifModified = (ifUnmodifiedSince == null);
 				DateTimeOffset modifiedInQuestion = ifModified ? ifModifiedSince.Value : ifUnmodifiedSince.Value;
 
@@ -418,7 +421,7 @@ namespace CacheCow.Server
 				}
 
 				return isModified ^ ifModified
-						? new NotModifiedResponse(actualEtag.ToEntityTagHeaderValue()).ToTask()
+						? new NotModifiedResponse(request, actualEtag.ToEntityTagHeaderValue()).ToTask()
 						: null;
 
 			};
@@ -449,7 +452,8 @@ namespace CacheCow.Server
 					isModified = actualEtag.LastModified > modifiedInQuestion;
 				}
 
-				return isModified ? new HttpResponseMessage(HttpStatusCode.PreconditionFailed).ToTask()
+				return isModified ? request.CreateResponse(HttpStatusCode.PreconditionFailed)
+					.ToTask()
 					: null;
 
 			};
@@ -481,7 +485,8 @@ namespace CacheCow.Server
 				}
 
 				return matchFound ? null
-					: new HttpResponseMessage(HttpStatusCode.PreconditionFailed).ToTask();
+					: request.CreateResponse(HttpStatusCode.PreconditionFailed)
+						.ToTask();
 
 			};
 		}

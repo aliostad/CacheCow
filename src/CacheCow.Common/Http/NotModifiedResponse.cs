@@ -11,16 +11,19 @@ namespace CacheCow.Common.Http
 {
 	public class NotModifiedResponse : HttpResponseMessage
 	{
-		public NotModifiedResponse()
-			: base(HttpStatusCode.NotModified)
+		public NotModifiedResponse(HttpRequestMessage request)
+			: this(request, null)
 		{
 		}
 
 
-		public NotModifiedResponse(EntityTagHeaderValue etag)
+		public NotModifiedResponse(HttpRequestMessage request, EntityTagHeaderValue etag)
 			: base(HttpStatusCode.NotModified)
 		{
-			this.Headers.ETag = etag;
+			if(etag!=null)
+				this.Headers.ETag = etag;
+
+			this.RequestMessage = request;
 		}
 
 	}
