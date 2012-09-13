@@ -20,7 +20,7 @@ namespace CacheCow.Client.FileCacheStore
 		private ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim();
 		private MessageContentHttpMessageSerializer _serializer = new MessageContentHttpMessageSerializer();
 		internal const string CacheMetadataDbName = "cache-metadata.db";
-		private const int ReaderWriterLockTimeout = 30000; // ms 
+		private const int ReaderWriterLockTimeout = 30000; // 30 seconds 
 		private dynamic _database;
 		private CacheStoreQuotaManager _quotaManager;
 		private string _dataRoot;
@@ -199,7 +199,7 @@ namespace CacheCow.Client.FileCacheStore
 			try
 			{
 				TraceWriter.WriteLine("Attempting lock: {0}", TraceLevel.Verbose, lockAttained);
-				//lockAttained = _lockSlim.TryEnterWriteLock(ReaderWriterLockTimeout);
+				lockAttained = _lockSlim.TryEnterWriteLock(ReaderWriterLockTimeout);
 				TraceWriter.WriteLine("lockAttained: {0}", TraceLevel.Verbose, lockAttained);
 				if (!lockAttained)
 					return false;
@@ -221,8 +221,8 @@ namespace CacheCow.Client.FileCacheStore
 			}
 			finally
 			{
-				//if (lockAttained)
-					//_lockSlim.ExitWriteLock();
+				if (lockAttained)
+					_lockSlim.ExitWriteLock();
 			}
 
 			return false;

@@ -9,7 +9,7 @@ using CacheCow.Common;
 
 namespace CacheCow.Tests.Helper
 {
-	public class DummyMessageHandler : HttpMessageHandler
+	class DummyMessageHandler : HttpMessageHandler
 	{
 		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, 
 			CancellationToken cancellationToken)
