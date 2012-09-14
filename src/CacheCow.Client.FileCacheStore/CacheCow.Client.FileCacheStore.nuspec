@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright 2012</copyright>
+    <tags>aspnetwebapi http caching webapi cachecow etag filestore file</tags>
+	<dependencies>
+      <dependency id="CacheCow.Client" version="$version$"  />
+      <dependency id="Simple.Data.Sqlite" version="0.16.0.0"  />
+	  
+	  
+    </dependencies>	
+  </metadata>
+</package>
