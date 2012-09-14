@@ -17,7 +17,6 @@ namespace CacheCow.Client.FileCacheStore
 {
 	public class FileStore : ICacheStore, ICacheMetadataProvider
 	{
-		private ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim();
 		private MessageContentHttpMessageSerializer _serializer = new MessageContentHttpMessageSerializer();
 		internal const string CacheMetadataDbName = "cache-metadata.db";
 		private const int ReaderWriterLockTimeout = 30000; // 30 seconds 
@@ -25,6 +24,7 @@ namespace CacheCow.Client.FileCacheStore
 		private CacheStoreQuotaManager _quotaManager;
 		private string _dataRoot;
 		private string _dbFileName;
+		private bool _bufferedFileAccess;
 
 		private const string CacheTableScript =
 			@"CREATE TABLE `Cache`
@@ -36,9 +36,22 @@ namespace CacheCow.Client.FileCacheStore
        LastAccessed DATETIME,
        PRIMARY KEY(Hash)
 )";
-
-		public FileStore(string dataRoot)
+		// currently only buffered
+		public FileStore(string dataRoot):this(dataRoot, true)
 		{
+					
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dataRoot"></param>
+		/// <param name="bufferedFileAccess">It first loads the response into a memory buffer before processing. 
+		/// Improves file locking especially if response takes long time to come back from server.
+		/// </param>
+		private FileStore(string dataRoot, bool bufferedFileAccess)
+		{
+			_bufferedFileAccess = bufferedFileAccess;
 			_dataRoot = dataRoot;
 			if (!Directory.Exists(dataRoot))
 				Directory.CreateDirectory(dataRoot);
@@ -62,59 +75,39 @@ namespace CacheCow.Client.FileCacheStore
 			}
 		}
 
-		private void ThrowTimeoutException(CacheKey key)
-		{
-			throw new TimeoutException("Could not establish lock for " + key.ResourceUri);
-		}
-
 		public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
 		{
 			response = null;
 
-			bool lockAttained = false;
-			try
-			{
-				lockAttained = _lockSlim.TryEnterReadLock(ReaderWriterLockTimeout);
-				if (!lockAttained)
-					ThrowTimeoutException(key);
-					//return false;
 
-				string fileName = key.EnsureFolderAndGetFileName(_dataRoot);
-				if (File.Exists(fileName))
+			string fileName = key.EnsureFolderAndGetFileName(_dataRoot);
+			if (File.Exists(fileName))
+			{
+				var ms = new MemoryStream();
+				using (var fs = GetFile(fileName, FileMode.Open))
 				{
-
-
-					using (var fs = new FileStream(fileName, FileMode.Open))
-					{
-						TraceWriter.WriteLine("TryGetValue - before DeserializeToResponseAsync", TraceLevel.Verbose);
-						response = _serializer.DeserializeToResponseAsync(fs).Result;
-						TraceWriter.WriteLine("TryGetValue - After DeserializeToResponseAsync", TraceLevel.Verbose);
-						if (response.Content != null)
-						{
-							var task = response.Content.LoadIntoBufferAsync();
-							task.Wait();
-
-							TraceWriter.WriteLine("TryGetValue - After  wait", TraceLevel.Verbose);
-						}
-					}
-
-					_database.Cache
-						.UpdateByHash(new
-						{
-							Hash = Convert.ToBase64String(key.Hash),
-							LastAccessed = DateTime.Now
-						});
-
-					TraceWriter.WriteLine("After updating Last Accessed", TraceLevel.Verbose);
-
-
-
+					TraceWriter.WriteLine("TryGetValue - before DeserializeToResponseAsync", TraceLevel.Verbose);
+					fs.CopyTo(ms);
+					ms.Position = 0;
 				}
-			}
-			finally
-			{
-				if (lockAttained)
-					_lockSlim.ExitReadLock();
+				response = _serializer.DeserializeToResponseAsync(ms).Result;
+				TraceWriter.WriteLine("TryGetValue - After DeserializeToResponseAsync", TraceLevel.Verbose);
+				if (response.Content != null)
+				{
+					var task = response.Content.LoadIntoBufferAsync();
+					task.Wait();
+					TraceWriter.WriteLine("TryGetValue - After  wait", TraceLevel.Verbose);
+				}
+
+				_database.Cache
+					.UpdateByHash(new
+					{
+						Hash = Convert.ToBase64String(key.Hash),
+						LastAccessed = DateTime.Now
+					});
+
+				TraceWriter.WriteLine("After updating Last Accessed", TraceLevel.Verbose);
+
 			}
 
 
@@ -123,67 +116,81 @@ namespace CacheCow.Client.FileCacheStore
 
 		public void AddOrUpdate(CacheKey key, HttpResponseMessage response)
 		{
-			bool lockAttained = false;
-			try
+			string fileName = key.EnsureFolderAndGetFileName(_dataRoot);
+
+			if (File.Exists(fileName))
 			{
-				
-				lockAttained = _lockSlim.TryEnterWriteLock(ReaderWriterLockTimeout);
+				TraceWriter.WriteLine("Must remove file", TraceLevel.Verbose);
+				TryRemove(key);
+			}
 
-				TraceWriter.WriteLine("Start - lockAttained: {0}", TraceLevel.Verbose, lockAttained);
+			var ms = new MemoryStream();
+			_serializer.SerializeAsync(TaskHelpers.FromResult(response), ms).Wait();
+			ms.Position = 0;
+			using (var fs = GetFile(fileName, FileMode.Create))
+			{
+				TraceWriter.WriteLine("Before serialise", TraceLevel.Verbose);
+				ms.CopyTo(fs);
+				TraceWriter.WriteLine("After serialise", TraceLevel.Verbose);
+			}
+			
 
-				if (!lockAttained)
-					//return;
-					ThrowTimeoutException(key);
+			var info = new FileInfo(fileName);
 
-
-				string fileName = key.EnsureFolderAndGetFileName(_dataRoot);
-
-				if (File.Exists(fileName))
-				{
-					TraceWriter.WriteLine("Must remove file", TraceLevel.Verbose);
-
-					TryRemove(key);
-				}
-
-
-				using (var fs = new FileStream(fileName, FileMode.Create))
-				{
-					TraceWriter.WriteLine("Before serialise", TraceLevel.Verbose);
-					_serializer.SerializeAsync(TaskHelpers.FromResult(response), fs).Wait();
-					TraceWriter.WriteLine("After serialise", TraceLevel.Verbose);
-				}
-				var info = new FileInfo(fileName);
-
-				// Update database
-				_database.Cache
-					.Insert(new CacheItem()
-					{
-						Domain = key.Domain,
-						Hash = Convert.ToBase64String(key.Hash),
-						LastAccessed = DateTime.Now,
-						LastUpdated = response.Content != null && response.Content.Headers.LastModified.HasValue ?
-							response.Content.Headers.LastModified.Value.UtcDateTime : DateTime.Now
-						,
-						Size = info.Length
-					});
-				TraceWriter.WriteLine("After db update", TraceLevel.Verbose);
-
-
-				// tell quota manager
-				_quotaManager.ItemAdded(new CacheItemMetadata()
+			// Update database
+			_database.Cache
+				.Insert(new CacheItem()
 				{
 					Domain = key.Domain,
-					Key = key.Hash,
+					Hash = Convert.ToBase64String(key.Hash),
 					LastAccessed = DateTime.Now,
+					LastUpdated = response.Content != null && response.Content.Headers.LastModified.HasValue ?
+						response.Content.Headers.LastModified.Value.UtcDateTime : DateTime.Now
+					,
 					Size = info.Length
 				});
+			TraceWriter.WriteLine("After db update", TraceLevel.Verbose);
 
-			}
-			finally
+
+			// tell quota manager
+			_quotaManager.ItemAdded(new CacheItemMetadata()
 			{
-				if (lockAttained)
-					_lockSlim.ExitWriteLock();
+				Domain = key.Domain,
+				Key = key.Hash,
+				LastAccessed = DateTime.Now,
+				Size = info.Length
+			});
+
+
+		}
+
+
+		private static FileStream GetFile(string fileName, FileMode mode)
+		{
+
+			int retry = 0;
+			int delay = 2000;
+
+			while (retry < 3)
+			{
+				try
+				{
+					return new FileStream(fileName, mode);
+				}
+				catch (IOException e)
+				{
+					if (e.Message.Contains("process cannot access"))
+					{
+						Thread.Sleep(delay);
+						retry++;
+						delay *= 4;
+					}
+					else
+						throw e;
+				}
 			}
+
+			throw new TimeoutException("Could not access file after timeout and 3 retries: " + fileName);
 
 		}
 
@@ -203,37 +210,22 @@ namespace CacheCow.Client.FileCacheStore
 
 		private bool TryRemove(CacheItemMetadata metadata, bool tellQuotaManager)
 		{
-			bool lockAttained = false;
-			try
+
+
+			var fileName = metadata.EnsureFolderAndGetFileName(_dataRoot);
+			if (File.Exists(fileName))
 			{
-				TraceWriter.WriteLine("Attempting lock: {0}", TraceLevel.Verbose, lockAttained);
-				lockAttained = _lockSlim.TryEnterWriteLock(ReaderWriterLockTimeout);
-				TraceWriter.WriteLine("lockAttained: {0}", TraceLevel.Verbose, lockAttained);
-				if (!lockAttained)
-					//return false;
-					ThrowTimeoutException(new CacheKey("unknown", new string[0]));
+				File.Delete(fileName);
+				TraceWriter.WriteLine("After delete file {0}", TraceLevel.Verbose, fileName);
 
+				_database.Cache.DeleteByHash(Convert.ToBase64String(metadata.Key));
 
-				var fileName = metadata.EnsureFolderAndGetFileName(_dataRoot);
-				if (File.Exists(fileName))
-				{
-					File.Delete(fileName);
-					TraceWriter.WriteLine("After delete file {0}", TraceLevel.Verbose, fileName);
+				TraceWriter.WriteLine("After db update. File name: {0}", TraceLevel.Verbose, fileName);
 
-					_database.Cache.DeleteByHash(Convert.ToBase64String(metadata.Key));
+				if (tellQuotaManager)
+					_quotaManager.ItemRemoved(metadata);
+				return true;
 
-					TraceWriter.WriteLine("After db update. File name: {0}", TraceLevel.Verbose, fileName);
-
-					if (tellQuotaManager)
-						_quotaManager.ItemRemoved(metadata);
-					return true;
-
-				}
-			}
-			finally
-			{
-				if (lockAttained)
-					_lockSlim.ExitWriteLock();
 			}
 
 			return false;

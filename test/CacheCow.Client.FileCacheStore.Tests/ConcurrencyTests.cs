@@ -17,8 +17,8 @@ namespace CacheCow.Client.FileCacheStore.Tests
 
 		private string _rootPath;
 		private Random _random = new Random();
-		private const int ConcurrencyLevel = 40;
-		private const int WaitTimeOut = 10000; // 15 seconds  
+		private const int ConcurrencyLevel = 100;
+		private const int WaitTimeOut = 20000; // 20 seconds   
 		private RandomResponseBuilder _responseBuilder = new RandomResponseBuilder(ConcurrencyLevel);
 
 		[SetUp]
@@ -37,7 +37,7 @@ namespace CacheCow.Client.FileCacheStore.Tests
 			{
 				try
 				{
-					//Directory.Delete(_rootPath, true);
+					Directory.Delete(_rootPath, true);
 					break;
 				}
 				catch(Exception e)
@@ -76,13 +76,14 @@ namespace CacheCow.Client.FileCacheStore.Tests
 			}
 
 			var randomisedList = new List<Task>();
-			while (tasks.Count>0)
-			{
-				var i = _random.Next(tasks.Count);
-				randomisedList.Add(tasks[i]);
-				tasks.RemoveAt(i);
-			}
-			tasks = randomisedList;
+			//while (tasks.Count>0)
+			//{
+			//    var i = _random.Next(tasks.Count);
+			//    randomisedList.Add(tasks[i]);
+			//    tasks.RemoveAt(i);
+			//}
+			
+			//tasks = randomisedList;
 
 			foreach (var task in tasks)
 			{
@@ -95,8 +96,10 @@ namespace CacheCow.Client.FileCacheStore.Tests
 			}
 
 			DateTime tt = DateTime.Now;
-			Assert.That( Task.WaitAll(tasks.ToArray(), WaitTimeOut), "Timedout!!"); //
+			var waited = Task.WaitAll(tasks.ToArray(), WaitTimeOut); //
 			Console.WriteLine("Total milliseconds " + (DateTime.Now - tt).TotalMilliseconds);
+			if(!waited)
+				Assert.Fail("Timed out");
 		}
 
 		private HttpRequestMessage GetMessage(int number)

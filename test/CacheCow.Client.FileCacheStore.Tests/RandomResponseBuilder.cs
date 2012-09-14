@@ -14,7 +14,7 @@ namespace CacheCow.Client.FileCacheStore.Tests
 	class RandomResponseBuilder : HttpMessageHandler
 	{
 		private Random _random = new Random();
-		private Dictionary<int, HttpResponseMessage> _responses = new Dictionary<int, HttpResponseMessage>();
+		private Dictionary<int, byte[]> _responses = new Dictionary<int, byte[]>();
 		private SHA1CryptoServiceProvider _sha1 = new SHA1CryptoServiceProvider();
 		private int _totalResponses;
 
@@ -28,18 +28,16 @@ namespace CacheCow.Client.FileCacheStore.Tests
 			_totalResponses = totalResponses;
 			for (int i = 0; i < totalResponses; i++)
 			{
-				_responses.Add(i, BuildRandomResponse());
+				_responses.Add(i, BuildRandomResponseContent());
 			}
 		}
 
-		private HttpResponseMessage BuildRandomResponse()
+		private Byte[] BuildRandomResponseContent()
 		{
 			var response = new HttpResponseMessage( HttpStatusCode.OK);
 			var bytes = new byte[_random.Next(100000)];
 			_random.NextBytes(bytes);
-			response.Content = new ByteArrayContent(bytes);
-			response.Content.Headers.Add("content-type", "application/octet-stream");
-			return response;
+			return bytes;
 		}
 
 
@@ -53,8 +51,13 @@ namespace CacheCow.Client.FileCacheStore.Tests
 		{
 			var hash = _sha1.ComputeHash(Encoding.UTF8.GetBytes(request.RequestUri.ToString()));
 			var i = Math.Abs( BitConverter.ToInt32(hash, 0));
-			var response = _responses[i % _totalResponses];
-			response.RequestMessage = request;
+			var bytes = _responses[i % _totalResponses];
+			var response = new HttpResponseMessage( HttpStatusCode.OK)
+			                          	{
+			                          		RequestMessage = request,
+			                          		Content = new ByteArrayContent(bytes)
+			                          	};
+			response.Content.Headers.Add("content-type", "application/octet-stream");
 			return response;
 		}
 	}

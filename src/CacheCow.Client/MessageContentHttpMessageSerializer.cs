@@ -45,13 +45,20 @@ namespace CacheCow.Client
 					return r.Content.LoadIntoBufferAsync()
 						.Then(() =>
 						{
-							TraceWriter.WriteLine("SerializeAsync - afetr load", TraceLevel.Verbose);
+							TraceWriter.WriteLine("SerializeAsync - after load", TraceLevel.Verbose);
 							var httpMessageContent = new HttpMessageContent(r);
 							// All in-memory and CPU-bound so no need to async
-							var buffer = httpMessageContent.ReadAsByteArrayAsync().Result;
-							return Task.Factory.FromAsync(stream.BeginWrite, stream.EndWrite,
-								buffer, 0, buffer.Length, null, TaskCreationOptions.AttachedToParent);
-						});
+							return httpMessageContent.ReadAsByteArrayAsync();
+						})
+						.Then( buffer =>
+							        {
+										TraceWriter.WriteLine("SerializeAsync - after ReadAsByteArrayAsync", TraceLevel.Verbose);
+										return Task.Factory.FromAsync(stream.BeginWrite, stream.EndWrite,
+											buffer, 0, buffer.Length, null, TaskCreationOptions.AttachedToParent);						                                                		
+							        }
+								);
+
+						;
 				}
 				else
 				{
