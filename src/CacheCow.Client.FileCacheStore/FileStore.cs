@@ -62,6 +62,11 @@ namespace CacheCow.Client.FileCacheStore
 			}
 		}
 
+		private void ThrowTimeoutException(CacheKey key)
+		{
+			throw new TimeoutException("Could not establish lock for " + key.ResourceUri);
+		}
+
 		public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
 		{
 			response = null;
@@ -71,7 +76,8 @@ namespace CacheCow.Client.FileCacheStore
 			{
 				lockAttained = _lockSlim.TryEnterReadLock(ReaderWriterLockTimeout);
 				if (!lockAttained)
-					return false;
+					ThrowTimeoutException(key);
+					//return false;
 
 				string fileName = key.EnsureFolderAndGetFileName(_dataRoot);
 				if (File.Exists(fileName))
@@ -126,7 +132,9 @@ namespace CacheCow.Client.FileCacheStore
 				TraceWriter.WriteLine("Start - lockAttained: {0}", TraceLevel.Verbose, lockAttained);
 
 				if (!lockAttained)
-					return;
+					//return;
+					ThrowTimeoutException(key);
+
 
 				string fileName = key.EnsureFolderAndGetFileName(_dataRoot);
 
@@ -195,14 +203,17 @@ namespace CacheCow.Client.FileCacheStore
 
 		private bool TryRemove(CacheItemMetadata metadata, bool tellQuotaManager)
 		{
-			bool lockAttained = true;
+			bool lockAttained = false;
 			try
 			{
 				TraceWriter.WriteLine("Attempting lock: {0}", TraceLevel.Verbose, lockAttained);
 				lockAttained = _lockSlim.TryEnterWriteLock(ReaderWriterLockTimeout);
 				TraceWriter.WriteLine("lockAttained: {0}", TraceLevel.Verbose, lockAttained);
 				if (!lockAttained)
-					return false;
+					//return false;
+					ThrowTimeoutException(new CacheKey("unknown", new string[0]));
+
+
 				var fileName = metadata.EnsureFolderAndGetFileName(_dataRoot);
 				if (File.Exists(fileName))
 				{

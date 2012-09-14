@@ -17,7 +17,8 @@ namespace CacheCow.Client.FileCacheStore.Tests
 
 		private string _rootPath;
 		private Random _random = new Random();
-		private const int ConcurrencyLevel = 10;
+		private const int ConcurrencyLevel = 40;
+		private const int WaitTimeOut = 10000; // 15 seconds  
 		private RandomResponseBuilder _responseBuilder = new RandomResponseBuilder(ConcurrencyLevel);
 
 		[SetUp]
@@ -69,7 +70,7 @@ namespace CacheCow.Client.FileCacheStore.Tests
 						() => store.TryGetValue(cacheKey, out responseMessage)));
 
 				tasks.Add(new Task(
-						() => store.TryRemove(cacheKey)));
+				        () => store.TryRemove(cacheKey)));
 
 
 			}
@@ -88,12 +89,14 @@ namespace CacheCow.Client.FileCacheStore.Tests
 				task.ContinueWith(t =>
 				                  	{
 				                  		if (t.IsFaulted)
-				                  			Assert.Fail(t.Exception.ToString());
+				                  			Assert.Fail(t.Exception.ToString());  
 				                  	});
 				task. Start();
 			}
 
-			Assert.That( Task.WaitAll(tasks.ToArray(), 5000), "Timedout!!");
+			DateTime tt = DateTime.Now;
+			Assert.That( Task.WaitAll(tasks.ToArray(), WaitTimeOut), "Timedout!!"); //
+			Console.WriteLine("Total milliseconds " + (DateTime.Now - tt).TotalMilliseconds);
 		}
 
 		private HttpRequestMessage GetMessage(int number)
