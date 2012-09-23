@@ -69,19 +69,15 @@ namespace CacheCow.Client
 
 					if (response.Content.Headers.Expires != null &&
 						response.Content.Headers.Expires < DateTimeOffset.UtcNow)
-						return ResponseValidationResult.Stale;
+						return response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
 
 					if (response.Headers.CacheControl.MaxAge != null &&
 						DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.MaxAge.Value))
-						return ResponseValidationResult.Stale;
+						return response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
 
 					if (response.Headers.CacheControl.SharedMaxAge != null &&
 						DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.SharedMaxAge.Value))
-						return ResponseValidationResult.Stale;
-
-					if (response.Headers.CacheControl.MustRevalidate)
-						return ResponseValidationResult.MustRevalidate;
-
+						return response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
 
 			        return ResponseValidationResult.OK;
 			    };

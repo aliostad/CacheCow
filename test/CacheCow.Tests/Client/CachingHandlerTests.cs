@@ -179,6 +179,7 @@ namespace CacheCow.Tests.Client
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			var responseFromCache = GetOkMessage(true);
 			responseFromCache.Headers.ETag = new EntityTagHeaderValue(ETagValue);
+			responseFromCache.Content.Headers.Expires = DateTime.Now.Subtract(TimeSpan.FromSeconds(10));
 			var responseFromServer = new HttpResponseMessage(HttpStatusCode.NotModified);
 			_messageHandler.Response = responseFromServer;
 			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
@@ -211,6 +212,8 @@ namespace CacheCow.Tests.Client
 			lastModified = lastModified.AddMilliseconds(1000 - lastModified.Millisecond);
 			var responseFromCache = GetOkMessage(true);
 			responseFromCache.Content.Headers.LastModified = lastModified;
+			responseFromCache.Content.Headers.Expires = DateTime.Now.Subtract(TimeSpan.FromSeconds(10));
+
 			var responseFromServer = new HttpResponseMessage(HttpStatusCode.NotModified);
 			_messageHandler.Response = responseFromServer;
 			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
@@ -244,6 +247,8 @@ namespace CacheCow.Tests.Client
 			var responseFromCache = GetOkMessage(true);
 			responseFromCache.Content.Headers.LastModified = lastModified;
 			var responseFromServer = GetOkMessage();
+			responseFromCache.Content.Headers.Expires = DateTime.Now.Subtract(TimeSpan.FromSeconds(10));
+
 			_messageHandler.Response = responseFromServer;
 			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
 				  out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
