@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.FileCacheSt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.RedisCacheStore", "src\CacheCow.Client.RedisCacheStore\CacheCow.Client.RedisCacheStore.csproj", "{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.RedisCacheStore.Tests", "test\CacheCow.Client.RedisCacheStore.Tests\CacheCow.Client.RedisCacheStore.Tests.csproj", "{53E2C779-A780-41B2-A55B-0E4156C5AD7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,5 +97,6 @@ Global
 		{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{69933472-B520-453B-8AC3-DCDE5F7995D8} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{ABF4138F-70C4-4C76-8D62-A2A410AE4CFC} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 	EndGlobalSection
 EndGlobal
