@@ -27,10 +27,7 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 			}.Initialize();
 
 			new RavenDocumentsByEntityName().Execute(documentStore);
-			//var documentStore = new DocumentStore() {
-			//    Url = "http://localhost:8082/databases/entitytagstore"
-			//}.Initialize();
-
+			
 			var store = new RavenDbEntityTagStore(documentStore);
 			var value = new TimedEntityTagHeaderValue("\"abcdef1234\"") {LastModified = DateTime.Now};
 
@@ -56,12 +53,10 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 		public void UpdateTest()
 		{
 			var cacheKey = new CacheKey("/api/Cars", new[] { "1234", "abcdef" });
-			//var documentStore = new EmbeddableDocumentStore() {
-			//    RunInMemory = true
-			//}.Initialize();
-			var documentStore = new DocumentStore() {
-				Url = "http://localhost:8082/databases/entitytagstore"
+			var documentStore = new EmbeddableDocumentStore() {
+				RunInMemory = true
 			}.Initialize();
+			
 			var store = new RavenDbEntityTagStore(documentStore);
 			var value = new TimedEntityTagHeaderValue("\"abcdef1234\"") { LastModified = DateTime.Now };
 
@@ -97,12 +92,10 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 		public void RemoveByIdTest()
 		{
 			var cacheKey = new CacheKey("/api/Cars", new[] { "1234", "abcdef" });
-			//var documentStore = new EmbeddableDocumentStore() {
-			//    RunInMemory = true
-			//}.Initialize();
-			var documentStore = new DocumentStore() {
-				Url = "http://localhost:8082/databases/entitytagstore"
+			var documentStore = new EmbeddableDocumentStore() {
+				RunInMemory = true
 			}.Initialize();
+
 			var store = new RavenDbEntityTagStore(documentStore);
 			var value = new TimedEntityTagHeaderValue("\"abcdef1234\"") { LastModified = DateTime.Now };
 
@@ -126,12 +119,10 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 		{
 			var cacheKey = new CacheKey("/api/Cars", new[] { "1234", "abcdef" });
 			var cacheKey2 = new CacheKey("/api/Cars", new[] { "1234", "abcdefgh" });
-			//var documentStore = new EmbeddableDocumentStore() {
-			//    RunInMemory = true
-			//}.Initialize();
-			var documentStore = new DocumentStore() {
-				Url = "http://localhost:8082/databases/entitytagstore"
+			var documentStore = new EmbeddableDocumentStore() {
+				RunInMemory = true
 			}.Initialize();
+			
 			var store = new RavenDbEntityTagStore(documentStore);
 			var value = new TimedEntityTagHeaderValue("\"abcdef1234\"") { LastModified = DateTime.Now };
 

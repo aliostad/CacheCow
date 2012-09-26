@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using CacheCow.Common;
 using Raven.Client;
+using Raven.Client.Document;
 
 namespace CacheCow.Server.EntityTagStore.RavenDb
 {
@@ -31,12 +32,17 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 			}
 
 			_connectionSting = ConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString;
-
+			_documentStore = new DocumentStore() {
+				ConnectionStringName = _connectionSting
+			};
 		}
 
 		public RavenDbEntityTagStore(string connectionSting)
 		{
 			_connectionSting = connectionSting;
+			_documentStore = new DocumentStore() {
+				ConnectionStringName = _connectionSting
+			};
 		}
 
 		public RavenDbEntityTagStore(IDocumentStore documentStore) {
@@ -78,8 +84,9 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 			else {
 				using(var session = _documentStore.OpenSession()) {
 					var cacheKey =
-						session.Query<PersistentCacheKey>().Customize(x => x.WaitForNonStaleResults()).FirstOrDefault(
-							x => x.Hash == key.Hash);
+						session.Query<PersistentCacheKey>()
+						.Customize(x => x.WaitForNonStaleResults())
+						.FirstOrDefault(x => x.Hash == key.Hash);
 					cacheKey.ETag = eTag.Tag;
 					cacheKey.LastModified = eTag.LastModified;
 					session.Store(cacheKey);
@@ -107,8 +114,13 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 		public int RemoveAllByRoutePattern(string routePattern) {
 			var count = 0;
 			using(var session = _documentStore.OpenSession()) {
-				var persistentCacheKeys = session.Query<PersistentCacheKey>().Customize(x => x.WaitForNonStaleResults()).Where(p => p.RoutePattern == routePattern);
+				var persistentCacheKeys = 
+					session.Query<PersistentCacheKey>()
+					.Customize(x => x.WaitForNonStaleResults()).
+					Where(p => p.RoutePattern == routePattern);
+				
 				count = persistentCacheKeys.Count();
+				
 				foreach (var key in persistentCacheKeys) {
 					session.Delete(key);
 				}
