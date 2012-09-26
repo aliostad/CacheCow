@@ -104,6 +104,7 @@ namespace CacheCow.Tests.Client
 			};
 			response.Headers.Date = DateTimeOffset.UtcNow;
 			response.Content = new ByteArrayContent(new byte[256]);
+			response.Content.Headers.Expires = DateTime.Now.Subtract(TimeSpan.FromSeconds(10));
 			Assert.AreEqual(cachingHandler.ResponseValidator(response), ResponseValidationResult.MustRevalidate);
 		}
 

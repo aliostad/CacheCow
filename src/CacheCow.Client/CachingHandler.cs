@@ -137,6 +137,57 @@ namespace CacheCow.Client
 		public Action<HttpResponseMessage> ResponseStoragePreparationRules { get; set; } 
 
 
+		private bool? IsFreshOrStaleAcceptable(HttpResponseMessage cachedResponse, HttpRequestMessage request)
+		{
+
+			TimeSpan staleness = TimeSpan.Zero; // negative = fresh, positive = stale
+
+			if(cachedResponse==null)
+				throw new ArgumentNullException("cachedResponse");
+
+			if(request==null)
+				throw new ArgumentNullException("request");
+
+			if (cachedResponse.Content == null)
+				return null;		
+
+			DateTimeOffset? responseDate = cachedResponse.Headers.Date ?? cachedResponse.Content.Headers.LastModified; // Date should have a value
+			if (responseDate == null)
+				return null;
+
+			if (cachedResponse.Headers.CacheControl == null)
+				return null;
+
+			// calculating staleness
+			// according to http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3 max-age overrides expires header
+			if (cachedResponse.Content.Headers.Expires != null)
+			{
+				staleness = DateTimeOffset.Now.Subtract(cachedResponse.Content.Headers.Expires.Value);
+			}
+
+			if (cachedResponse.Headers.CacheControl.MaxAge.HasValue) // Note: this is MaxAge for response
+			{
+				staleness = DateTimeOffset.Now.Subtract(responseDate.Value.Add(cachedResponse.Headers.CacheControl.MaxAge.Value));
+			}
+
+			if (request.Headers.CacheControl == null)
+				return staleness > TimeSpan.Zero;
+
+			if (request.Headers.CacheControl.MinFresh.HasValue)
+				return -staleness > request.Headers.CacheControl.MinFresh.Value; // staleness is negative if still fresh
+
+			if (request.Headers.CacheControl.MaxStale) // stale acceptable
+				return true;
+
+			if (request.Headers.CacheControl.MaxStaleLimit.HasValue)
+				return staleness > request.Headers.CacheControl.MaxStaleLimit.Value;
+
+			if (request.Headers.CacheControl.MaxAge.HasValue)
+				return responseDate.Value.Add(request.Headers.CacheControl.MaxAge.Value) > DateTimeOffset.Now;
+
+			return false;
+		}
+
 		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
 			var cacheCowHeader = new CacheCowHeader();
@@ -213,7 +264,11 @@ namespace CacheCow.Client
 			else if(validationResultForCachedResponse == ResponseValidationResult.Stale)
 			{
 				cacheCowHeader.WasStale = true;
-				_cacheStore.TryRemove(cacheKey);
+				var isFreshOrStaleAcceptable = IsFreshOrStaleAcceptable(cachedResponse, request);
+				if (isFreshOrStaleAcceptable.HasValue && isFreshOrStaleAcceptable.Value) // similar to OK
+					return TaskHelpers.FromResult(cachedResponse.AddCacheCowHeader(cacheCowHeader)); // EXIT !! ____________________________				
+				else
+					_cacheStore.TryRemove(cacheKey);
 				TraceWriter.WriteLine("{0} - after TryRemove ", TraceLevel.Verbose, request.RequestUri.ToString());
 
 			}

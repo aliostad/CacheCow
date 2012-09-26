@@ -7,7 +7,7 @@ using CacheCow.Client.Headers;
 
 namespace CacheCow.Client.Internal
 {
-	public static class HttpResponseMessageExtensions
+	internal static class HttpResponseMessageExtensions
 	{
 		public static HttpResponseMessage AddCacheCowHeader(this HttpResponseMessage response,
 			CacheCowHeader header)
@@ -15,5 +15,7 @@ namespace CacheCow.Client.Internal
 			response.Headers.Add(CacheCowHeader.Name, header.ToString());
 			return response;
 		}
+
+
 	}
 }
