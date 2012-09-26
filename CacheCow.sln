@@ -38,6 +38,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.RedisCacheS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.RedisCacheStore.Tests", "test\CacheCow.Client.RedisCacheStore.Tests\CacheCow.Client.RedisCacheStore.Tests.csproj", "{53E2C779-A780-41B2-A55B-0E4156C5AD7F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.RavenDb", "src\CacheCow.Server.EntityTagStore.RavenDb\CacheCow.Server.EntityTagStore.RavenDb.csproj", "{7F236A6F-FBBF-4A0F-A215-E86E325058DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.RavenDb.Tests", "test\CacheCow.Server.EntityTagStore.RavenDb.Tests\CacheCow.Server.EntityTagStore.RavenDb.Tests.csproj", "{7E5FFED1-8337-43A8-BF3C-18C2733656F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +84,10 @@ Global
 		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7F236A6F-FBBF-4A0F-A215-E86E325058DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7F236A6F-FBBF-4A0F-A215-E86E325058DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F236A6F-FBBF-4A0F-A215-E86E325058DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -88,10 +96,6 @@ Global
 		{7E5FFED1-8337-43A8-BF3C-18C2733656F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E5FFED1-8337-43A8-BF3C-18C2733656F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E5FFED1-8337-43A8-BF3C-18C2733656F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
