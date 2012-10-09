@@ -21,8 +21,8 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 
 		public RavenDbEntityTagStore()
 		{
-			if(!ConfigurationManager.ConnectionStrings.Cast<ConnectionStringSettings>()
-				.Any(x=>ConnectionStringName.Equals(x.Name, StringComparison.CurrentCultureIgnoreCase)))
+			if (!ConfigurationManager.ConnectionStrings.Cast<ConnectionStringSettings>()
+				.Any(x => ConnectionStringName.Equals(x.Name, StringComparison.CurrentCultureIgnoreCase)))
 			{
 				throw new InvalidOperationException(
 					string.Format(
@@ -32,7 +32,8 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 			}
 
 			_connectionSting = ConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString;
-			_documentStore = new DocumentStore() {
+			_documentStore = new DocumentStore()
+			{
 				ConnectionStringName = _connectionSting
 			};
 		}
@@ -40,49 +41,59 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 		public RavenDbEntityTagStore(string connectionSting)
 		{
 			_connectionSting = connectionSting;
-			_documentStore = new DocumentStore() {
+			_documentStore = new DocumentStore()
+			{
 				ConnectionStringName = _connectionSting
 			};
 		}
 
-		public RavenDbEntityTagStore(IDocumentStore documentStore) {
+		public RavenDbEntityTagStore(IDocumentStore documentStore)
+		{
 			_documentStore = documentStore;
 		}
 
 		public bool TryGetValue(CacheKey key, out TimedEntityTagHeaderValue eTag)
 		{
 			eTag = null;
-			using(var session = _documentStore.OpenSession()) {
+			using (var session = _documentStore.OpenSession())
+			{
 				var cacheKey = session.Query<PersistentCacheKey>()
 					.Customize(x => x.WaitForNonStaleResultsAsOfNow())
 					.FirstOrDefault(x => x.Hash == key.Hash);
-				if (null == cacheKey) 
+				if (null == cacheKey)
 					return false;
 
-				eTag = new TimedEntityTagHeaderValue(cacheKey.ETag) {
+				eTag = new TimedEntityTagHeaderValue(cacheKey.ETag)
+				{
 					LastModified = cacheKey.LastModified
 				};
 				return true;
 			}
 		}
 
-		public void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag) {
+		public void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag)
+		{
 			TimedEntityTagHeaderValue test;
-			if(!TryGetValue(key, out test)) {
-				var cacheKey = new PersistentCacheKey() {
+			if (!TryGetValue(key, out test))
+			{
+				var cacheKey = new PersistentCacheKey()
+				{
 					Hash = key.Hash,
 					RoutePattern = key.RoutePattern,
 					ETag = eTag.Tag,
 					LastModified = eTag.LastModified
 				};
-				using(var session = _documentStore.OpenSession()) {
+				using (var session = _documentStore.OpenSession())
+				{
 					session.Store(cacheKey);
 					session.SaveChanges();
 				}
 
 			}
-			else {
-				using(var session = _documentStore.OpenSession()) {
+			else
+			{
+				using (var session = _documentStore.OpenSession())
+				{
 					var cacheKey =
 						session.Query<PersistentCacheKey>()
 						.Customize(x => x.WaitForNonStaleResults())
@@ -98,12 +109,14 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 		public bool TryRemove(CacheKey key)
 		{
 			var count = 0;
-			using (var session = _documentStore.OpenSession()) {
-				var persistentCacheKeys = 
+			using (var session = _documentStore.OpenSession())
+			{
+				var persistentCacheKeys =
 					session.Query<PersistentCacheKey>()
 					.Customize(x => x.WaitForNonStaleResults()).Where(p => p.Hash == key.Hash);
 				count = persistentCacheKeys.Count();
-				foreach (var cacheKey in persistentCacheKeys) {
+				foreach (var cacheKey in persistentCacheKeys)
+				{
 					session.Delete(cacheKey);
 				}
 				session.SaveChanges();
@@ -111,17 +124,20 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 			return count > 0;
 		}
 
-		public int RemoveAllByRoutePattern(string routePattern) {
+		public int RemoveAllByRoutePattern(string routePattern)
+		{
 			var count = 0;
-			using(var session = _documentStore.OpenSession()) {
-				var persistentCacheKeys = 
+			using (var session = _documentStore.OpenSession())
+			{
+				var persistentCacheKeys =
 					session.Query<PersistentCacheKey>()
 					.Customize(x => x.WaitForNonStaleResults()).
 					Where(p => p.RoutePattern == routePattern);
-				
+
 				count = persistentCacheKeys.Count();
-				
-				foreach (var key in persistentCacheKeys) {
+
+				foreach (var key in persistentCacheKeys)
+				{
 					session.Delete(key);
 				}
 
@@ -146,11 +162,5 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 
 	}
 
-	public class PersistentCacheKey {
-		public string Id { get; set; }
-		public byte[] Hash { get; set; }
-		public string RoutePattern { get; set; }
-		public string ETag { get; set; }
-		public DateTimeOffset LastModified { get; set; }
-	}
+
 }
