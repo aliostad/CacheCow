@@ -2,9 +2,9 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>$version$</version>
+    <version>$version$-Unstable</version>
     <title>$title$</title>
-    <authors>$author$ AlexZeitler</authors>
+    <authors>AlexZeitler $author$</authors>
     <owners>$author$</owners>
     <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -12,8 +12,8 @@
     <copyright>Copyright 2012</copyright>
     <tags>aspnetwebapi http caching webapi cachecow etag ravendb</tags>
     <dependencies>
-      <dependency id="CacheCow.Server" version="$version$" />
-      <dependency id="RavenDB.Client" version="1.2" />
+      <dependency id="CacheCow.Server" version="0.2.2" />
+      <dependency id="RavenDB.Client" version="1.2.2096-Unstable" />
     </dependencies>
   </metadata>
 </package>
