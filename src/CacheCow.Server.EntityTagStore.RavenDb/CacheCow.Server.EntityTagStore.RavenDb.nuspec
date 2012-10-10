@@ -13,7 +13,7 @@
     <tags>aspnetwebapi http caching webapi cachecow etag ravendb</tags>
     <dependencies>
       <dependency id="CacheCow.Server" version="$version$" />
-      <dependency id="RavenDB.Client" version="1.2.2096-Unstable" />
+      <dependency id="RavenDB.Client" version="1.2" />
     </dependencies>
   </metadata>
 </package>
