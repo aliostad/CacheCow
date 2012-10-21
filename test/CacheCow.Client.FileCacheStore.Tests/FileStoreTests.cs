@@ -60,7 +60,7 @@ namespace CacheCow.Client.FileCacheStore.Tests
 			});
 
 
-			var cacheItemMetadata = _store.GetLastAccessedItem("d");
+			var cacheItemMetadata = _store.GetEarliestAccessedItem("d");
 			Assert.AreEqual(100, cacheItemMetadata.Size);
 			Assert.AreEqual("d", cacheItemMetadata.Domain);
 			Assert.AreEqual(dateTime, cacheItemMetadata.LastAccessed);
@@ -90,7 +90,7 @@ namespace CacheCow.Client.FileCacheStore.Tests
 			});
 
 
-			var cacheItemMetadata = _store.GetLastAccessedItem();
+			var cacheItemMetadata = _store.GetEarliestAccessedItem();
 			Assert.AreEqual(100, cacheItemMetadata.Size);
 			Assert.AreEqual("d", cacheItemMetadata.Domain);
 			Assert.AreEqual(dateTime.AddDays(-1), cacheItemMetadata.LastAccessed);

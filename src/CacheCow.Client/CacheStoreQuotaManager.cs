@@ -96,7 +96,7 @@ namespace CacheCow.Client
 		{
 			while (GrandTotal > _settings.TotalQuota)
 			{
-				var item = _metadataProvider.GetLastAccessedItem();
+				var item = _metadataProvider.GetEarliestAccessedItem();
 				if(item!=null)
 				{
 					_remover(item);
@@ -122,7 +122,7 @@ namespace CacheCow.Client
 			var dom = (string) domain;
 			while (StorageMetadata[dom] > _settings.PerDomainQuota)
 			{
-				var item = _metadataProvider.GetLastAccessedItem(dom);
+				var item = _metadataProvider.GetEarliestAccessedItem(dom);
 				if (item != null)
 				{
 					_remover(item);

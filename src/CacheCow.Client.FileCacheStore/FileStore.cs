@@ -257,7 +257,7 @@ namespace CacheCow.Client.FileCacheStore
 			return dictionary;
 		}
 
-		public CacheItemMetadata GetLastAccessedItem(string domain)
+		public CacheItemMetadata GetEarliestAccessedItem(string domain)
 		{
 			return (CacheItemMetadata)_database.Cache
 				.FindAllByDomain(domain)
@@ -267,7 +267,7 @@ namespace CacheCow.Client.FileCacheStore
 
 		}
 
-		public CacheItemMetadata GetLastAccessedItem()
+		public CacheItemMetadata GetEarliestAccessedItem()
 		{
 
 			return _database.Cache

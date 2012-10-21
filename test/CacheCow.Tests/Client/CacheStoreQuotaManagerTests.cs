@@ -59,7 +59,7 @@ namespace CacheCow.Tests.Client
 		public void Add_Two_Test_Call_remove()
 		{
 			bool called = false;
-			_metadataProvider.Expect(x => x.GetLastAccessedItem("d")).Return(new CacheItemMetadata()
+			_metadataProvider.Expect(x => x.GetEarliestAccessedItem("d")).Return(new CacheItemMetadata()
 			                                                                 	{
 																					Domain = "d",
 			                                                                 		Size = 5
@@ -80,7 +80,7 @@ namespace CacheCow.Tests.Client
 		public void Add_Test_GrandTotal_remove()
 		{
 			bool called = false;
-			_metadataProvider.Expect(x => x.GetLastAccessedItem()).Return(new CacheItemMetadata()
+			_metadataProvider.Expect(x => x.GetEarliestAccessedItem()).Return(new CacheItemMetadata()
 			{
 				Domain = "c",
 				Size = 3

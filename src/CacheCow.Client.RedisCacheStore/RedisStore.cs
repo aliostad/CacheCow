@@ -36,11 +36,11 @@ namespace CacheCow.Client.RedisCacheStore
 	/// 3) Total Size
 	/// Store as "String". Gets incremented/decremented
 	/// 
-	/// 4) All LastAccessed
-	/// Store as "SortedSet". negative of lastaccessed used as score.
+	/// 4) All EarliestAccessed
+	/// Store as "SortedSet". negative of EarliestAccessed used as score.
 	/// 
-	/// 5) Domain-specific lastAccessed
-	/// Store as "SortedSet". negative of lastaccessed used as score.
+	/// 5) Domain-specific EarliestAccessed
+	/// Store as "SortedSet". negative of EarliestAccessed used as score.
 	/// 
 	/// 6) List of domains
 	/// Stored as "Set".
@@ -59,9 +59,11 @@ namespace CacheCow.Client.RedisCacheStore
 		{
 			public const string DomainList = "List:CacheCow:Domains";
 			public const string DomainPrefix = "String:CacheCow";
+			public const string GlobalSize = "String:CacheCow:Size";
 			public const string DomainSizePrefix = "String:CacheCow:Domain:Size";
-			public const string DomainLastAccessedPrefix = "String:CacheCow:Domain:LastAccessed:";
-			public const string LastAccessed = "String:CacheCow:LastAccessed";
+			public const string DomainEarliestAccessedPrefix = "String:CacheCow:Domain:LastAccessed:";
+			public const string EarliestAccessed = "String:CacheCow:EarliestAccessed";
+			public const string EntryPrefix = "Hash:CacheCow:Entry:";
 			public const string AllEntries = "List:Entries";
 
 		}
@@ -105,7 +107,19 @@ namespace CacheCow.Client.RedisCacheStore
 			_connection = connection;
 		}
 
-	
+		/// <summary>
+		/// Gets the value if exists
+		/// ------------------------------------------
+		/// 
+		/// Steps:
+		/// 
+		/// 1) Get the value
+		/// 2) Update domain-based earliest access
+		/// 3) Update global earliest access
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="response"></param>
+		/// <returns></returns>
 		public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
 		{
 			HttpResponseMessage result = null;
@@ -120,14 +134,44 @@ namespace CacheCow.Client.RedisCacheStore
 						.Wait();
 
 			response = result;
-			return result != null;
+			bool resultBool = result != null;
 
+			if(resultBool)
+			{
+				// step 2
+				_connection.SortedSets.Add(_databaseId, KeyNames.DomainEarliestAccessedPrefix + key.Domain,
+								  key.Hash, DateTime.Now.ToBinary()).Wait();
+
+				// step 3
+				_connection.SortedSets.Add(_databaseId, KeyNames.EarliestAccessed,
+								  key.Hash, DateTime.Now.ToBinary()).Wait();
+
+			}
+
+			return resultBool;
 		}
 
+
+		/// <summary>
+		/// Adds or updates an item in the store
+		/// ------------------------------------
+		/// 
+		/// Steps:
+		/// 1) Add the item
+		/// 2) Update domain-specific sizes
+		/// 3) Update total size
+		/// 4) Add to last accessed in domain set
+		/// 5) Add to general lasst accessed set 
+		/// 6) Add domain (if not exists)
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="response"></param>
 		public void AddOrUpdate(CacheKey key, HttpResponseMessage response)
 		{
 			var memoryStream = new MemoryStream();
 			int length = 0;
+
+			// step 1
 			_serializer.SerializeAsync(response.ToTask(), memoryStream)
 				.Then(() =>
 				      	{
@@ -143,22 +187,74 @@ namespace CacheCow.Client.RedisCacheStore
 				      	})
 				.Wait();
 
-			var uri = new Uri(key.ResourceUri);
-			_connection.Strings.Increment(_databaseId, uri.Host, length)
+			// setp 2
+			_connection.Strings.Increment(_databaseId, KeyNames.DomainPrefix + key.Domain, length)
 				.Wait();
+
+			// step 3
+			_connection.Strings.Increment(_databaseId, KeyNames.GlobalSize, length)
+				.Wait();
+
+			// setp 4
+			_connection.SortedSets.Add(_databaseId, KeyNames.DomainEarliestAccessedPrefix + key.Domain,
+							  key.Hash, DateTime.Now.ToBinary()).Wait();
+
+			// step 5
+			_connection.SortedSets.Add(_databaseId, KeyNames.EarliestAccessed,
+							  key.Hash, DateTime.Now.ToBinary()).Wait();
+
+			// setp 6
+			_connection.Sets.Add(_databaseId, KeyNames.DomainList, key.Domain);
 
 		}
 
+		/// <summary>
+		/// Removes item in cache by its key
+		/// 
+		/// Steps:
+		/// 
+		/// 1) Remove the item
+		/// 2) Update domain-specific sizes
+		/// 3) Update total size
+		/// 4) Remove from last accessed in domain set
+		/// 5) Remove from general lasst accessed set
+		/// </summary>
+		/// <param name="key"></param>
+		/// <returns></returns>
 		public bool TryRemove(CacheKey key)
 		{
-			return _connection.Keys.Remove(_databaseId, key.Hash.ToBase64())
+			var sizeBytes = _connection.Hashes.Get(_databaseId, key.Hash.ToBase64(), Fields.Size).Result;
+			long size = BitConverter.ToInt64(sizeBytes, 0);
+
+			// setp 1
+			bool result = _connection.Keys.Remove(_databaseId, key.Hash.ToBase64())
 				.Result;
+			
+			if(result)
+			{
+				// step 2
+				_connection.Strings.Decrement(_databaseId, KeyNames.DomainSizePrefix + key.Domain,
+				                              size).Wait();
+
+				// setp 3
+				_connection.Strings.Decrement(_databaseId, KeyNames.GlobalSize,
+											  size).Wait();
+
+				// step 4
+				_connection.SortedSets.Remove(_databaseId, KeyNames.DomainEarliestAccessedPrefix + key.Domain,
+				                              key.Hash).Wait();
+
+				// step 5
+				_connection.SortedSets.Remove(_databaseId, KeyNames.EarliestAccessed,
+											  key.Hash).Wait();
+
+			}
+			return result;
 		}
 
 		public void Clear()
 		{
-
-			//_connection.Keys.
+			throw new NotSupportedException("Currently not supported. Might get implemented later"); // TODO: think of implementation 
 		}
 
 		public void Dispose()
@@ -187,13 +283,13 @@ namespace CacheCow.Client.RedisCacheStore
 			return sizes;
 		}
 
-		public CacheItemMetadata GetLastAccessedItem(string domain)
+		public CacheItemMetadata GetEarliestAccessedItem(string domain)
 		{
 			var cacheItemMetadata = new CacheItemMetadata();
 			cacheItemMetadata.Domain = domain;
 			//cacheItemMetadata.
 			var item = _connection.SortedSets.Range(_databaseId, 
-				KeyNames.DomainLastAccessedPrefix + domain, 0,0).Result; // TODO!!
+				KeyNames.DomainEarliestAccessedPrefix + domain, 0,0).Result; // TODO!!
 
 			if(item.Length==0)
 				return null;
@@ -206,12 +302,12 @@ namespace CacheCow.Client.RedisCacheStore
 			return cacheItemMetadata;
 		}
 
-		public CacheItemMetadata GetLastAccessedItem()
+		public CacheItemMetadata GetEarliestAccessedItem()
 		{
 			var cacheItemMetadata = new CacheItemMetadata();
 			//cacheItemMetadata.
 			var item = _connection.SortedSets.Range(_databaseId,
-				KeyNames.LastAccessed, 0, 0).Result; // TODO!! refactor to do proper async
+				KeyNames.EarliestAccessed, 0, 0).Result; // TODO!! refactor to do proper async
 
 			if (item.Length == 0)
 				return null;

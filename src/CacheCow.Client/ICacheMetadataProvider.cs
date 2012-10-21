@@ -8,7 +8,7 @@ namespace CacheCow.Client
 	public interface ICacheMetadataProvider
 	{
 		IDictionary<string, long> GetDomainSizes();
-		CacheItemMetadata GetLastAccessedItem(string domain);
-		CacheItemMetadata GetLastAccessedItem();
+		CacheItemMetadata GetEarliestAccessedItem(string domain);
+		CacheItemMetadata GetEarliestAccessedItem();
 	}
 }
