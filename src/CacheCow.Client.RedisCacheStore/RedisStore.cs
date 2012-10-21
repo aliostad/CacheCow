@@ -63,8 +63,6 @@ namespace CacheCow.Client.RedisCacheStore
 			public const string DomainSizePrefix = "String:CacheCow:Domain:Size";
 			public const string DomainEarliestAccessedPrefix = "String:CacheCow:Domain:LastAccessed:";
 			public const string EarliestAccessed = "String:CacheCow:EarliestAccessed";
-			public const string EntryPrefix = "Hash:CacheCow:Entry:";
-			public const string AllEntries = "List:Entries";
 
 		}
 
@@ -84,7 +82,7 @@ namespace CacheCow.Client.RedisCacheStore
 		public RedisStore(string connectingString)
 			: this(RedisConnectionSettings.Parse(connectingString))
 		{
-			
+
 		}
 
 		public RedisStore(RedisConnectionSettings settings)
@@ -92,11 +90,12 @@ namespace CacheCow.Client.RedisCacheStore
 			_dispose = true;
 			_connection = new RedisConnection(settings.HostName,
 				settings.Port,
-				(int) (settings.IoTimeout <= TimeSpan.Zero ? -1 : settings.IoTimeout.TotalMilliseconds),
+				(int)(settings.IoTimeout <= TimeSpan.Zero ? -1 : settings.IoTimeout.TotalMilliseconds),
 				string.IsNullOrEmpty(settings.Password) ? null : settings.Password,
 				settings.MaxUnsentBytes,
 				settings.AllowAdmin,
-				(int) settings.SynTimeout.TotalMilliseconds);
+				(int)settings.SynTimeout.TotalMilliseconds);
+			_connection.Open();
 			_databaseId = settings.DatabaseId;
 		}
 
@@ -123,20 +122,24 @@ namespace CacheCow.Client.RedisCacheStore
 		public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
 		{
 			HttpResponseMessage result = null;
+			response = null;
+			string entryKey = key.Hash.ToBase64();
+			if (!_connection.Keys.Exists(_databaseId, entryKey).Result)
+				return false;
 
-			_connection.Hashes.Get(_databaseId, Fields.Response, key.Hash.ToBase64())
-				.Then(bytes =>
-				      	{
-							var memoryStream = new MemoryStream(bytes);
-				      		return _serializer.DeserializeToResponseAsync(memoryStream);
-				      	})
-						.Then(r => result = r)
-						.Wait();
+			_connection.Hashes.Get(_databaseId, entryKey, Fields.Response)
+			.Then(bytes =>
+			{
+				var memoryStream = new MemoryStream(bytes);
+				return _serializer.DeserializeToResponseAsync(memoryStream);
+			})
+					.Then(r => result = r)
+					.Wait();
 
 			response = result;
 			bool resultBool = result != null;
 
-			if(resultBool)
+			if (resultBool)
 			{
 				// step 2
 				_connection.SortedSets.Add(_databaseId, KeyNames.DomainEarliestAccessedPrefix + key.Domain,
@@ -174,17 +177,17 @@ namespace CacheCow.Client.RedisCacheStore
 			// step 1
 			_serializer.SerializeAsync(response.ToTask(), memoryStream)
 				.Then(() =>
-				      	{
-				      		var bytes = memoryStream.ToArray();
-				      		length = bytes.Length;
-				      		var dictionary = new Dictionary<string, byte[]>();
-							dictionary.Add(Fields.Response, bytes);
-							dictionary.Add(Fields.Size, BitConverter.GetBytes(length));
-							dictionary.Add(Fields.Domain, Encoding.UTF8.GetBytes(key.Domain));
-							
-				      		return _connection.Hashes.Set(_databaseId,
-								key.Hash.ToBase64(), dictionary);
-				      	})
+				{
+					var bytes = memoryStream.ToArray();
+					length = bytes.Length;
+					var dictionary = new Dictionary<string, byte[]>();
+					dictionary.Add(Fields.Response, bytes);
+					dictionary.Add(Fields.Size, BitConverter.GetBytes(length));
+					dictionary.Add(Fields.Domain, Encoding.UTF8.GetBytes(key.Domain));
+
+					return _connection.Hashes.Set(_databaseId,
+						key.Hash.ToBase64(), dictionary);
+				})
 				.Wait();
 
 			// setp 2
@@ -223,18 +226,21 @@ namespace CacheCow.Client.RedisCacheStore
 		/// <returns></returns>
 		public bool TryRemove(CacheKey key)
 		{
+			if (!_connection.Keys.Exists(_databaseId, key.Hash.ToBase64()).Result)
+				return false;
+
 			var sizeBytes = _connection.Hashes.Get(_databaseId, key.Hash.ToBase64(), Fields.Size).Result;
 			long size = BitConverter.ToInt64(sizeBytes, 0);
 
 			// setp 1
 			bool result = _connection.Keys.Remove(_databaseId, key.Hash.ToBase64())
 				.Result;
-			
-			if(result)
+
+			if (result)
 			{
 				// step 2
 				_connection.Strings.Decrement(_databaseId, KeyNames.DomainSizePrefix + key.Domain,
-				                              size).Wait();
+											  size).Wait();
 
 				// setp 3
 				_connection.Strings.Decrement(_databaseId, KeyNames.GlobalSize,
@@ -242,7 +248,7 @@ namespace CacheCow.Client.RedisCacheStore
 
 				// step 4
 				_connection.SortedSets.Remove(_databaseId, KeyNames.DomainEarliestAccessedPrefix + key.Domain,
-				                              key.Hash).Wait();
+											  key.Hash).Wait();
 
 				// step 5
 				_connection.SortedSets.Remove(_databaseId, KeyNames.EarliestAccessed,
@@ -270,16 +276,16 @@ namespace CacheCow.Client.RedisCacheStore
 			Dictionary<string, long> sizes = new Dictionary<string, long>();
 			_connection.Lists.Range(_databaseId, KeyNames.DomainList, 0, int.MaxValue)
 				.ContinueWith(t =>
-				              	{
-				              		var result = t.Result;
-				              		for (int i = 0; i < result.Length; i++)
-				              		{
-				              			string domain = Encoding.UTF8.GetString(result[i]);
-				              			var size = _connection.Strings.Get(_databaseId, KeyNames.DomainSizePrefix + domain).Result;
-										sizes.Add(domain, BitConverter.ToInt64(size, 0));
-				              		}
+				{
+					var result = t.Result;
+					for (int i = 0; i < result.Length; i++)
+					{
+						string domain = Encoding.UTF8.GetString(result[i]);
+						var size = _connection.Strings.Get(_databaseId, KeyNames.DomainSizePrefix + domain).Result;
+						sizes.Add(domain, BitConverter.ToInt64(size, 0));
+					}
 
-				              	}).Wait();
+				}).Wait();
 			return sizes;
 		}
 
@@ -288,15 +294,15 @@ namespace CacheCow.Client.RedisCacheStore
 			var cacheItemMetadata = new CacheItemMetadata();
 			cacheItemMetadata.Domain = domain;
 			//cacheItemMetadata.
-			var item = _connection.SortedSets.Range(_databaseId, 
-				KeyNames.DomainEarliestAccessedPrefix + domain, 0,0).Result; // TODO!!
+			var item = _connection.SortedSets.Range(_databaseId,
+				KeyNames.DomainEarliestAccessedPrefix + domain, 0, 0).Result; // TODO!!
 
-			if(item.Length==0)
+			if (item.Length == 0)
 				return null;
-			string key = Encoding.UTF8.GetString(item[0].Key);
-			cacheItemMetadata.Key = Convert.FromBase64String(key);
-			var results = _connection.Hashes.GetValues(_databaseId, key).Result; // TODO!! refactor to do proper async
-			cacheItemMetadata.Size = Convert.ToInt64(results[1]);
+
+			cacheItemMetadata.Key = item[0].Key;
+			var results = _connection.Hashes.GetValues(_databaseId, item[0].Key.ToBase64()).Result; // TODO!! refactor to do proper async
+			cacheItemMetadata.Size = BitConverter.ToInt64(results[1], 0);
 			cacheItemMetadata.LastAccessed = DateTime.Now; // TODO: this value is not really required. Decide whether deleted
 			cacheItemMetadata.Domain = Encoding.UTF8.GetString(results[2]);
 			return cacheItemMetadata;
@@ -305,16 +311,14 @@ namespace CacheCow.Client.RedisCacheStore
 		public CacheItemMetadata GetEarliestAccessedItem()
 		{
 			var cacheItemMetadata = new CacheItemMetadata();
-			//cacheItemMetadata.
 			var item = _connection.SortedSets.Range(_databaseId,
 				KeyNames.EarliestAccessed, 0, 0).Result; // TODO!! refactor to do proper async
 
 			if (item.Length == 0)
 				return null;
-			string key = Encoding.UTF8.GetString(item[0].Key);
-			cacheItemMetadata.Key = Convert.FromBase64String(key);
-			var results = _connection.Hashes.GetValues(_databaseId, key).Result; // TODO!! refactor to do proper async
-			cacheItemMetadata.Size = Convert.ToInt64(results[1]);
+			cacheItemMetadata.Key = item[0].Key;
+			var results = _connection.Hashes.GetValues(_databaseId, item[0].Key.ToBase64()).Result; // TODO!! refactor to do proper async
+			cacheItemMetadata.Size = BitConverter.ToInt64(results[1], 0);
 			cacheItemMetadata.LastAccessed = DateTime.Now; // TODO: this value is not really required. Decide whether deleted
 			cacheItemMetadata.Domain = Encoding.UTF8.GetString(results[2]);
 			return cacheItemMetadata;
