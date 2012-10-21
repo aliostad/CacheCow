@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright 2012</copyright>
+    <tags>aspnetwebapi http caching webapi cachecow etag redisstore redis booksleeve</tags>
+	<dependencies>
+      <dependency id="CacheCow.Client" version="$version$"  />
+      <dependency id="Simple.Data.Sqlite" version="0.16.0.0"  />
+      <dependency id="BookSleeve" version="1.2.0.1"  />
+    </dependencies>	
+  </metadata>
+</package>
