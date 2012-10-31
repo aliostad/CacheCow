@@ -41,9 +41,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagSt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.RavenDb.Tests", "test\CacheCow.Server.EntityTagStore.RavenDb.Tests\CacheCow.Server.EntityTagStore.RavenDb.Tests.csproj", "{7E5FFED1-8337-43A8-BF3C-18C2733656F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.MongoDb", "CacheCow.Server.EntityTagStore.MongoDb\CacheCow.Server.EntityTagStore.MongoDb.csproj", "{49EDF342-99DB-4832-98AA-1815415DDD96}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.MongoDb", "src\CacheCow.Server.EntityTagStore.MongoDb\CacheCow.Server.EntityTagStore.MongoDb.csproj", "{49EDF342-99DB-4832-98AA-1815415DDD96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.MongoDb.Tests", "CacheCow.Server.EntityTagStore.MongoDb.Tests\CacheCow.Server.EntityTagStore.MongoDb.Tests.csproj", "{34435BE1-1EC6-424C-9BD6-5F8DC71CBEF6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.MongoDb.Tests", "test\CacheCow.Server.EntityTagStore.MongoDb.Tests\CacheCow.Server.EntityTagStore.MongoDb.Tests.csproj", "{34435BE1-1EC6-424C-9BD6-5F8DC71CBEF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

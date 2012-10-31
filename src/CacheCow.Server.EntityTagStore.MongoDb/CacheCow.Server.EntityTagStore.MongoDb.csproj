@@ -55,7 +55,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\CacheCow.Common\CacheCow.Common.csproj">
+    <ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj">
       <Project>{88E170E4-B857-42FE-963C-0505502B548C}</Project>
       <Name>CacheCow.Common</Name>
     </ProjectReference>
