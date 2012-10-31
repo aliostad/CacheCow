@@ -139,7 +139,7 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 
 			// delete
 			Assert.AreEqual(2, store.RemoveAllByRoutePattern("/api/Cars"));
-
+			Assert.AreEqual(0, store.RemoveAllByRoutePattern("/api/Cars"));
 
 		}
 

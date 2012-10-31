@@ -116,7 +116,7 @@ namespace CacheCow.Server.EntityTagStore.SqlServer.Tests
 
 			// delete
 			Assert.AreEqual(2, store.RemoveAllByRoutePattern("/api/Cars"));
-
+			Assert.AreEqual(0, store.RemoveAllByRoutePattern("/api/Cars"));
 
 		}
 
