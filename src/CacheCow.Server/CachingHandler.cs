@@ -45,6 +45,10 @@ namespace CacheCow.Server
 
 		public bool AddVaryHeader { get; set; }
 
+		public bool AddExpiresMinusOneHeader { get; set; }
+
+		public bool AddPragmaNoCacheHeader { get; set; }
+
 		public CachingHandler(params string[] varyByHeader)
 			: this(new InMemoryEntityTagStore(), varyByHeader)
 		{
@@ -55,6 +59,9 @@ namespace CacheCow.Server
 		{
 			AddLastModifiedHeader = true;
 			AddVaryHeader = true;
+			AddExpiresMinusOneHeader = true;
+			AddPragmaNoCacheHeader = true;
+
 			_varyByHeaders = varyByHeaders;
 			_entityTagStore = entityTagStore;
 			ETagValueGenerator = (resourceUri, headers) =>
@@ -241,6 +248,20 @@ namespace CacheCow.Server
 						{
 							eTagValue = new TimedEntityTagHeaderValue(ETagValueGenerator(uri, varyHeaders));
 							_entityTagStore.AddOrUpdate(cacheKey, eTagValue);
+						}
+
+						// set pragma
+						if (AddPragmaNoCacheHeader && !response.Headers.Any(x => x.Key.Equals(HttpHeaderNames.Pragma,
+							StringComparison.CurrentCultureIgnoreCase)))
+						{
+							response.Headers.Add("Pragma", "no-cache");
+						}
+
+						// set expires
+						if (AddExpiresMinusOneHeader && response.Content != null && !response.Content.Headers.Any(x => x.Key.Equals(HttpHeaderNames.LastModified,
+							StringComparison.CurrentCultureIgnoreCase)))
+						{
+							response.Content.Headers.TryAddWithoutValidation(HttpHeaderNames.Expires, "-1");
 						}
 
 						// set ETag
