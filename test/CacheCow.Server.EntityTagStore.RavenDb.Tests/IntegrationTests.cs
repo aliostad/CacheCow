@@ -31,8 +31,7 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 
 			var store = new RavenDbEntityTagStore(documentStore);
 			var value = new TimedEntityTagHeaderValue("\"abcdef1234\"") { LastModified = DateTime.Now };
-
-
+			
 			// first remove them
 			store.RemoveAllByRoutePattern(cacheKey.RoutePattern);
 
@@ -140,7 +139,7 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 
 			// delete
 			Assert.AreEqual(2, store.RemoveAllByRoutePattern("/api/Cars"));
-
+			Assert.AreEqual(0, store.RemoveAllByRoutePattern("/api/Cars"));
 
 		}
 
