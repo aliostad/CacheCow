@@ -73,7 +73,7 @@ namespace CacheCow.Server
 				Private = true,
 				MustRevalidate = true,
 				NoTransform = true,
-				MaxAge = TimeSpan.FromDays(7)
+				MaxAge = TimeSpan.Zero
 			};
 		}
 
