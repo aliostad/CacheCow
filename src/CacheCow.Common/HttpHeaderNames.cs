@@ -17,7 +17,7 @@ namespace CacheCow.Common
 		public const string IfModifiedSince = "If-Modified-Since";
 		public const string IfUnmodifiedSince = "If-Unmodified-Since";
 		public const string Vary = "Vary";
-
+		public const string Pragma = "Pragma";
+		public const string Expires = "Expires";
 	}
-
 }
