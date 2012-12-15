@@ -39,6 +39,7 @@
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Server.EntityTagStore.MongoDb\CacheCow.Server.EntityTagStore.MongoDb.csproj -Build -OutputDirectory ..\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Client.FileCacheStore\CacheCow.Client.FileCacheStore.csproj -Build -OutputDirectory ..\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Client.RedisCacheStore\CacheCow.Client.RedisCacheStore.csproj -Build -OutputDirectory ..\artifacts\packages" />
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack ..\src\CacheCow.Client.SqlCacheStore\CacheCow.Client.SqlCacheStore.csproj -Build -OutputDirectory ..\artifacts\packages" />
   </Target>
   <Target Name="Publish">
     <Exec WorkingDirectory="%(ScriptsDir.FullPath)" Command="powershell -file .\publish.ps1" />
