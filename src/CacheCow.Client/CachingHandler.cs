@@ -171,7 +171,7 @@ namespace CacheCow.Client
 			}
 
 			if (request.Headers.CacheControl == null)
-				return staleness > TimeSpan.Zero;
+				return staleness < TimeSpan.Zero;
 
 			if (request.Headers.CacheControl.MinFresh.HasValue)
 				return -staleness > request.Headers.CacheControl.MinFresh.Value; // staleness is negative if still fresh
