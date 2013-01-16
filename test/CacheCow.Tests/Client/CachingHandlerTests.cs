@@ -147,7 +147,6 @@ namespace CacheCow.Tests.Client
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			var responseFromCache = GetOkMessage();
 			responseFromCache.Content.Headers.Expires = DateTimeOffset.Now.AddDays(-1);
-			responseFromCache.Headers.CacheControl.MaxAge = null;
 			var responseFromServer = GetOkMessage();
 			_messageHandler.Response = responseFromServer;
 			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
@@ -173,40 +172,6 @@ namespace CacheCow.Tests.Client
 
 		}
 
-		[Test]
-		public void Get_Stale_And_Expired_Max_Age_In_Cache_To_Get_Again()
-		{
-			// setup 
-			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
-			var responseFromCache = GetOkMessage();
-			responseFromCache.Content.Headers.Expires = DateTimeOffset.Now.AddDays(-1);
-			responseFromCache.Headers.CacheControl.MaxAge = TimeSpan.FromSeconds(200);
-			responseFromCache.Headers.Date = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromSeconds(201));
-			var responseFromServer = GetOkMessage();
-			_messageHandler.Response = responseFromServer;
-			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
-				  out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
-			_cacheStore.Expect(x => x.TryRemove(Arg<CacheKey>.Is.Anything)).Return(true);
-			_cacheStore.Expect(x => x.AddOrUpdate(Arg<CacheKey>.Is.Anything,
-				  Arg<HttpResponseMessage>.Is.Same(responseFromServer)));
-
-			_mockRepository.ReplayAll();
-
-			// run
-			var task = _client.SendAsync(request);
-			var responseReturned = task.Result;
-			var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
-			CacheCowHeader cacheCowHeader = null;
-			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
-
-			// verify
-			_mockRepository.VerifyAll();
-			Assert.IsNotNull(cacheCowHeader);
-			Assert.AreSame(responseFromServer, responseReturned);
-			Assert.AreEqual(true, cacheCowHeader.WasStale);
-		}
-
- 
 		[Test]
 		public void Get_Must_Revalidate_Etag_NotModified()
 		{
