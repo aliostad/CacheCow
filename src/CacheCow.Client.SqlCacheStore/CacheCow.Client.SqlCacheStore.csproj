@@ -58,6 +58,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Common\TaskHelpers.cs">
+      <Link>Internal\TaskHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\TaskHelpersExtensions.cs">
+      <Link>Internal\TaskHelpersExtensions.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlStore.cs" />
   </ItemGroup>

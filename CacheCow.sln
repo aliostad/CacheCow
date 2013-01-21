@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2010
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B1901128-F84A-46CE-B8FD-E863465F94C2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{039FAC3C-D681-4028-ADB3-A382C695F7E9}"
@@ -46,6 +46,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.SqlCacheStore", "src\CacheCow.Client.SqlCacheStore\CacheCow.Client.SqlCacheStore.csproj", "{943C3FC9-78E6-4188-9086-33765CEF84BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.SqlCacheStore.Tests", "test\CacheCow.Client.SqlCacheStore.Tests\CacheCow.Client.SqlCacheStore.Tests.csproj", "{74E1187D-9E70-47F3-8C22-54655FB1E472}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.Tests", "test\CacheCow.Client.Tests\CacheCow.Client.Tests.csproj", "{1ADB6175-95B9-4BB9-AF56-B4291196554C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,6 +115,10 @@ Global
 		{74E1187D-9E70-47F3-8C22-54655FB1E472}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74E1187D-9E70-47F3-8C22-54655FB1E472}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74E1187D-9E70-47F3-8C22-54655FB1E472}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -133,5 +139,6 @@ Global
 		{53E2C779-A780-41B2-A55B-0E4156C5AD7F} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{7E5FFED1-8337-43A8-BF3C-18C2733656F2} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{74E1187D-9E70-47F3-8C22-54655FB1E472} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
+		{1ADB6175-95B9-4BB9-AF56-B4291196554C} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 	EndGlobalSection
 EndGlobal
