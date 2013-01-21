@@ -12,6 +12,7 @@ using CacheCow.Common;
 using System.Data.SQLite;
 using Simple.Data;
 using CacheCow.Common.Helpers;
+using System.Threading.Tasks;
 
 namespace CacheCow.Client.FileCacheStore
 {

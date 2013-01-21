@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using CacheCow.Common;
+using System.Threading.Tasks;
 
 namespace CacheCow.Client
 {

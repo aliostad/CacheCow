@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using CacheCow.Common;
 using Dapper;
+using System.Threading.Tasks;
 
 namespace CacheCow.Client.SqlCacheStore
 {
