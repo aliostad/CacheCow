@@ -8,7 +8,7 @@ using System.Text;
 using CacheCow.Client;
 using NUnit.Framework;
 
-namespace CacheCow.Tests.Client
+namespace CacheCow.Client.Tests
 {
 	[TestFixture]
 	public class ResponseValidatorTests

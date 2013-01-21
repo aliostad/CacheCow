@@ -79,6 +79,12 @@
     <Compile Include="..\Common\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\Common\TaskHelpers.cs">
+      <Link>Internal\TaskHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\TaskHelpersExtensions.cs">
+      <Link>Internal\TaskHelpersExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Common\TraceWriter.cs">
       <Link>Internal\TraceWriter.cs</Link>
     </Compile>

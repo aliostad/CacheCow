@@ -61,17 +61,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\CacheCowHeaderTests.cs" />
-    <Compile Include="Client\CacheStoreQuotaManagerTests.cs" />
-    <Compile Include="Client\CachingHandlerTests.cs" />
-    <Compile Include="Client\IntegrationTests.cs" />
-    <Compile Include="Client\RequestSerializationTests.cs" />
-    <Compile Include="Client\ResponseSerializationTests.cs" />
-    <Compile Include="Client\ResponseValidatorTests.cs" />
-    <Compile Include="Client\SerialisationTests.cs" />
-    <Compile Include="DeepComparer.cs" />
-    <Compile Include="Helper\DummyMessageHandler.cs" />
-    <Compile Include="Helper\ResponseHelper.cs" />
+    <Compile Include="..\Common\DummyMessageHandler.cs">
+      <Link>Common\DummyMessageHandler.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\CachingHandlerRulesTests.cs" />
     <Compile Include="Server\CachingHandlerTests.cs" />
@@ -79,15 +71,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EmbeddedResource Include="Data\Request.bin" />
-    <EmbeddedResource Include="Data\Response.bin" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CacheCow.Client\CacheCow.Client.csproj">
-      <Project>{943325CB-7189-42FE-9DA4-E513DB3E0E87}</Project>
-      <Name>CacheCow.Client</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj">
       <Project>{88e170e4-b857-42fe-963c-0505502b548c}</Project>
       <Name>CacheCow.Common</Name>
@@ -96,9 +82,6 @@
       <Project>{b67727f4-5b65-41d0-8d26-8d1c32cea63d}</Project>
       <Name>CacheCow.Server</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Helper\Headers.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
