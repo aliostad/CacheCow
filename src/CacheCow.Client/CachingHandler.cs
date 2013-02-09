@@ -38,6 +38,7 @@ namespace CacheCow.Client
 		{
 			_cacheStore = cacheStore;
 			UseConditionalPut = true;
+		    MustRevalidateByDefault = true;
 			VaryHeaderStore = new InMemoryVaryHeaderStore();
 			DefaultVaryHeaders = new string[]{"Accept"};
 			ResponseValidator = (response) =>
@@ -69,15 +70,15 @@ namespace CacheCow.Client
 
 					if (response.Content.Headers.Expires != null &&
 						response.Content.Headers.Expires < DateTimeOffset.UtcNow)
-						return response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
+						return MustRevalidateByDefault || response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
 
 					if (response.Headers.CacheControl.MaxAge != null &&
 						DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.MaxAge.Value))
-						return response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
+                        return MustRevalidateByDefault || response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
 
 					if (response.Headers.CacheControl.SharedMaxAge != null &&
 						DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.SharedMaxAge.Value))
-						return response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
+                        return MustRevalidateByDefault || response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
 
 			        return ResponseValidationResult.OK;
 			    };
@@ -124,6 +125,15 @@ namespace CacheCow.Client
 		/// </summary>
 		public bool UseConditionalPut { get; set; }
 
+        /// <summary>
+        /// true by default;
+        /// If true, then as soon as a resource is stale, GET calls will always be
+        /// conditional GET regardless of presence of must-revalidate in the response.
+        /// If false, conditional GET is called only if max-age defined by request or
+        /// must-revalidate is defined in the response.
+        /// </summary>
+        public bool MustRevalidateByDefault { get; set; }
+
 		/// <summary>
 		/// Inspects the response and returns ResponseValidationResult
 		/// based on the rules defined
@@ -137,6 +147,15 @@ namespace CacheCow.Client
 		public Action<HttpResponseMessage> ResponseStoragePreparationRules { get; set; } 
 
 
+        /// <summary>
+        /// Returns whether resource is fresh of if stale, it is acceptable to be stale
+        /// null --> dont know, cannot be determined
+        /// true --> yes, is OK if stale
+        /// false --> no, it is not OK to be stale 
+        /// </summary>
+        /// <param name="cachedResponse"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
 		private bool? IsFreshOrStaleAcceptable(HttpResponseMessage cachedResponse, HttpRequestMessage request)
 		{
 
@@ -171,7 +190,7 @@ namespace CacheCow.Client
 			}
 
 			if (request.Headers.CacheControl == null)
-				return staleness > TimeSpan.Zero;
+				return staleness < TimeSpan.Zero;
 
 			if (request.Headers.CacheControl.MinFresh.HasValue)
 				return -staleness > request.Headers.CacheControl.MinFresh.Value; // staleness is negative if still fresh
@@ -265,11 +284,11 @@ namespace CacheCow.Client
 			{
 				cacheCowHeader.WasStale = true;
 				var isFreshOrStaleAcceptable = IsFreshOrStaleAcceptable(cachedResponse, request);
-				if (isFreshOrStaleAcceptable.HasValue && isFreshOrStaleAcceptable.Value) // similar to OK
-					return TaskHelpers.FromResult(cachedResponse.AddCacheCowHeader(cacheCowHeader)); // EXIT !! ____________________________				
-				else
-					_cacheStore.TryRemove(cacheKey);
-				TraceWriter.WriteLine("{0} - after TryRemove ", TraceLevel.Verbose, request.RequestUri.ToString());
+			    if (isFreshOrStaleAcceptable.HasValue && isFreshOrStaleAcceptable.Value) // similar to OK
+			        return TaskHelpers.FromResult(cachedResponse.AddCacheCowHeader(cacheCowHeader));
+			            // EXIT !! ____________________________				
+			    else
+			        validationResultForCachedResponse = ResponseValidationResult.MustRevalidate; // revalidate
 
 			}
 
