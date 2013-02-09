@@ -141,19 +141,19 @@ namespace CacheCow.Client.Tests
 
 
 		[Test]
-		public void Get_Stale()
+		public void Get_Stale_ApplyValidation_NotModified()
 		{
 			// setup 
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			var responseFromCache = GetOkMessage();
-			responseFromCache.Content.Headers.Expires = DateTimeOffset.Now.AddDays(-1);
+            responseFromCache.Content.Headers.Expires = DateTimeOffset.Now.AddDays(-1);
+            responseFromCache.Content.Headers.LastModified = DateTimeOffset.Now.AddDays(-2);
 			var responseFromServer = GetOkMessage();
+            responseFromServer.StatusCode = HttpStatusCode.NotModified;
+		    
 			_messageHandler.Response = responseFromServer;
 			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
 				  out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
-			_cacheStore.Expect(x => x.TryRemove(Arg<CacheKey>.Is.Anything)).Return(true);
-			_cacheStore.Expect(x => x.AddOrUpdate(Arg<CacheKey>.Is.Anything,
-				  Arg<HttpResponseMessage>.Is.Same(responseFromServer)));
 
 			_mockRepository.ReplayAll();
 
@@ -167,8 +167,9 @@ namespace CacheCow.Client.Tests
 			// verify
 			_mockRepository.VerifyAll();
 			Assert.IsNotNull(cacheCowHeader);
-			Assert.AreSame(responseFromServer, responseReturned);
-			Assert.AreEqual(true, cacheCowHeader.WasStale);
+			Assert.AreSame(responseFromCache, responseReturned);
+            Assert.AreEqual(true, cacheCowHeader.WasStale);
+            Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
 
 		}
 
@@ -323,8 +324,6 @@ namespace CacheCow.Client.Tests
             _messageHandler.Response = responseFromServer;
             _cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
                   out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
-            _cacheStore.Expect(x => x.AddOrUpdate(Arg<CacheKey>.Is.Anything,
-                  Arg<HttpResponseMessage>.Is.Same(responseFromServer)));
 
             _mockRepository.ReplayAll();
 
@@ -338,8 +337,8 @@ namespace CacheCow.Client.Tests
             // verify
             _mockRepository.VerifyAll();
             Assert.IsNotNull(cacheCowHeader);
-            Assert.AreSame(responseFromServer, responseReturned);
-            Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
+            Assert.AreSame(responseFromCache, responseReturned);
+            Assert.AreEqual(true, cacheCowHeader.WasStale);
 
         }
 

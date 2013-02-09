@@ -148,7 +148,7 @@ namespace CacheCow.Client
 
 
         /// <summary>
-        /// Returns whether resource is fresh of if stale, it is acceptable to be stale
+        /// Returns whether resource is fresh or if stale, it is acceptable to be stale
         /// null --> dont know, cannot be determined
         /// true --> yes, is OK if stale
         /// false --> no, it is not OK to be stale 
@@ -199,7 +199,7 @@ namespace CacheCow.Client
 				return true;
 
 			if (request.Headers.CacheControl.MaxStaleLimit.HasValue)
-				return staleness > request.Headers.CacheControl.MaxStaleLimit.Value;
+				return staleness < request.Headers.CacheControl.MaxStaleLimit.Value;
 
 			if (request.Headers.CacheControl.MaxAge.HasValue)
 				return responseDate.Value.Add(request.Headers.CacheControl.MaxAge.Value) > DateTimeOffset.Now;
@@ -207,6 +207,7 @@ namespace CacheCow.Client
 			return false;
 		}
 
+        // TODO: this method is terribly long. Shorten
 		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
 			var cacheCowHeader = new CacheCowHeader();
@@ -296,6 +297,7 @@ namespace CacheCow.Client
 			else if(validationResultForCachedResponse == ResponseValidationResult.MustRevalidate)
 			{
 				cacheCowHeader.CacheValidationApplied = true;
+                cacheCowHeader.WasStale = true;
 
 				// add headers for a cache validation. First check ETag since is better 
 				if(cachedResponse.Headers.ETag!=null)

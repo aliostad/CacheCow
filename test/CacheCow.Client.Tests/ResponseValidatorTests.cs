@@ -54,6 +54,8 @@ namespace CacheCow.Client.Tests
 		public void Test_Stale_By_Expires()
 		{
 			var cachingHandler = new CachingHandler();
+            cachingHandler.MustRevalidateByDefault = false;
+
 			var response = new HttpResponseMessage(HttpStatusCode.OK);
 			response.Headers.CacheControl = new CacheControlHeaderValue() { Public = true };
 			response.Content = new ByteArrayContent(new byte[256]);
@@ -65,7 +67,7 @@ namespace CacheCow.Client.Tests
 		public void Test_Stale_By_Age()
 		{
 			var cachingHandler = new CachingHandler();
-			var response = new HttpResponseMessage(HttpStatusCode.OK);
+            var response = new HttpResponseMessage(HttpStatusCode.OK);
 			response.Headers.CacheControl = new CacheControlHeaderValue()
 			                                	{
 			                                		Public = true,
@@ -73,13 +75,32 @@ namespace CacheCow.Client.Tests
 			                                	};
 			response.Headers.Date = DateTimeOffset.UtcNow.AddDays(-1);
 			response.Content = new ByteArrayContent(new byte[256]);
-			Assert.AreEqual(cachingHandler.ResponseValidator(response), ResponseValidationResult.Stale);
+			Assert.AreEqual(cachingHandler.ResponseValidator(response), ResponseValidationResult.MustRevalidate);
 		}
+
+        [Test]
+        public void Test_Stale_By_Age_MustRevalidateByDefaultOFF()
+        {
+            var cachingHandler = new CachingHandler();
+            cachingHandler.MustRevalidateByDefault = false;
+
+            var response = new HttpResponseMessage(HttpStatusCode.OK);
+            response.Headers.CacheControl = new CacheControlHeaderValue()
+            {
+                Public = true,
+                MaxAge = TimeSpan.FromSeconds(200)
+            };
+            response.Headers.Date = DateTimeOffset.UtcNow.AddDays(-1);
+            response.Content = new ByteArrayContent(new byte[256]);
+            Assert.AreEqual(cachingHandler.ResponseValidator(response), ResponseValidationResult.Stale);
+        }
 
 		[Test]
 		public void Test_Stale_By_SharedAge()
 		{
 			var cachingHandler = new CachingHandler();
+            cachingHandler.MustRevalidateByDefault = false;
+
 			var response = new HttpResponseMessage(HttpStatusCode.OK);
 			response.Headers.CacheControl = new CacheControlHeaderValue()
 			{
