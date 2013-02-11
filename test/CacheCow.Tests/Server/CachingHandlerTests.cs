@@ -21,6 +21,7 @@ namespace CacheCow.Tests.Server
 		[TestCase("DELETE")]
 		[TestCase("PUT")]
 		[TestCase("POST")]
+		[TestCase("PATCH")]
 		public static void TestCacheInvalidation(string method)
 		{
 			// setup
@@ -30,9 +31,9 @@ namespace CacheCow.Tests.Server
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
 			var linkedUrls = new []{"url1", "url2"};
 			var cachingHandler = new CachingHandler(entityTagStore)
-			                     	{
+									{
 										LinkedRoutePatternProvider = (url, mthd) => linkedUrls
-			                     	};
+									};
 			var entityTagKey = new CacheKey(TestUrl, new string[0], routePattern);
 			var response = new HttpResponseMessage();
 			var invalidateCache = cachingHandler.InvalidateCache(entityTagKey, request, response);
@@ -52,6 +53,7 @@ namespace CacheCow.Tests.Server
 
 		[TestCase("PUT")]
 		[TestCase("POST")]
+        [TestCase("PATCH")]
 		public static void TestCacheInvalidationForPost(string method)
 		{
 			// setup
