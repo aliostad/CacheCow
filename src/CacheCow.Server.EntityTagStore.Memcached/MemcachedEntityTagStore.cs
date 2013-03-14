@@ -44,6 +44,8 @@ namespace CacheCow.Server.EntityTagStore.Memcached
 
         }
 
+        // TODO: !!! routePattern implementation needs to be changed to Cas
+
         public void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag)
         {
             // add item
@@ -91,6 +93,7 @@ namespace CacheCow.Server.EntityTagStore.Memcached
             return list;
         }
 
+        // TODO: !!! routePattern implementation needs to be changed to Cas
         public bool TryRemove(CacheKey key)
         {
             // remove item
