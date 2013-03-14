@@ -284,7 +284,7 @@ namespace CacheCow.Server
 				() =>
 				{
 
-					if (!request.Method.Method.IsIn("PUT", "DELETE", "POST"))
+					if (!request.Method.Method.IsIn("PUT", "DELETE", "POST", "PATCH"))
 						return;
 
 					string uri = UriTrimmer(request.RequestUri);
