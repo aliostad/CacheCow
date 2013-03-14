@@ -57,6 +57,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.SqliteCache
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.Memcached", "src\CacheCow.Server.EntityTagStore.Memcached\CacheCow.Server.EntityTagStore.Memcached.csproj", "{7773016D-82CB-4AD6-9A8A-1CB39BF60915}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.Memcached.Tests", "test\CacheCow.Server.EntityTagStore.Memcached.Tests\CacheCow.Server.EntityTagStore.Memcached.Tests.csproj", "{BC711491-8102-4504-9E42-63D42F8D108B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,10 @@ Global
 		{7773016D-82CB-4AD6-9A8A-1CB39BF60915}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7773016D-82CB-4AD6-9A8A-1CB39BF60915}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7773016D-82CB-4AD6-9A8A-1CB39BF60915}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC711491-8102-4504-9E42-63D42F8D108B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC711491-8102-4504-9E42-63D42F8D108B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC711491-8102-4504-9E42-63D42F8D108B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC711491-8102-4504-9E42-63D42F8D108B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -168,5 +174,6 @@ Global
 		{74E1187D-9E70-47F3-8C22-54655FB1E472} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{1ADB6175-95B9-4BB9-AF56-B4291196554C} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{C360857D-3222-452D-9D02-CBBD5CF8EFEE} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
+		{BC711491-8102-4504-9E42-63D42F8D108B} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 	EndGlobalSection
 EndGlobal

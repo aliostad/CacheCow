@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7773016D-82CB-4AD6-9A8A-1CB39BF60915}</ProjectGuid>
+    <ProjectGuid>{BC711491-8102-4504-9E42-63D42F8D108B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CacheCow.Server.EntityTagStore.Memcached</RootNamespace>
-    <AssemblyName>CacheCow.Server.EntityTagStore.Memcached</AssemblyName>
+    <RootNamespace>CacheCow.Server.EntityTagStore.Memcached.Tests</RootNamespace>
+    <AssemblyName>CacheCow.Server.EntityTagStore.Memcached.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -32,11 +33,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Enyim.Caching">
+    <Reference Include="Enyim.Caching, Version=2.12.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\EnyimMemcached.2.12\lib\net35\Enyim.Caching.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -56,19 +61,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Common\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="MemcachedEntityTagStore.cs" />
+    <Compile Include="IntegrationTests.cs" />
+    <Compile Include="LengthedPrefixedStringTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="LengthedPrefixedString.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj">
+    <ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj">
       <Project>{88e170e4-b857-42fe-963c-0505502b548c}</Project>
       <Name>CacheCow.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CacheCow.Server\CacheCow.Server.csproj">
+    <ProjectReference Include="..\..\src\CacheCow.Server.EntityTagStore.Memcached\CacheCow.Server.EntityTagStore.Memcached.csproj">
+      <Project>{7773016d-82cb-4ad6-9a8a-1cb39bf60915}</Project>
+      <Name>CacheCow.Server.EntityTagStore.Memcached</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\CacheCow.Server\CacheCow.Server.csproj">
       <Project>{b67727f4-5b65-41d0-8d26-8d1c32cea63d}</Project>
       <Name>CacheCow.Server</Name>
     </ProjectReference>
