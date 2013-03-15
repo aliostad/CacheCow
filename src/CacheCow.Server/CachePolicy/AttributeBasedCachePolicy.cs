@@ -1,0 +1,58 @@
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Web.Http;
+using System.Web.Http.Controllers;
+
+namespace CacheCow.Server.CachePolicy
+{
+    /// <summary>
+    /// NOTE: This will currently only work in WebHost scenario
+    /// and not in SelfHost
+    /// </summary>
+    public class AttributeBasedCachePolicy : CachePolicyBase
+    {
+        public AttributeBasedCachePolicy(CacheControlHeaderValue defaultValue) : base(defaultValue)
+        {
+        }
+
+        protected override CacheControlHeaderValue DoGetCacheControl(HttpRequestMessage request, HttpConfiguration configuration)
+        {
+            var httpRouteData = request.GetRouteData();
+            if (httpRouteData == null)
+                return null;
+
+            // call these first
+            var controllerSelector = configuration.Services.GetHttpControllerSelector();
+            var controllerDescriptor = controllerSelector.SelectController(request);
+
+            // first check the action
+            var controllerContext = new HttpControllerContext(configuration, httpRouteData, request)
+                                        {
+                                            ControllerDescriptor = controllerDescriptor
+                                        };
+            var httpActionSelector = configuration.Services.GetActionSelector();
+            
+
+            var actionDescriptor = httpActionSelector.SelectAction(controllerContext);
+            var cachePolicyAttribute = actionDescriptor.GetCustomAttributes<HttpCachePolicyAttribute>().FirstOrDefault();
+            if (cachePolicyAttribute != null)
+                return cachePolicyAttribute.CacheControl;
+
+            // now check controller
+            var controllerPolicy = controllerDescriptor.GetCustomAttributes<HttpCachePolicyAttribute>().FirstOrDefault();
+
+            return controllerPolicy == null ? null : controllerPolicy.CacheControl;
+
+        }
+
+        private Type GetControllerByName(string name)
+        {
+            name += "Controller";
+            var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes());
+            return allTypes.FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)
+                                                && x.IsAssignableFrom(typeof (ApiController)));
+        }
+    }
+}

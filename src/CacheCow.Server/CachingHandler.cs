@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http;
 using CacheCow.Common;
 using CacheCow.Common.Helpers;
 using CacheCow.Common.Http;
@@ -31,9 +32,10 @@ namespace CacheCow.Server
 		protected readonly IEntityTagStore _entityTagStore;
 		private readonly string[] _varyByHeaders;
 		private object _padLock = new object();
+	    private HttpConfiguration _configuration;
 
 
-		/// <summary>
+	    /// <summary>
 		/// A Chain of responsibility of rules for handling various scenarios. 
 		/// List is ordered. First one to return a non-null task will break the chain and 
 		/// method will return
@@ -51,9 +53,20 @@ namespace CacheCow.Server
 
 		}
 
-		public CachingHandler(IEntityTagStore entityTagStore, params string[] varyByHeaders)
+        /// <summary>
+        /// Assumes Web host and uses GlobalConfiguration.Configuration
+        /// </summary>
+        /// <param name="entityTagStore"></param>
+        /// <param name="varyByHeaders"></param>
+	    public CachingHandler(IEntityTagStore entityTagStore, params string[] varyByHeaders)
+            : this(GlobalConfiguration.Configuration, entityTagStore, varyByHeaders)
+	    {
+	    }
+
+	    public CachingHandler(HttpConfiguration configuration, IEntityTagStore entityTagStore, params string[] varyByHeaders)
 		{
-			AddLastModifiedHeader = true;
+	        _configuration = configuration;
+	        AddLastModifiedHeader = true;
 			AddVaryHeader = true;
 			_varyByHeaders = varyByHeaders;
 			_entityTagStore = entityTagStore;
@@ -68,7 +81,7 @@ namespace CacheCow.Server
 			LinkedRoutePatternProvider = (uri, method) => new string[0]; // a dummy
 			UriTrimmer = (uri) => uri.PathAndQuery;
 
-			CacheControlHeaderProvider = (request) => new CacheControlHeaderValue()
+			CacheControlHeaderProvider = (request, cfg) => new CacheControlHeaderValue()
 			{
 				Private = true,
 				MustRevalidate = true,
@@ -104,7 +117,7 @@ namespace CacheCow.Server
 		/// Alternatively it can return a CacheControlHeaderValue which controls cache lifetime on the client.
 		/// By default value is set so that all requests are cachable with expiry of 1 week.
 		/// </summary>
-		public Func<HttpRequestMessage, CacheControlHeaderValue> CacheControlHeaderProvider { get; set; }
+		public Func<HttpRequestMessage, HttpConfiguration, CacheControlHeaderValue> CacheControlHeaderProvider { get; set; }
 
 		/// <summary>
 		/// This is a function to allow the clients to invalidate the cache
@@ -222,7 +235,7 @@ namespace CacheCow.Server
 				() =>
 				{
 
-					var cacheControlHeaderValue = CacheControlHeaderProvider(request);
+					var cacheControlHeaderValue = CacheControlHeaderProvider(request, _configuration);
 					if (cacheControlHeaderValue == null)
 						return;
 
