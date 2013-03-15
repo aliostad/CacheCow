@@ -18,11 +18,11 @@ namespace CacheCow.Server.CacheRefreshPolicy
             _defaultRefreshInterval = defaultRefreshInterval;
         }
 
-        public TimeSpan GetCacheControl(HttpRequestMessage request, HttpConfiguration configuration)
+        public TimeSpan GetCacheRefreshPolicy(HttpRequestMessage request, HttpConfiguration configuration)
         {
-            return DoGetCacheControl(request, configuration) ?? _defaultRefreshInterval;
+            return DoGetCacheRefreshPolicy(request, configuration) ?? _defaultRefreshInterval;
         }
 
-        public abstract TimeSpan? DoGetCacheControl(HttpRequestMessage request, HttpConfiguration configuration);
+        public abstract TimeSpan? DoGetCacheRefreshPolicy(HttpRequestMessage request, HttpConfiguration configuration);
     }
 }

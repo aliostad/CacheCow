@@ -22,7 +22,7 @@ namespace CacheCow.Server.CacheRefreshPolicy
 
         }
 
-        public override TimeSpan? DoGetCacheControl(HttpRequestMessage request, HttpConfiguration configuration)
+        public override TimeSpan? DoGetCacheRefreshPolicy(HttpRequestMessage request, HttpConfiguration configuration)
         {
             var httpRouteData = request.GetRouteData();
             if (httpRouteData == null)

@@ -10,6 +10,6 @@ namespace CacheCow.Server.CacheRefreshPolicy
 {
     public interface ICacheRefreshPolicy
     {
-        TimeSpan GetCacheControl(HttpRequestMessage request, HttpConfiguration configuration);
+        TimeSpan GetCacheRefreshPolicy(HttpRequestMessage request, HttpConfiguration configuration);
     }
 }

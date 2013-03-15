@@ -6,7 +6,7 @@ using System.Web.Http.Hosting;
 using CacheCow.Server.CacheControlPolicy;
 using NUnit.Framework;
 
-namespace CacheCow.Tests.Server.CachePolicy
+namespace CacheCow.Tests.Server.CacheControlPolicy
 {
     [TestFixture]
     public class AttributeBasedCachePolicyTests
@@ -32,25 +32,6 @@ namespace CacheCow.Tests.Server.CachePolicy
 
         [Test]
         public void TestControllerAndActionLevelPolicy()
-        {
-            var configuration = new HttpConfiguration(new HttpRouteCollection("/"));
-            configuration.Routes.MapHttpRoute("main", "api/{controller}/{id}");
-            var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://aliostad/api/CachePolicyAction/1"));
-            var routeData = configuration.Routes.GetRouteData(request);
-            request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
-            var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue());
-
-            // act
-            var cchv = attributeBasedCachePolicy.GetCacheControl(request, configuration);
-
-            // assert
-            Assert.AreEqual(TimeSpan.FromSeconds(120), cchv.MaxAge);
-            Assert.AreEqual(false, cchv.Private, "Private");
-
-        }
-
-        [Test]
-        public void TestControllerAndActionLevelolicy()
         {
             var configuration = new HttpConfiguration(new HttpRouteCollection("/"));
             configuration.Routes.MapHttpRoute("main", "api/{controller}/{id}");
