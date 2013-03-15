@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Hosting;
-using CacheCow.Server.CachePolicy;
+using CacheCow.Server.CacheControlPolicy;
 using NUnit.Framework;
 
 namespace CacheCow.Tests.Server.CachePolicy
@@ -22,7 +22,7 @@ namespace CacheCow.Tests.Server.CachePolicy
             request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
             
 
-            var attributeBasedCachePolicy = new AttributeBasedCachePolicy(new CacheControlHeaderValue());
+            var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue());
             var cchv = attributeBasedCachePolicy.GetCacheControl(request, configuration);
 
             Assert.AreEqual(TimeSpan.FromSeconds(110), cchv.MaxAge);
@@ -38,7 +38,7 @@ namespace CacheCow.Tests.Server.CachePolicy
             var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://aliostad/api/CachePolicyAction/1"));
             var routeData = configuration.Routes.GetRouteData(request);
             request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
-            var attributeBasedCachePolicy = new AttributeBasedCachePolicy(new CacheControlHeaderValue());
+            var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue());
 
             // act
             var cchv = attributeBasedCachePolicy.GetCacheControl(request, configuration);
@@ -57,7 +57,7 @@ namespace CacheCow.Tests.Server.CachePolicy
             var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://aliostad/api/CachePolicyAction/1"));
             var routeData = configuration.Routes.GetRouteData(request);
             request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
-            var attributeBasedCachePolicy = new AttributeBasedCachePolicy(new CacheControlHeaderValue());
+            var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue());
 
             // act
             var cchv = attributeBasedCachePolicy.GetCacheControl(request, configuration);
@@ -77,7 +77,7 @@ namespace CacheCow.Tests.Server.CachePolicy
             var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://aliostad/api/NoCachePolicy/1"));
             var routeData = configuration.Routes.GetRouteData(request);
             request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
-            var attributeBasedCachePolicy = new AttributeBasedCachePolicy(new CacheControlHeaderValue()
+            var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue()
                 {NoStore = true, NoCache = true});
 
             // action

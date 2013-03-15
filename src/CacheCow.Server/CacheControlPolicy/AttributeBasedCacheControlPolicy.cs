@@ -5,15 +5,15 @@ using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 
-namespace CacheCow.Server.CachePolicy
+namespace CacheCow.Server.CacheControlPolicy
 {
     /// <summary>
     /// NOTE: This will currently only work in WebHost scenario
     /// and not in SelfHost
     /// </summary>
-    public class AttributeBasedCachePolicy : CachePolicyBase
+    public class AttributeBasedCacheControlPolicy : CacheControlPolicyBase
     {
-        public AttributeBasedCachePolicy(CacheControlHeaderValue defaultValue) : base(defaultValue)
+        public AttributeBasedCacheControlPolicy(CacheControlHeaderValue defaultValue) : base(defaultValue)
         {
         }
 

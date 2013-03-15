@@ -6,10 +6,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 
-namespace CacheCow.Server.CachePolicy
+namespace CacheCow.Server.CacheRefreshPolicy
 {
-    public interface ICachePolicy
+    public interface ICacheRefreshPolicy
     {
-        CacheControlHeaderValue GetCacheControl(HttpRequestMessage request, HttpConfiguration configuration);
+        TimeSpan GetCacheControl(HttpRequestMessage request, HttpConfiguration configuration);
     }
 }

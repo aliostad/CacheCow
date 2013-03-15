@@ -81,6 +81,10 @@ namespace CacheCow.Server
 			LinkedRoutePatternProvider = (uri, method) => new string[0]; // a dummy
 			UriTrimmer = (uri) => uri.PathAndQuery;
 
+            // infinite - Never refresh
+	        CacheRefreshPolicyProvider = (message, httpConfiguration) => TimeSpan.MaxValue;
+
+            // items by default get cached but must be revalidated
 			CacheControlHeaderProvider = (request, cfg) => new CacheControlHeaderValue()
 			{
 				Private = true,
@@ -118,6 +122,18 @@ namespace CacheCow.Server
 		/// By default value is set so that all requests are cachable with expiry of 1 week.
 		/// </summary>
 		public Func<HttpRequestMessage, HttpConfiguration, CacheControlHeaderValue> CacheControlHeaderProvider { get; set; }
+
+
+        /// <summary>
+        /// This is a function responsible for controlling server's cache expiry
+        /// By default, there is no expiry in the cache items as any change 
+        /// to the resource must be done via the HTTP API (using POST, PUT, DELETE).
+        /// But in some cases (usually adding Web API on top of legacy code), data is changed 
+        /// in the database (e.g. configuration data) but server would not know.
+        /// In these cases a cache expiry is useful. In this case, CachingHandler uses the 
+        /// LastModified to calculate whether cache key must be expired.
+        /// </summary>
+        public Func<HttpRequestMessage, HttpConfiguration, TimeSpan> CacheRefreshPolicyProvider { get; set; } 
 
 		/// <summary>
 		/// This is a function to allow the clients to invalidate the cache
@@ -157,12 +173,35 @@ namespace CacheCow.Server
 				.Chain()();
 		}
 
-		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected virtual void CheckExpiry(HttpRequestMessage request)
+        {
+            // not interested if not GET
+            if(request.Method!=HttpMethod.Get)
+                return;
+
+            var cacheExpiry = CacheRefreshPolicyProvider(request, _configuration);
+            if(cacheExpiry == TimeSpan.MaxValue)
+                return; // infinity
+
+            var cacheKey = BuildCacheKey(request);
+            TimedEntityTagHeaderValue value = null;
+            if(!_entityTagStore.TryGetValue(cacheKey, out value))
+                return;
+
+            if (value.LastModified.Add(cacheExpiry) < DateTimeOffset.Now)
+                _entityTagStore.TryRemove(cacheKey);
+
+        }
+
+	    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
 			EnsureRulesSetup();
 
 			var varyByHeaders = request.Headers.Where(h => _varyByHeaders.Any(
 				v => v.Equals(h.Key, StringComparison.CurrentCultureIgnoreCase)));
+
+            // do the expiry
+		    CheckExpiry(request);
 
 			Task<HttpResponseMessage> task = null;
 
@@ -379,10 +418,7 @@ namespace CacheCow.Server
 				var isNoneMatch = noneMatchTags.Count > 0;
 				var etags = isNoneMatch ? noneMatchTags : matchTags;
 
-				var resource = UriTrimmer(request.RequestUri);
-				var headers =
-					request.Headers.Where(h => _varyByHeaders.Any(v => v.Equals(h.Key, StringComparison.CurrentCultureIgnoreCase)));
-				var entityTagKey = CacheKeyGenerator(resource, headers);
+			    var entityTagKey = BuildCacheKey(request);
 				// compare the Etag with the one in the cache
 				// do conditional get.
 				TimedEntityTagHeaderValue actualEtag = null;
@@ -400,6 +436,15 @@ namespace CacheCow.Server
 			};
 
 		}
+
+        protected CacheKey BuildCacheKey(HttpRequestMessage request)
+        {
+            var resource = UriTrimmer(request.RequestUri);
+            var headers =
+                request.Headers.Where(h => _varyByHeaders.Any(v => v.Equals(h.Key, StringComparison.CurrentCultureIgnoreCase)));
+            return CacheKeyGenerator(resource, headers);
+            
+        }
 
 		internal Func<HttpRequestMessage, Task<HttpResponseMessage>> GetIfModifiedUnmodifiedSince()
 		{

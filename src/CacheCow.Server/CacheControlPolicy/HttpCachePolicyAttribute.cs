@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace CacheCow.Server.CachePolicy
+namespace CacheCow.Server.CacheControlPolicy
 {
 
     public class CachePolicyHeader : CacheControlHeaderValue

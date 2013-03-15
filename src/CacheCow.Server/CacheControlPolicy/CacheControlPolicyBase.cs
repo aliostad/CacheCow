@@ -5,14 +5,15 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
+using CacheCow.Server.CacheControlPolicy;
 
-namespace CacheCow.Server.CachePolicy
+namespace CacheCow.Server.CacheControlPolicy
 {
-    public abstract class CachePolicyBase : ICachePolicy
+    public abstract class CacheControlPolicyBase : ICacheControlPolicy
     {
         private CacheControlHeaderValue _defaultValue;
 
-        public CachePolicyBase(CacheControlHeaderValue defaultValue)
+        public CacheControlPolicyBase(CacheControlHeaderValue defaultValue)
         {
             _defaultValue = defaultValue;
         }
