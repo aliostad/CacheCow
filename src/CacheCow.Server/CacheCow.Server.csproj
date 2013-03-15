@@ -74,6 +74,7 @@
     <Compile Include="..\Common\TaskHelpersExtensions.cs">
       <Link>Common\TaskHelpersExtensions.cs</Link>
     </Compile>
+    <Compile Include="CacheRefreshPolicy\AttributeBasedCacheRefreshPolicy.cs" />
     <Compile Include="CacheRefreshPolicy\CacheRefreshPolicyBase.cs" />
     <Compile Include="CacheRefreshPolicy\HttpCacheRefreshAttribute.cs" />
     <Compile Include="CacheRefreshPolicy\ICacheRefreshPolicy.cs" />
