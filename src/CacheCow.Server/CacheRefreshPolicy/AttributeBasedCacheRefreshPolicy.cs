@@ -41,12 +41,12 @@ namespace CacheCow.Server.CacheRefreshPolicy
 
 
             var actionDescriptor = httpActionSelector.SelectAction(controllerContext);
-            var cachePolicyAttribute = actionDescriptor.GetCustomAttributes<HttpCacheRefreshAttribute>().FirstOrDefault();
+            var cachePolicyAttribute = actionDescriptor.GetCustomAttributes<HttpCacheRefreshPolicyAttribute>().FirstOrDefault();
             if (cachePolicyAttribute != null)
                 return cachePolicyAttribute.RefreshInterval;
 
             // now check controller
-            var controllerPolicy = controllerDescriptor.GetCustomAttributes<HttpCacheRefreshAttribute>().FirstOrDefault();
+            var controllerPolicy = controllerDescriptor.GetCustomAttributes<HttpCacheRefreshPolicyAttribute>().FirstOrDefault();
 
             return controllerPolicy == null ? (TimeSpan?) null : controllerPolicy.RefreshInterval;
         }

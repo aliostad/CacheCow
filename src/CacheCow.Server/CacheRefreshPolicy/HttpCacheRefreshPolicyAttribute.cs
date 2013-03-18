@@ -4,11 +4,11 @@
 namespace CacheCow.Server.CacheRefreshPolicy
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class HttpCacheRefreshAttribute : Attribute
+    public class HttpCacheRefreshPolicyAttribute : Attribute
     {
         private readonly TimeSpan _refreshInterval;
 
-        public HttpCacheRefreshAttribute(int refreshIntervalInSeconds)
+        public HttpCacheRefreshPolicyAttribute(int refreshIntervalInSeconds)
         {
             _refreshInterval = TimeSpan.FromSeconds(refreshIntervalInSeconds);
         }

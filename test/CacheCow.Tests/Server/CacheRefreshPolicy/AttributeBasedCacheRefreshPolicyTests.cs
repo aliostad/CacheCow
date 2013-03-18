@@ -83,7 +83,7 @@ namespace CacheCow.Tests.Server.CacheRefreshPolicy
 
 namespace CacheCow.Tests.Server.CacheRefreshPolicy.Controllers
 {
-    [HttpCacheRefresh(110)]
+    [HttpCacheRefreshPolicy(110)]
     public class CacheRefreshPolicyController : ApiController
     {
         public string Get(int id)
@@ -92,10 +92,10 @@ namespace CacheCow.Tests.Server.CacheRefreshPolicy.Controllers
         }
     }
 
-    [HttpCacheRefresh(110)]
+    [HttpCacheRefreshPolicy(110)]
     public class CacheRefreshPolicyActionController : ApiController
     {
-        [HttpCacheRefresh(120)]
+        [HttpCacheRefreshPolicy(120)]
         public string Get(int id)
         {
             return "CacheCow";
