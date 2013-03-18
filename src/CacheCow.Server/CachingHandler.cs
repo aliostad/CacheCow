@@ -315,7 +315,7 @@ namespace CacheCow.Server
                         if (cacheControlHeaderValue.NoCache)
                         {
                             cacheControlHeaderValue.NoStore = true;
-                            response.Headers.TryAddWithoutValidation(HttpHeaderNames.Pragma, "no-cache")
+                            response.Headers.TryAddWithoutValidation(HttpHeaderNames.Pragma, "no-cache");
                             if (response.Content != null)
                                 response.Content.Headers.Expires = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(1));
                         }
