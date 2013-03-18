@@ -311,18 +311,21 @@ namespace CacheCow.Server
 							response.Headers.Add(HttpHeaderNames.Vary, _varyByHeaders);
 						}
 
-						response.Headers.TryAddWithoutValidation(HttpHeaderNames.CacheControl, cacheControlHeaderValue.ToString());
-
                         // harmonise Pragma header with cachecontrol header
                         if (cacheControlHeaderValue.NoCache)
                         {
-                            response.Headers.TryAddWithoutValidation(HttpHeaderNames.Pragma, "no-cache");
+                            cacheControlHeaderValue.NoStore = true;
+                            response.Headers.TryAddWithoutValidation(HttpHeaderNames.Pragma, "no-cache")
+                            if (response.Content != null)
+                                response.Content.Headers.Expires = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(1));
                         }
                         else
                         {
                             if (response.Headers.Contains(HttpHeaderNames.Pragma))
                                 response.Headers.Remove(HttpHeaderNames.Pragma);                            
                         }
+
+						response.Headers.TryAddWithoutValidation(HttpHeaderNames.CacheControl, cacheControlHeaderValue.ToString());
 
 					}
 
