@@ -36,12 +36,12 @@ namespace CacheCow.Server.CacheControlPolicy
             
 
             var actionDescriptor = httpActionSelector.SelectAction(controllerContext);
-            var cachePolicyAttribute = actionDescriptor.GetCustomAttributes<HttpCachePolicyAttribute>().FirstOrDefault();
+            var cachePolicyAttribute = actionDescriptor.GetCustomAttributes<HttpCacheControlPolicyAttribute>().FirstOrDefault();
             if (cachePolicyAttribute != null)
                 return cachePolicyAttribute.CacheControl;
 
             // now check controller
-            var controllerPolicy = controllerDescriptor.GetCustomAttributes<HttpCachePolicyAttribute>().FirstOrDefault();
+            var controllerPolicy = controllerDescriptor.GetCustomAttributes<HttpCacheControlPolicyAttribute>().FirstOrDefault();
 
             return controllerPolicy == null ? null : controllerPolicy.CacheControl;
 

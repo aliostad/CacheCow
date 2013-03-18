@@ -79,7 +79,7 @@
     <Compile Include="CacheRefreshPolicy\HttpCacheRefreshAttribute.cs" />
     <Compile Include="CacheRefreshPolicy\ICacheRefreshPolicy.cs" />
     <Compile Include="CacheControlPolicy\AttributeBasedCacheControlPolicy.cs" />
-    <Compile Include="CacheControlPolicy\HttpCachePolicyAttribute.cs" />
+    <Compile Include="CacheControlPolicy\HttpCacheControlPolicyAttribute.cs" />
     <Compile Include="CacheControlPolicy\CacheControlPolicyBase.cs" />
     <Compile Include="CacheControlPolicy\ICacheControlPolicy.cs" />
     <Compile Include="CachingHandler.cs" />

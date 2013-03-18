@@ -26,6 +26,7 @@ namespace CacheCow.Tests.Server.CacheRefreshPolicy
             request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
             var attributeBasedCachePolicy = new AttributeBasedCacheRefreshPolicy();
 
+
             // act
             var refresh = attributeBasedCachePolicy.DoGetCacheRefreshPolicy(request, configuration);
 

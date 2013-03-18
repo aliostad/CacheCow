@@ -77,7 +77,7 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
 
 namespace CacheCow.Tests.Server.CachePolicy.Controllers
 {
-    [HttpCachePolicy(false, 110)]
+    [HttpCacheControlPolicy(false, 110)]
     public class CachePolicyController : ApiController
     {
         public string Get(int id)
@@ -86,10 +86,10 @@ namespace CacheCow.Tests.Server.CachePolicy.Controllers
         }
     }
 
-    [HttpCachePolicy(false, 110)]
+    [HttpCacheControlPolicy(false, 110)]
     public class CachePolicyActionController : ApiController
     {
-        [HttpCachePolicy(false, 120)]
+        [HttpCacheControlPolicy(false, 120)]
         public string Get(int id)
         {
             return "CacheCow";

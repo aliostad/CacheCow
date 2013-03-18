@@ -7,12 +7,8 @@ using System.Text;
 namespace CacheCow.Server.CacheControlPolicy
 {
 
-    public class CachePolicyHeader : CacheControlHeaderValue
-    {
-    }
-
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class HttpCachePolicyAttribute : Attribute
+    public class HttpCacheControlPolicyAttribute : Attribute
     {
 
         private readonly CacheControlHeaderValue _cacheControl;
@@ -20,7 +16,7 @@ namespace CacheCow.Server.CacheControlPolicy
         /// <summary>
         /// default .ctor is no cache policy
         /// </summary>
-        public HttpCachePolicyAttribute()
+        public HttpCacheControlPolicyAttribute()
         {
 
             _cacheControl = new CacheControlHeaderValue()
@@ -31,7 +27,7 @@ namespace CacheCow.Server.CacheControlPolicy
                                 };
         }
 
-        public HttpCachePolicyAttribute(bool isPrivate, int maxAgeInSeconds) : this()
+        public HttpCacheControlPolicyAttribute(bool isPrivate, int maxAgeInSeconds) : this()
         {
             _cacheControl = new CacheControlHeaderValue()
             {

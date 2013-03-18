@@ -313,6 +313,17 @@ namespace CacheCow.Server
 
 						response.Headers.TryAddWithoutValidation(HttpHeaderNames.CacheControl, cacheControlHeaderValue.ToString());
 
+                        // harmonise Pragma header with cachecontrol header
+                        if (cacheControlHeaderValue.NoCache)
+                        {
+                            response.Headers.TryAddWithoutValidation(HttpHeaderNames.Pragma, "no-cache");
+                        }
+                        else
+                        {
+                            if (response.Headers.Contains(HttpHeaderNames.Pragma))
+                                response.Headers.Remove(HttpHeaderNames.Pragma);                            
+                        }
+
 					}
 
 				};
