@@ -93,7 +93,7 @@ namespace CacheCow.Server
 
 		/// <summary>
 		/// A function which receives URL of the resource and generates a unique value for ETag
-		/// It also receives varyByHeaders request headers.
+		/// It also receives request headers.
 		/// Default value is a function that generates a guid and URL is ignored and
 		/// it generates a weak ETag if no varyByHeaders is passed in
 		/// </summary>
