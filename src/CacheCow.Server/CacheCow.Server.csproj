@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\CacheCow.Server.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\CacheCow.Server.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -83,6 +85,10 @@
     <Compile Include="CacheControlPolicy\CacheControlPolicyBase.cs" />
     <Compile Include="CacheControlPolicy\ICacheControlPolicy.cs" />
     <Compile Include="CachingHandler.cs" />
+    <Compile Include="ETagGeneration\ContentHashETagAttribute.cs" />
+    <Compile Include="ETagGeneration\ContentHashETagGenerator.cs" />
+    <Compile Include="ETagGeneration\DefaultETagGenerator.cs" />
+    <Compile Include="ETagGeneration\IETagGenerator.cs" />
     <Compile Include="InMemoryEntityTagStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -12,6 +12,7 @@ using System.Web.Http;
 using CacheCow.Common;
 using CacheCow.Common.Helpers;
 using CacheCow.Common.Http;
+using CacheCow.Server.ETagGeneration;
 
 namespace CacheCow.Server
 {
@@ -70,11 +71,7 @@ namespace CacheCow.Server
 			AddVaryHeader = true;
 			_varyByHeaders = varyByHeaders;
 			_entityTagStore = entityTagStore;
-			ETagValueGenerator = (resourceUri, headers) =>
-				new EntityTagHeaderValue(
-					string.Format("\"{0}\"", Guid.NewGuid().ToString("N").ToLower()),
-				varyByHeaders.Length == 0); // default ETag generation will create weak tags if varyByHeaders has zero items
-
+	        ETagValueGenerator = new DefaultETagGenerator().Generate;
 			CacheKeyGenerator = (resourceUri, headers) =>
 				new CacheKey(resourceUri, headers.SelectMany(h => h.Value));
 
@@ -291,7 +288,7 @@ namespace CacheCow.Server
 						// create new ETag only if it does not already exist
 						if (!_entityTagStore.TryGetValue(cacheKey, out eTagValue))
 						{
-							eTagValue = new TimedEntityTagHeaderValue(ETagValueGenerator(uri, varyHeaders));
+							eTagValue = new TimedEntityTagHeaderValue(ETagValueGenerator(uri, request.Headers));
 							_entityTagStore.AddOrUpdate(cacheKey, eTagValue);
 						}
 
