@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright 2012</copyright>
+    <tags>aspnetwebapi http caching webapi cachecow memcached enyim etag</tags>
+	<dependencies>
+      <dependency id="CacheCow.Server" version="$version$" />
+    </dependencies>
+	</metadata>
+	<files>
+		<file src="..\..\lib\Enyim.Caching.dll" target="lib\net40"/>
+	</files>
+</package>

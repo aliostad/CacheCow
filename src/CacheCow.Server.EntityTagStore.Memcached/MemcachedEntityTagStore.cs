@@ -21,6 +21,15 @@ namespace CacheCow.Server.EntityTagStore.Memcached
             _memcachedClient = new MemcachedClient();
         }
 
+         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sectionName">Configuration section name</param>
+        public MemcachedEntityTagStore(string sectionName)
+        {
+            _memcachedClient = new MemcachedClient(sectionName);
+        }
+
         public MemcachedEntityTagStore(IMemcachedClientConfiguration configuration)
         {
             _memcachedClient = new MemcachedClient(configuration);
