@@ -28,6 +28,11 @@ namespace CacheCow.Client.MemcachedCacheStore
             _memcachedClient = new MemcachedClient(configuration);
         }
 
+        public MemcachedStore(string sectionName)
+        {
+            _memcachedClient = new MemcachedClient(sectionName);
+        }
+
         public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
         {
             response = null;
