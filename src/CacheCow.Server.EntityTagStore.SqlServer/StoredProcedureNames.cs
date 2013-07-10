@@ -11,5 +11,6 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 		public static string AddUpdateCache = "AddUpdateCache";
 		public static string DeleteCacheById = "DeleteCacheById";
 		public static string DeleteCacheByRoutePattern = "DeleteCacheByRoutePattern";
+		public static string Clear = "ClearCache";
 	}
 }
