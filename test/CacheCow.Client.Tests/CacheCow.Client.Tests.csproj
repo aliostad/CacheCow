@@ -65,6 +65,8 @@
     <Compile Include="CacheCowHeaderTests.cs" />
     <Compile Include="CacheStoreQuotaManagerTests.cs" />
     <Compile Include="CachingHandlerTests.cs" />
+    <EmbeddedResource Include="Data\Request.cs" />
+    <EmbeddedResource Include="Data\Response.cs" />
     <Compile Include="Helper\DeepComparer.cs" />
     <Compile Include="Helper\ResponseHelper.cs" />
     <Compile Include="IntegrationTests.cs" />
@@ -85,8 +87,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data\Request.cs" />
-    <EmbeddedResource Include="Data\Response.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
