@@ -122,12 +122,10 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 			{
 				connection.Open();
 				command.Connection = connection;
-				command.CommandText = "DELETE FROM db.CacheState;";
-				command.CommandType = CommandType.Text;
+				command.CommandText = StoredProcedureNames.Clear;
+				command.CommandType = CommandType.StoredProcedure;
 				command.ExecuteNonQuery();
 			}
 		}
-
-
 	}
 }
