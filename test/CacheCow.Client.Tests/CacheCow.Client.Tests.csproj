@@ -85,8 +85,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data\Request.bin" />
-    <EmbeddedResource Include="Data\Response.bin" />
+    <EmbeddedResource Include="Data\Request.cs" />
+    <EmbeddedResource Include="Data\Response.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
