@@ -11,7 +11,7 @@ using Enyim.Caching.Memcached;
 
 namespace CacheCow.Server.EntityTagStore.Memcached12
 {
-    internal class MemcachedEntityTagStore12 : IEntityTagStore, IDisposable
+    public class MemcachedEntityTagStore12 : IEntityTagStore, IDisposable
     {
 
         private readonly MemcachedClient _memcachedClient;
