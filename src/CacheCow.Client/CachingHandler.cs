@@ -50,11 +50,19 @@ namespace CacheCow.Client
 					// explicit expiration time associated with a response, we do not expect it to be cached, but certain caches MAY violate this expectation 
 					// (for example, when little or no network connectivity is available).
 
+                    // 14.9.1
+                    // If the no-cache directive does not specify a field-name, then a cache MUST NOT use the response to satisfy a subsequent request without 
+                    // successful revalidation with the origin server. This allows an origin server to prevent caching 
+                    // even by caches that have been configured to return stale responses to client requests.
+                    //If the no-cache directive does specify one or more field-names, then a cache MAY use the response 
+                    // to satisfy a subsequent request, subject to any other restrictions on caching. However, the specified 
+                    // field-name(s) MUST NOT be sent in the response to a subsequent request without successful revalidation 
+                    // with the origin server. This allows an origin server to prevent the re-use of certain header fields in a response, while still allowing caching of the rest of the response.
 					if (!response.StatusCode.IsIn(_cacheableStatuses))
 						return ResponseValidationResult.NotCacheable;
 
 					if (!response.IsSuccessStatusCode || response.Headers.CacheControl == null ||
-						response.Headers.CacheControl.NoStore || response.Headers.CacheControl.NoCache)
+                        response.Headers.CacheControl.NoStore) //  || response.Headers.CacheControl.NoCache was removed. See issue
 						return ResponseValidationResult.NotCacheable;
 
 					response.Headers.Date = response.Headers.Date ?? DateTimeOffset.UtcNow; // this also helps in cache creation
@@ -68,17 +76,24 @@ namespace CacheCow.Client
 						response.Content.Headers.Expires == null)
 						return ResponseValidationResult.NotCacheable;
 
+                    if(response.Headers.CacheControl.NoCache)
+                        return ResponseValidationResult.MustRevalidate;
+
+                    // here we use 
 					if (response.Content.Headers.Expires != null &&
 						response.Content.Headers.Expires < DateTimeOffset.UtcNow)
-						return MustRevalidateByDefault || response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
+						return response.Headers.CacheControl.ShouldRevalidate(MustRevalidateByDefault) 
+                            ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
 
 					if (response.Headers.CacheControl.MaxAge != null &&
 						DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.MaxAge.Value))
-                        return MustRevalidateByDefault || response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
+                        return response.Headers.CacheControl.ShouldRevalidate(MustRevalidateByDefault)
+                            ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
 
 					if (response.Headers.CacheControl.SharedMaxAge != null &&
 						DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.SharedMaxAge.Value))
-                        return MustRevalidateByDefault || response.Headers.CacheControl.MustRevalidate ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
+                        return response.Headers.CacheControl.ShouldRevalidate(MustRevalidateByDefault)
+                            ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;					
 
 			        return ResponseValidationResult.OK;
 			    };

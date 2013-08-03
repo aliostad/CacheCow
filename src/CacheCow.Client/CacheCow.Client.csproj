@@ -76,6 +76,7 @@
     <Compile Include="Headers\HttpResponseHeadersExtensions.cs" />
     <Compile Include="ICacheMetadataProvider.cs" />
     <Compile Include="IHttpMessageSerializerAsync.cs" />
+    <Compile Include="Internal\CacheControlHeaderExtensions.cs" />
     <Compile Include="Internal\HttpResponseMessageExtensions.cs" />
     <Compile Include="ResponseValidationResult.cs" />
     <Compile Include="CachingHandler.cs" />

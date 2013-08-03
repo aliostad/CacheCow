@@ -50,6 +50,18 @@ namespace CacheCow.Client.Tests
 			Assert.AreEqual(cachingHandler.ResponseValidator(response), ResponseValidationResult.NotCacheable);
 		}
 
+        [Test]
+        public void Test_NoCache_IsCacheable_And_NotStale_But_MustRevalidate()
+        {
+            var cachingHandler = new CachingHandler();
+            var response = new HttpResponseMessage(HttpStatusCode.OK);
+            response.Headers.CacheControl = new CacheControlHeaderValue() { Public = true, NoCache = true};
+            response.Content = new ByteArrayContent(new byte[256]);
+            response.Content.Headers.Expires = DateTimeOffset.Now.AddHours(1); // resource is not stale
+            Assert.AreEqual(cachingHandler.ResponseValidator(response), ResponseValidationResult.MustRevalidate);
+        }
+
+
 		[Test]
 		public void Test_Stale_By_Expires()
 		{

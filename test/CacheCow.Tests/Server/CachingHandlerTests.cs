@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -13,7 +15,7 @@ using Rhino.Mocks;
 
 namespace CacheCow.Tests.Server
 {
-	public static class CachingHandlerTests
+	public class CachingHandlerTests
 	{
 		private const string TestUrl = "http://myserver/api/stuff/";
 		private static readonly string[] EtagValues = new[] { "abcdefgh", "12345678" };
@@ -85,6 +87,32 @@ namespace CacheCow.Tests.Server
 
 			
 		}
+
+        [Test]
+        public void Test_NoStore_ResultsIn_ExpiredResourceAndPragmaNoCache()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
+            request.Headers.Add(HttpHeaderNames.Accept, "text/xml");
+            var entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"");
+            var cachingHandler = new CachingHandler()
+            {              
+                ETagValueGenerator = (x, y) => entityTagHeaderValue,
+                CacheControlHeaderProvider = (r, c) =>
+                                                 {
+                                                     return new CacheControlHeaderValue()
+                                                                {
+                                                                    NoStore = true,
+                                                                    NoCache = true
+                                                                };
+                                                 }
+            };
+            var response = request.CreateResponse(HttpStatusCode.Accepted);
+
+            cachingHandler.AddCaching(new CacheKey(TestUrl, new string[0]), request, response, 
+                new List<KeyValuePair<string, IEnumerable<string>>>())();
+            Assert.IsTrue(response.Headers.Pragma.Any(x=>x.Name == "no-cache"), "no-cache not in pragma");
+
+        }
 
 		[TestCase("GET", true, true, true, false, new[] { "Accept", "Accept-Language" })]
 		[TestCase("GET", false, true, true, false, new[] { "Accept", "Accept-Language" })]

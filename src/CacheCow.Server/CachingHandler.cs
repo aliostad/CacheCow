@@ -116,7 +116,7 @@ namespace CacheCow.Server
 		/// Function can return null to negate any caching. In this case, responses will not be cached
 		/// and ETag header will not be sent.
 		/// Alternatively it can return a CacheControlHeaderValue which controls cache lifetime on the client.
-		/// By default value is set so that all requests are cachable with expiry of 1 week.
+		/// By default value is set so that all requests are cachable with immediate expiry.
 		/// </summary>
 		public Func<HttpRequestMessage, HttpConfiguration, CacheControlHeaderValue> CacheControlHeaderProvider { get; set; }
 
@@ -309,9 +309,8 @@ namespace CacheCow.Server
 						}
 
                         // harmonise Pragma header with cachecontrol header
-                        if (cacheControlHeaderValue.NoCache)
+                        if (cacheControlHeaderValue.NoStore)
                         {
-                            cacheControlHeaderValue.NoStore = true;
                             response.Headers.TryAddWithoutValidation(HttpHeaderNames.Pragma, "no-cache");
                             if (response.Content != null)
                                 response.Content.Headers.Expires = DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(1));
