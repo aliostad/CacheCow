@@ -25,25 +25,35 @@ namespace CacheCow.Server.CacheControlPolicy
 
             // call these first
             var controllerSelector = configuration.Services.GetHttpControllerSelector();
-            var controllerDescriptor = controllerSelector.SelectController(request);
 
-            // first check the action
-            var controllerContext = new HttpControllerContext(configuration, httpRouteData, request)
-                                        {
-                                            ControllerDescriptor = controllerDescriptor
-                                        };
-            var httpActionSelector = configuration.Services.GetActionSelector();
-            
+            try
+            {
+                var controllerDescriptor = controllerSelector.SelectController(request);
 
-            var actionDescriptor = httpActionSelector.SelectAction(controllerContext);
-            var cachePolicyAttribute = actionDescriptor.GetCustomAttributes<HttpCacheControlPolicyAttribute>().FirstOrDefault();
-            if (cachePolicyAttribute != null)
-                return cachePolicyAttribute.CacheControl;
+                // first check the action
+                var controllerContext = new HttpControllerContext(configuration, httpRouteData, request)
+                {
+                    ControllerDescriptor = controllerDescriptor
+                };
+                var httpActionSelector = configuration.Services.GetActionSelector();
 
-            // now check controller
-            var controllerPolicy = controllerDescriptor.GetCustomAttributes<HttpCacheControlPolicyAttribute>().FirstOrDefault();
 
-            return controllerPolicy == null ? null : controllerPolicy.CacheControl;
+                var actionDescriptor = httpActionSelector.SelectAction(controllerContext);
+                var cachePolicyAttribute = actionDescriptor.GetCustomAttributes<HttpCacheControlPolicyAttribute>().FirstOrDefault();
+                if (cachePolicyAttribute != null)
+                    return cachePolicyAttribute.CacheControl;
+
+                // now check controller
+                var controllerPolicy = controllerDescriptor.GetCustomAttributes<HttpCacheControlPolicyAttribute>().FirstOrDefault();
+
+                return controllerPolicy == null ? null : controllerPolicy.CacheControl;
+
+            }
+            catch (HttpResponseException)
+            {
+
+                return null;
+            }
 
         }
 

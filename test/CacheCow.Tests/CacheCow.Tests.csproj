@@ -76,6 +76,7 @@
     <Compile Include="..\Common\DummyMessageHandler.cs">
       <Link>Common\DummyMessageHandler.cs</Link>
     </Compile>
+    <Compile Include="Common\NotFoundControllerSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\CacheControlPolicy\AttributeBasedCachePolicyTests.cs" />
     <Compile Include="Server\CacheRefreshPolicy\AttributeBasedCacheRefreshPolicyTests.cs" />

@@ -2,8 +2,10 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
+using System.Web.Http.Dispatcher;
 using System.Web.Http.Hosting;
 using CacheCow.Server.CacheControlPolicy;
+using CacheCow.Tests.Common;
 using NUnit.Framework;
 
 namespace CacheCow.Tests.Server.CacheControlPolicy
@@ -27,6 +29,28 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
 
             Assert.AreEqual(TimeSpan.FromSeconds(110), cchv.MaxAge);
             Assert.AreEqual(false, cchv.Private, "Private");
+
+        }
+
+        
+
+        [Test]
+        public void TestRefreshPolicyFor404()
+        {
+            var configuration = new HttpConfiguration(new HttpRouteCollection("/"));
+            configuration.Services.Replace(typeof (IHttpControllerSelector), new NotFoundControllerSelector());
+            configuration.Routes.MapHttpRoute("main", "api/{controller}/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://aliostad/api/CachePolicyAction/1"));
+            var routeData = configuration.Routes.GetRouteData(request);
+            request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
+            var headerValue = new CacheControlHeaderValue();
+            var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(headerValue);
+
+            // act
+            var cchv = attributeBasedCachePolicy.GetCacheControl(request, configuration);
+
+            // assert
+            Assert.AreEqual(headerValue, cchv);
 
         }
 

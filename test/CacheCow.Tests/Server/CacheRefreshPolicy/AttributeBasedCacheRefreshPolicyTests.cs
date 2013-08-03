@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Dispatcher;
 using System.Web.Http.Hosting;
 using CacheCow.Server.CacheControlPolicy;
 using CacheCow.Server.CacheRefreshPolicy;
+using CacheCow.Tests.Common;
 using NUnit.Framework;
 
 namespace CacheCow.Tests.Server.CacheRefreshPolicy
@@ -56,6 +60,27 @@ namespace CacheCow.Tests.Server.CacheRefreshPolicy
 
         }
 
+    
+
+        [Test]
+        public void TestRefreshPolicyFor404()
+        {
+            var configuration = new HttpConfiguration(new HttpRouteCollection("/"));
+            configuration.Routes.MapHttpRoute("main", "api/{controller}/{id}");
+            configuration.Services.Replace(typeof(IHttpControllerSelector), new NotFoundControllerSelector());
+            var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://aliostad/api/CacheRefreshPolicyAction/1"));
+            var routeData = configuration.Routes.GetRouteData(request);
+            request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
+            var attributeBasedCachePolicy = new AttributeBasedCacheRefreshPolicy();
+
+            // act
+            var refresh = attributeBasedCachePolicy.DoGetCacheRefreshPolicy(request, configuration);
+
+            // assert
+            Assert.AreEqual(false, refresh.HasValue);
+
+
+        }
         [Test]
         public void TestDefaultControllerOrActionLevelPolicy()
         {

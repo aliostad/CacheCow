@@ -30,25 +30,33 @@ namespace CacheCow.Server.CacheRefreshPolicy
 
             // call these first
             var controllerSelector = configuration.Services.GetHttpControllerSelector();
-            var controllerDescriptor = controllerSelector.SelectController(request);
-
-            // first check the action
-            var controllerContext = new HttpControllerContext(configuration, httpRouteData, request)
+            try
             {
-                ControllerDescriptor = controllerDescriptor
-            };
-            var httpActionSelector = configuration.Services.GetActionSelector();
+                var controllerDescriptor = controllerSelector.SelectController(request);
+
+                // first check the action
+                var controllerContext = new HttpControllerContext(configuration, httpRouteData, request)
+                {
+                    ControllerDescriptor = controllerDescriptor
+                };
+                var httpActionSelector = configuration.Services.GetActionSelector();
 
 
-            var actionDescriptor = httpActionSelector.SelectAction(controllerContext);
-            var cachePolicyAttribute = actionDescriptor.GetCustomAttributes<HttpCacheRefreshPolicyAttribute>().FirstOrDefault();
-            if (cachePolicyAttribute != null)
-                return cachePolicyAttribute.RefreshInterval;
+                var actionDescriptor = httpActionSelector.SelectAction(controllerContext);
+                var cachePolicyAttribute = actionDescriptor.GetCustomAttributes<HttpCacheRefreshPolicyAttribute>().FirstOrDefault();
+                if (cachePolicyAttribute != null)
+                    return cachePolicyAttribute.RefreshInterval;
 
-            // now check controller
-            var controllerPolicy = controllerDescriptor.GetCustomAttributes<HttpCacheRefreshPolicyAttribute>().FirstOrDefault();
+                // now check controller
+                var controllerPolicy = controllerDescriptor.GetCustomAttributes<HttpCacheRefreshPolicyAttribute>().FirstOrDefault();
 
-            return controllerPolicy == null ? (TimeSpan?) null : controllerPolicy.RefreshInterval;
+                return controllerPolicy == null ? (TimeSpan?)null : controllerPolicy.RefreshInterval;
+
+            }
+            catch (HttpResponseException e)
+            {
+                return null;
+            }
         }
     }
 }
