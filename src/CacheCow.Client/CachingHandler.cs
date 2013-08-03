@@ -107,7 +107,7 @@ namespace CacheCow.Client
 					// client can tell CachingHandler not to do caching for a particular request
 					if(request.Headers.CacheControl!=null)
 					{
-						if (request.Headers.CacheControl.NoCache || request.Headers.CacheControl.NoStore)
+						if (request.Headers.CacheControl.NoStore)
 							return true;
 					}
 
