@@ -27,14 +27,20 @@ namespace CacheCow.Server.CacheControlPolicy
                                 };
         }
 
-        public HttpCacheControlPolicyAttribute(bool isPrivate, int maxAgeInSeconds) : this()
+        public HttpCacheControlPolicyAttribute(bool isPrivate, 
+            int maxAgeInSeconds, 
+            bool mustRevalidate = true,
+            bool noCache = false,
+            bool noTransform = false) : this()
         {
             _cacheControl = new CacheControlHeaderValue()
             {
                 Private = isPrivate,
                 Public = !isPrivate,
-                MustRevalidate = true,
-                MaxAge = TimeSpan.FromSeconds(maxAgeInSeconds)
+                MustRevalidate = mustRevalidate,
+                MaxAge = TimeSpan.FromSeconds(maxAgeInSeconds),
+                NoCache = noCache,
+                NoTransform = noTransform   
             };
         }
 
