@@ -11,6 +11,7 @@ using NUnit.Framework;
 
 namespace CacheCow.Client.FileCacheStore.Tests
 {
+    [Ignore]
 	[TestFixture]
 	public class ConcurrencyTests
 	{

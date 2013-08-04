@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Text;
 using CacheCow.Common;
 
@@ -9,33 +10,30 @@ namespace CacheCow.Client
 {
 	public class InMemoryVaryHeaderStore : IVaryHeaderStore
 	{
-
+	    private const string CacheName = "###_IVaryHeaderStore_###";
 		private readonly ConcurrentDictionary<string , string[]> _varyHeaderCache = new ConcurrentDictionary<string, string[]>();
-
+        private ObjectCache _cache = new MemoryCache(CacheName);
 
 		public bool TryGetValue(string uri, out IEnumerable<string> headers)
 		{
-			string[] hdrs;
-			bool result = _varyHeaderCache.TryGetValue(uri, out hdrs);
-			headers = hdrs;
-			return result;
+            headers = (string[])_cache.Get(uri);
+			return headers!=null;
 		}
 
 		public void AddOrUpdate(string uri, IEnumerable<string> headers)
 		{
-			_varyHeaderCache.AddOrUpdate(uri, headers.ToArray(),
-			                             (key, hdrs) => hdrs);
+		    _cache.Add(uri, headers, DateTimeOffset.MaxValue);
 		}
 
 		public bool TryRemove(string uri)
 		{
-			string[] hdrs;
-			return _varyHeaderCache.TryRemove(uri, out hdrs);
+		    return _cache.Remove(uri) != null;
 		}
 
 		public void Clear()
 		{
-			_varyHeaderCache.Clear();
+			((IDisposable)_cache).Dispose();
+            _cache = new MemoryCache(CacheName);
 		}
 	}
 }

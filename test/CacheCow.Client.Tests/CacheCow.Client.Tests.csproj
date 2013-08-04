@@ -69,6 +69,7 @@
     <EmbeddedResource Include="Data\Response.cs" />
     <Compile Include="Helper\DeepComparer.cs" />
     <Compile Include="Helper\ResponseHelper.cs" />
+    <Compile Include="InMemoryVaryHeaderStoreTests.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestSerializationTests.cs" />

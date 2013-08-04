@@ -67,21 +67,6 @@ namespace CacheCow.Client.Tests
 
 		}
 
-		[Test]
-		public void NoCache_Ignored()
-		{
-			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
-			request.Headers.CacheControl = new CacheControlHeaderValue();
-			request.Headers.CacheControl.NoCache = true;
-			var httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
-			_messageHandler.Response = httpResponseMessage;
-			var task = _client.SendAsync(request);
-			var response = task.Result;
-
-			Assert.AreEqual(response, httpResponseMessage);
-			Assert.IsNull(response.Headers.CacheControl);
-
-		}
 
 		[Test]
 		public void Get_OK_But_Not_In_Cache_To_Insert_In_Cache()
@@ -307,6 +292,43 @@ namespace CacheCow.Client.Tests
             Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
 
         }
+
+        [Test]
+        public void Get_NoCache_Expires_ResultsInValidation()
+        {
+            // setup 
+            var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
+            request.Headers.CacheControl = new CacheControlHeaderValue(){NoCache = true};
+            var lastModified = DateTimeOffset.UtcNow.AddHours(-1);
+            lastModified = lastModified.AddMilliseconds(1000 - lastModified.Millisecond);
+            var responseFromCache = GetOkMessage(false);
+            responseFromCache.Content.Headers.LastModified = lastModified;
+            var responseFromServer = GetOkMessage();
+            responseFromCache.Content.Headers.Expires = DateTime.Now.Subtract(TimeSpan.FromSeconds(10));
+
+            _messageHandler.Response = responseFromServer;
+            _cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
+                  out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
+            _cacheStore.Expect(x => x.AddOrUpdate(Arg<CacheKey>.Is.Anything,
+                  Arg<HttpResponseMessage>.Is.Same(responseFromServer)));
+
+            _mockRepository.ReplayAll();
+
+            // run
+            var task = _client.SendAsync(request);
+            var responseReturned = task.Result;
+            var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
+            CacheCowHeader cacheCowHeader = null;
+            CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
+
+            // verify
+            _mockRepository.VerifyAll();
+            Assert.IsNotNull(cacheCowHeader);
+            Assert.AreSame(responseFromServer, responseReturned);
+            Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
+
+        }
+
 
         [Test]
         public void Get_NoMustRevalidate_NoMustRevalidateByDefault_Expires_GetFromCache()
