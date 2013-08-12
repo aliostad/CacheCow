@@ -18,8 +18,10 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 	/// </summary>
 	public class SqlServerEntityTagStore : IEntityTagStore
 	{
-		private readonly string _connectionSting;
+		private readonly string _schema;
+		private readonly string _connectionString;
 		private const string ConnectionStringName = "EntityTagStore";
+		private const string DefaultSchema = "dbo";
 
 		public SqlServerEntityTagStore()
 		{
@@ -33,24 +35,31 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 
 			}
 
-			_connectionSting = ConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString;
-
+			this._connectionString = ConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString;
+			this._schema = DefaultSchema;
 		}
 
-		public SqlServerEntityTagStore(string connectionSting)
+		public SqlServerEntityTagStore(string connectionString)
 		{
-			_connectionSting = connectionSting;
+			this._connectionString = connectionString;
+			this._schema = DefaultSchema;
+		}
+
+		public SqlServerEntityTagStore(string connectionString, string schema)
+		{
+			this._schema = schema;
+			this._connectionString = connectionString;
 		}
 
 		public bool TryGetValue(CacheKey key, out TimedEntityTagHeaderValue eTag)
 		{
 			eTag = null;
-			using (var connection = new SqlConnection(_connectionSting))
+			using (var connection = new SqlConnection(this._connectionString))
 			using (var command = new SqlCommand())
 			{
 				connection.Open();
 				command.Connection = connection;
-				command.CommandText = StoredProcedureNames.GetCache;
+				command.CommandText = this.GetStoredProcedureName(StoredProcedureNames.GetCache);
 				command.CommandType = CommandType.StoredProcedure;
 				command.Parameters.AddWithValue(ColumnNames.CacheKeyHash, key.Hash);
 
@@ -72,12 +81,12 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 
 		public void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag)
 		{
-			using (var connection = new SqlConnection(_connectionSting))
+			using (var connection = new SqlConnection(this._connectionString))
 			using (var command = new SqlCommand())
 			{
 				connection.Open();
 				command.Connection = connection;
-				command.CommandText = StoredProcedureNames.AddUpdateCache;
+				command.CommandText = this.GetStoredProcedureName(StoredProcedureNames.AddUpdateCache);
 				command.CommandType = CommandType.StoredProcedure;
 				command.Parameters.AddWithValue(ColumnNames.CacheKeyHash, key.Hash);
 				command.Parameters.AddWithValue(ColumnNames.RoutePattern, key.RoutePattern);
@@ -89,12 +98,12 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 
 		public bool TryRemove(CacheKey key)
 		{
-			using (var connection = new SqlConnection(_connectionSting))
+			using (var connection = new SqlConnection(this._connectionString))
 			using (var command = new SqlCommand())
 			{
 				connection.Open();
 				command.Connection = connection;
-				command.CommandText = StoredProcedureNames.DeleteCacheById;
+				command.CommandText = this.GetStoredProcedureName(StoredProcedureNames.DeleteCacheById);
 				command.CommandType = CommandType.StoredProcedure;
 				command.Parameters.AddWithValue(ColumnNames.CacheKeyHash, key.Hash);
 				return command.ExecuteNonQuery() > 0;			
@@ -103,12 +112,12 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 
 		public int RemoveAllByRoutePattern(string routePattern)
 		{
-			using (var connection = new SqlConnection(_connectionSting))
+			using (var connection = new SqlConnection(this._connectionString))
 			using (var command = new SqlCommand())
 			{
 				connection.Open();
 				command.Connection = connection;
-				command.CommandText = StoredProcedureNames.DeleteCacheByRoutePattern;
+				command.CommandText = this.GetStoredProcedureName(StoredProcedureNames.DeleteCacheByRoutePattern);
 				command.CommandType = CommandType.StoredProcedure;
 				command.Parameters.AddWithValue(ColumnNames.RoutePattern, routePattern);
 				return command.ExecuteNonQuery();
@@ -117,15 +126,25 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 
 		public void Clear()
 		{
-			using (var connection = new SqlConnection(_connectionSting))
+			using (var connection = new SqlConnection(this._connectionString))
 			using (var command = new SqlCommand())
 			{
 				connection.Open();
 				command.Connection = connection;
-				command.CommandText = StoredProcedureNames.Clear;
+				command.CommandText = this.GetStoredProcedureName(StoredProcedureNames.Clear);
 				command.CommandType = CommandType.StoredProcedure;
 				command.ExecuteNonQuery();
 			}
+		}
+
+		/*********
+		** Private methods
+		*********/
+		/// <summary>Prefixes a stored procedure name with the configured database schema name.</summary>
+		/// <param name="procedure">The stored procedure name to format.</param>
+		private string GetStoredProcedureName(string procedureName)
+		{
+			return String.Format("[{0}].[{1}]", this._schema, procedureName);
 		}
 	}
 }
