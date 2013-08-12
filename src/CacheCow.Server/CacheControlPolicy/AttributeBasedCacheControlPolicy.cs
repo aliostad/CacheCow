@@ -11,6 +11,7 @@ namespace CacheCow.Server.CacheControlPolicy
     /// NOTE: This will currently only work in WebHost scenario
     /// and not in SelfHost
     /// </summary>
+    [Obsolete("This class is moving to its own dll after version 0.5: CacheCow.Server.WebHost.CachePolicies")]
     public class AttributeBasedCacheControlPolicy : CacheControlPolicyBase
     {
         public AttributeBasedCacheControlPolicy(CacheControlHeaderValue defaultValue) : base(defaultValue)
