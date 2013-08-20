@@ -35,15 +35,12 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 
 			}
 
-			this._connectionString = ConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString;
 			this._schema = DefaultSchema;
+			this._connectionString = ConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString;
 		}
 
 		public SqlServerEntityTagStore(string connectionString)
-		{
-			this._connectionString = connectionString;
-			this._schema = DefaultSchema;
-		}
+			: this(connectionString, DefaultSchema) {}
 
 		public SqlServerEntityTagStore(string connectionString, string schema)
 		{
