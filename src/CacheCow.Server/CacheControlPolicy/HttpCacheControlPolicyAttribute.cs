@@ -34,6 +34,7 @@ namespace CacheCow.Server.CacheControlPolicy
             bool noCache = false,
             bool noTransform = false) : this()
         {
+            // copy values to the header
             _cacheControl = new CacheControlHeaderValue()
             {
                 Private = isPrivate,
