@@ -100,6 +100,56 @@ namespace CacheCow.Tests.Server.CacheRefreshPolicy
 
 
         }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestHttpCacheRefreshPolicyAttributeFactoryConstructor_WithInvalidType()
+        {
+            var httpCacheControlPolicyAttribute = new HttpCacheRefreshPolicyAttribute(typeof(object));
+        }
+
+        [Test]
+        public void TestHttpCacheControlRefreshAttributeFactoryConstructor_WithValidType()
+        {
+            // arrange, act
+            var httpCacheControlPolicyAttribute = new HttpCacheRefreshPolicyAttribute(typeof(CacheRefreshFactory));
+
+            // assert
+            Assert.AreEqual(CacheRefreshFactory.Interval, httpCacheControlPolicyAttribute.RefreshInterval);
+
+        }
+
+        [Test]
+        [ExpectedException(typeof(FormatException))]
+        public void TestHttpCacheRefreshPolicyAttributeAppSettingConstructor_WithInvalidValue()
+        {
+            var httpCacheControlPolicyAttribute = new HttpCacheRefreshPolicyAttribute("RefreshSeconds-Invalid");
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void TestHttpCacheRefreshPolicyAttributeAppSettingConstructor_WithNonExistentValue()
+        {
+            var httpCacheControlPolicyAttribute = new HttpCacheRefreshPolicyAttribute("RefreshSeconds-NonExistent");
+        }
+
+        [Test]
+        public void TestHttpCacheRefreshPolicyAttributeAppSettingConstructor_WithValidValue()
+        {
+            var httpCacheControlPolicyAttribute = new HttpCacheRefreshPolicyAttribute("RefreshSeconds-Valid");
+            Assert.AreEqual(TimeSpan.FromSeconds(112), httpCacheControlPolicyAttribute.RefreshInterval);
+        }
+
+
+        public class CacheRefreshFactory
+        {
+            public static TimeSpan Interval = TimeSpan.FromSeconds(15 * 60);
+
+            public TimeSpan GetHeader()
+            {
+                return Interval;
+            }
+        }
     }
 
 

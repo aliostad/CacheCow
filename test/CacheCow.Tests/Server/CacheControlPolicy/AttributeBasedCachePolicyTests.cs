@@ -93,6 +93,34 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
             Assert.AreEqual(true, cchv.NoStore, "NoStore");
 
         }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestHttpCacheControlPolicyAttributeFactoryConstructor_WithInvalidType()
+        {
+            var httpCacheControlPolicyAttribute = new HttpCacheControlPolicyAttribute(typeof(object));
+        }
+
+        [Test]
+        public void TestHttpCacheControlPolicyAttributeFactoryConstructor_WithValidType()
+        {
+            // arrange, act
+            var httpCacheControlPolicyAttribute = new HttpCacheControlPolicyAttribute(typeof(CacheControlFactory));
+
+            // assert
+            Assert.AreEqual(CacheControlFactory.Header, httpCacheControlPolicyAttribute.CacheControl);
+
+        }
+
+        public class CacheControlFactory
+        {
+            public static CacheControlHeaderValue Header = new CacheControlHeaderValue();
+
+            public CacheControlHeaderValue GetHeader()
+            {
+                return Header;
+            }
+        }
     }
 
 

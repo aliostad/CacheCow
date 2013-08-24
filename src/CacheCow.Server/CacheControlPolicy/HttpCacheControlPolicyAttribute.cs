@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 
 namespace CacheCow.Server.CacheControlPolicy
@@ -28,6 +29,7 @@ namespace CacheCow.Server.CacheControlPolicy
                                 };
         }
 
+
         public HttpCacheControlPolicyAttribute(bool isPrivate, 
             int maxAgeInSeconds, 
             bool mustRevalidate = true,
@@ -44,6 +46,27 @@ namespace CacheCow.Server.CacheControlPolicy
                 NoCache = noCache,
                 NoTransform = noTransform   
             };
+        }
+
+        /// <summary>
+        /// Uses a factory type to provide the value.
+        /// This type can read from config, etc.
+        /// Must have a public parameterless method that return CacheControlHeaderValue
+        /// </summary>
+        /// <param name="cacheControlHeaderValueFactory">The type of the factory. 
+        /// Any public method that returns CacheControlHeaderValue will be used.
+        /// Type's constructor must be parameterless</param>
+        public HttpCacheControlPolicyAttribute(Type cacheControlHeaderValueFactory)
+        {
+            var factory = Activator.CreateInstance(cacheControlHeaderValueFactory);
+            var method = factory.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .FirstOrDefault(m => m.ReturnType == typeof(CacheControlHeaderValue));
+
+            if(method == null)
+                throw new ArgumentException("This type does not have a factory method: " + cacheControlHeaderValueFactory.FullName);
+
+            _cacheControl = (CacheControlHeaderValue) method.Invoke(factory, new object[0]);
+
         }
 
         public CacheControlHeaderValue CacheControl
