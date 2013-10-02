@@ -153,7 +153,7 @@ namespace CacheCow.Server
 	            var cacheKey = CacheKeyGenerator(trimmedUri, new List<KeyValuePair<string, IEnumerable<string>>>());
 
                 // remove pattern
-                this.InvalidateResource(trimmedUri, cacheKey.RoutePattern);
+                this.InvalidateResource(cacheKey.RoutePattern);
                 linkedUrls.AddRange(this.LinkedRoutePatternProvider(trimmedUri, method));
 	        }
 
@@ -364,7 +364,7 @@ namespace CacheCow.Server
 				    var trimmedUri = this.UriTrimmer(request.RequestUri);
                     
                     // remove pattern
-                    this.InvalidateResource(trimmedUri, cacheKey.RoutePattern);
+                    this.InvalidateResource(cacheKey.RoutePattern);
 
                     // remove all related URIs
                     var linkedUrls = this.LinkedRoutePatternProvider(trimmedUri, request.Method);
@@ -373,7 +373,7 @@ namespace CacheCow.Server
 
 		}
 
-	    internal void InvalidateResource(string trimmedUri, string routePattern)
+	    internal void InvalidateResource(string routePattern)
 	    {
 	        this._entityTagStore.RemoveAllByRoutePattern(routePattern);
 	    }
