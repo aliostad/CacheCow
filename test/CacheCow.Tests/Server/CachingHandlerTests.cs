@@ -15,9 +15,13 @@ using Rhino.Mocks;
 
 namespace CacheCow.Tests.Server
 {
-	public class CachingHandlerTests
+    using System.IO;
+
+    public class CachingHandlerTests
 	{
 		private const string TestUrl = "http://myserver/api/stuff/";
+        private const string TestUrl2 = "http://myserver/api/more/";
+
 		private static readonly string[] EtagValues = new[] { "abcdefgh", "12345678" };
 
 		[TestCase("DELETE")]
@@ -49,8 +53,6 @@ namespace CacheCow.Tests.Server
 
 			// verify
 			mocks.VerifyAll();
-
-
 		}
 
 		[TestCase("PUT")]
@@ -180,5 +182,43 @@ namespace CacheCow.Tests.Server
 
 		}
 
+        [TestCase("DELETE")]
+        [TestCase("PUT")]
+        [TestCase("POST")]
+        [TestCase("PATCH")]
+        public static void TestManualInvalidation(string method)
+        {
+            // setup
+            var mocks = new MockRepository();
+            
+            string routePattern1 = "http://myserver/api/stuffs/*";
+            string routePattern2 = "http://myserver/api/more/*";
+            
+            var entityTagStore = mocks.StrictMock<IEntityTagStore>();
+            var linkedUrls = new[] { "url1", "url2" };
+            var cachingHandler = new CachingHandler(entityTagStore)
+            {
+                LinkedRoutePatternProvider = (url, mthd) => linkedUrls,
+                CacheKeyGenerator = (url, headers) =>
+                    {
+                        if (url == "/api/stuff/") return new CacheKey(url, headers.SelectMany(h => h.Value), routePattern1);
+                        if (url == "/api/more/") return new CacheKey(url, headers.SelectMany(h => h.Value), routePattern2);
+                        throw new ArgumentException();
+                    }
+            };
+
+            entityTagStore.Expect(x => x.RemoveAllByRoutePattern(routePattern1)).Return(1);
+            entityTagStore.Expect(x => x.RemoveAllByRoutePattern(routePattern2)).Return(1);
+
+            entityTagStore.Expect(x => x.RemoveAllByRoutePattern(linkedUrls[0])).Return(0);
+            entityTagStore.Expect(x => x.RemoveAllByRoutePattern(linkedUrls[1])).Return(0);
+            mocks.ReplayAll();
+
+            // run
+            cachingHandler.InvalidateResources(new HttpMethod(method), new Uri(TestUrl), new Uri(TestUrl2));
+
+            // verify
+            mocks.VerifyAll();
+        }
 	}
 }

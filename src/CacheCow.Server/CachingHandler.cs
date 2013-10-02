@@ -34,16 +34,14 @@ namespace CacheCow.Server
 		private readonly string[] _varyByHeaders;
 		private object _padLock = new object();
 	    private HttpConfiguration _configuration;
-
-
+        
 	    /// <summary>
 		/// A Chain of responsibility of rules for handling various scenarios. 
 		/// List is ordered. First one to return a non-null task will break the chain and 
 		/// method will return
 		/// </summary>
 		protected IDictionary<string, Func<HttpRequestMessage, Task<HttpResponseMessage>>> RequestInterceptionRules { get; set; }
-
-
+        
 		public bool AddLastModifiedHeader { get; set; }
 
 		public bool AddVaryHeader { get; set; }
@@ -145,6 +143,23 @@ namespace CacheCow.Server
 		/// for keys. By default it will return Uri.PathAndQuery
 		/// </summary>
 		public Func<Uri, string> UriTrimmer { get; set; }
+
+	    public void InvalidateResources(HttpMethod method, params Uri[] resourceUris)
+	    {
+	        var linkedUrls = new List<string>();
+	        foreach (var resourceUri in resourceUris)
+	        {
+	            var trimmedUri = UriTrimmer(resourceUri);
+	            var cacheKey = CacheKeyGenerator(trimmedUri, new List<KeyValuePair<string, IEnumerable<string>>>());
+
+                // remove pattern
+                this.InvalidateResource(trimmedUri, cacheKey.RoutePattern);
+                linkedUrls.AddRange(this.LinkedRoutePatternProvider(trimmedUri, method));
+	        }
+
+            // remove all related URIs - only need to do this once per uri
+            this.InvalidateLinkedUrls(linkedUrls.Distinct());
+	    }
 
 		protected void ExecuteCacheInvalidationRules(CacheKey cacheKey,
 			HttpRequestMessage request,
@@ -322,9 +337,7 @@ namespace CacheCow.Server
                         }
 
 						response.Headers.TryAddWithoutValidation(HttpHeaderNames.CacheControl, cacheControlHeaderValue.ToString());
-
 					}
-
 				};
 		}
 
@@ -345,25 +358,35 @@ namespace CacheCow.Server
 			return
 				() =>
 				{
-
 					if (!request.Method.Method.IsIn("PUT", "DELETE", "POST", "PATCH"))
 						return;
 
-					string uri = UriTrimmer(request.RequestUri);
+				    var trimmedUri = this.UriTrimmer(request.RequestUri);
+                    
+                    // remove pattern
+                    this.InvalidateResource(trimmedUri, cacheKey.RoutePattern);
 
-					// remove pattern
-					_entityTagStore.RemoveAllByRoutePattern(cacheKey.RoutePattern);
-
-					// remove all related URIs
-					var linkedUrls = LinkedRoutePatternProvider(uri, request.Method);
-					foreach (var linkedUrl in linkedUrls)
-						_entityTagStore.RemoveAllByRoutePattern(linkedUrl);
-
+                    // remove all related URIs
+                    var linkedUrls = this.LinkedRoutePatternProvider(trimmedUri, request.Method);
+                    this.InvalidateLinkedUrls(linkedUrls);
 				};
 
 		}
 
-		internal Func<HttpResponseMessage, HttpResponseMessage> GetCachingContinuation(HttpRequestMessage request)
+	    internal void InvalidateResource(string trimmedUri, string routePattern)
+	    {
+	        this._entityTagStore.RemoveAllByRoutePattern(routePattern);
+	    }
+
+	    private void InvalidateLinkedUrls(IEnumerable<string> linkedUrls)
+	    {
+	        foreach (var linkedUrl in linkedUrls)
+	        {
+	            this._entityTagStore.RemoveAllByRoutePattern(linkedUrl);
+	        }
+	    }
+
+	    internal Func<HttpResponseMessage, HttpResponseMessage> GetCachingContinuation(HttpRequestMessage request)
 		{
 			return response =>
 			{
