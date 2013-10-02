@@ -28,7 +28,7 @@ namespace CacheCow.Server
 	/// * Allows caching to be turned off based on individual message
 	/// * Currently does not support If-Range headers
 	/// </summary>
-	public class CachingHandler : DelegatingHandler
+	public class CachingHandler : DelegatingHandler, ICachingHandler
 	{
 		protected readonly IEntityTagStore _entityTagStore;
 		private readonly string[] _varyByHeaders;
