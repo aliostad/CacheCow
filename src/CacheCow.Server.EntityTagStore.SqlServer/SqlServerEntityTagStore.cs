@@ -143,5 +143,10 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 		{
 			return String.Format("[{0}].[{1}]", this._schema, procedureName);
 		}
+
+	    public void Dispose()
+	    {
+	        // nothing
+	    }
 	}
 }

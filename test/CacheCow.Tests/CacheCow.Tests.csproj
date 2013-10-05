@@ -82,6 +82,7 @@
     <Compile Include="Server\CacheRefreshPolicy\AttributeBasedCacheRefreshPolicyTests.cs" />
     <Compile Include="Server\CachingHandlerRulesTests.cs" />
     <Compile Include="Server\CachingHandlerTests.cs" />
+    <Compile Include="Server\InMemoryEntityTagStoreTests.cs" />
     <Compile Include="TimedEntityTagHeaderValueTests.cs" />
   </ItemGroup>
   <ItemGroup>

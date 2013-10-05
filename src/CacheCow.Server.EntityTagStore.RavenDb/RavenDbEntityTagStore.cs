@@ -160,6 +160,10 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 		}
 
 
+	    public void Dispose()
+	    {
+	        _documentStore.Dispose();
+	    }
 	}
 
 

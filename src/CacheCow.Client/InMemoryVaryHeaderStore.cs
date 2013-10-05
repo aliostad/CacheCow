@@ -22,7 +22,7 @@ namespace CacheCow.Client
 
 		public void AddOrUpdate(string uri, IEnumerable<string> headers)
 		{
-		    _cache.Add(uri, headers, DateTimeOffset.MaxValue);
+		    _cache.Set(uri, headers, DateTimeOffset.MaxValue);
 		}
 
 		public bool TryRemove(string uri)

@@ -582,5 +582,12 @@ namespace CacheCow.Server
 			};
 		}
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            if(disposing)
+                _entityTagStore.Dispose();
+        }
+
 	}
 }

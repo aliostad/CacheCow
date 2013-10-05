@@ -128,5 +128,10 @@
 				connection.DocumentStore.RemoveAll();
 			}
 		}
+
+	    public void Dispose()
+	    {
+	        // nothing
+	    }
 	}
 }
