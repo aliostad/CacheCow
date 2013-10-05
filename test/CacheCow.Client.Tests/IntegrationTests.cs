@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using CacheCow.Client;
 using CacheCow.Client.Headers;
 using NUnit.Framework;
@@ -50,6 +52,20 @@ namespace CacheCow.Client.Tests
 			Assert.AreEqual(true, cacheCowHeader.RetrievedFromCache);
 		}
 
+
+        [Test]
+        public void TestMemoryLeak()
+        {
+            var memorySize64 = Process.GetCurrentProcess().PrivateMemorySize64;
+            for (int i = 0; i < 1000; i++)
+            {
+                var store = new CachingHandler();
+                Thread.Sleep(1);
+                store.Dispose();
+                if(Process.GetCurrentProcess().PrivateMemorySize64 - memorySize64 > 20 * 1024 * 1024)
+                    Assert.Fail("Memory leak");
+            }
+        }
 
 
 	}

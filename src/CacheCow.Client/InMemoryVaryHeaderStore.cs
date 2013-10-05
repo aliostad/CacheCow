@@ -12,7 +12,7 @@ namespace CacheCow.Client
 	{
 	    private const string CacheName = "###_IVaryHeaderStore_###";
 		private readonly ConcurrentDictionary<string , string[]> _varyHeaderCache = new ConcurrentDictionary<string, string[]>();
-        private ObjectCache _cache = new MemoryCache(CacheName);
+        private MemoryCache _cache = new MemoryCache(CacheName);
 
 		public bool TryGetValue(string uri, out IEnumerable<string> headers)
 		{
@@ -35,5 +35,10 @@ namespace CacheCow.Client
 			((IDisposable)_cache).Dispose();
             _cache = new MemoryCache(CacheName);
 		}
+
+	    public void Dispose()
+	    {
+	        _cache.Dispose();
+	    }
 	}
 }

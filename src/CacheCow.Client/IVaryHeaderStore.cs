@@ -6,7 +6,7 @@ using CacheCow.Common;
 
 namespace CacheCow.Client
 {
-	public interface IVaryHeaderStore
+	public interface IVaryHeaderStore : IDisposable
 	{
 		bool TryGetValue(string uri, out IEnumerable<string> headers);
 		void AddOrUpdate(string uri, IEnumerable<string> headers);

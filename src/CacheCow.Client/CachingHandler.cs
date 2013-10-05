@@ -399,6 +399,12 @@ namespace CacheCow.Client
 				);
 		}
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            if(disposing)
+                VaryHeaderStore.Dispose();
+        }
 
 	}
 }
