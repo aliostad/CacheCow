@@ -90,6 +90,7 @@
     <Compile Include="ETagGeneration\ContentHashETagGenerator.cs" />
     <Compile Include="ETagGeneration\DefaultETagGenerator.cs" />
     <Compile Include="ETagGeneration\IETagGenerator.cs" />
+    <Compile Include="ICachingHandler.cs" />
     <Compile Include="InMemoryEntityTagStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
