@@ -301,8 +301,12 @@ namespace CacheCow.Client
 				cacheCowHeader.WasStale = true;
 				var isFreshOrStaleAcceptable = IsFreshOrStaleAcceptable(cachedResponse, request);
 			    if (isFreshOrStaleAcceptable.HasValue && isFreshOrStaleAcceptable.Value) // similar to OK
-			        return TaskHelpers.FromResult(cachedResponse.AddCacheCowHeader(cacheCowHeader));
+			    {
+                    // TODO: CONSUME AND RELEASE Response !!!
+                    return TaskHelpers.FromResult(cachedResponse.AddCacheCowHeader(cacheCowHeader));
 			            // EXIT !! ____________________________				
+			    }
+			        
 			    else
 			        validationResultForCachedResponse = ResponseValidationResult.MustRevalidate; // revalidate
 
@@ -333,7 +337,6 @@ namespace CacheCow.Client
 			return base.SendAsync(request, cancellationToken)
 				.ContinueWith(
 				tt =>
-				//serverResponse =>
 					{
 						var serverResponse = tt.Result;
 						TraceWriter.WriteLine("{0} - After getting response", 
@@ -351,6 +354,8 @@ namespace CacheCow.Client
 							cacheCowHeader.RetrievedFromCache = true;
 							TraceWriter.WriteLine("{0} - NotModified",
 								TraceLevel.Verbose, request.RequestUri.ToString());
+
+                            ConsumeAndDisposeResponse(serverResponse);
 							return cachedResponse.AddCacheCowHeader(cacheCowHeader); // EXIT !! _______________
 						}
 
@@ -376,7 +381,7 @@ namespace CacheCow.Client
 
 								// if there is a vary header, store it
 								if(serverResponse.Headers.Vary!=null)
-									VaryHeaderStore.AddOrUpdate(uri, serverResponse.Headers.Vary);
+									VaryHeaderStore.AddOrUpdate(uri, serverResponse.Headers.Vary.Select(x=>x).ToArray());
 								break;
 							default:
 								TraceWriter.WriteLine("{0} - ResponseValidationResult. Other",
@@ -398,6 +403,11 @@ namespace CacheCow.Client
 					}
 				);
 		}
+
+        private void ConsumeAndDisposeResponse(HttpResponseMessage response)
+        {
+            response.Dispose();
+        }
 
         protected override void Dispose(bool disposing)
         {
