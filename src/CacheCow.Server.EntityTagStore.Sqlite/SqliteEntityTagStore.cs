@@ -32,5 +32,11 @@ namespace CacheCow.Server.EntityTagStore.Sqlite
         {
             throw new NotImplementedException();
         }
+		
+		public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+		
     }
 }
