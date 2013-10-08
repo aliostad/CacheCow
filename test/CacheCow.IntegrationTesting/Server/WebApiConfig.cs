@@ -17,18 +17,17 @@ namespace CacheCow.IntegrationTesting.Server
         {
             config.Routes.MapHttpRoute(
                 name: "PricingApi",
-                routeTemplate: "api/v1/{controller}/{productid}/{productvariantid}/{currency}/{flightkey}",
+                routeTemplate: "api/{controller}/{id}",
                 defaults: new
                 {
-                    controller = "Pricing",
-                    flightkey = RouteParameter.Optional
-                }
-                );
+                    controller = "Test",
+                    id = RouteParameter.Optional
+                });
 
             config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
             config.Formatters.XmlFormatter.UseXmlSerializer = true;
-            var cachingHandler = new CachingHandler("Accept", "Accept-Encoding");
+            var cachingHandler = new CachingHandler(config, new InMemoryEntityTagStore(),"Accept", "Accept-Encoding");
             cachingHandler.CacheControlHeaderProvider = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue()
                 {
                     NoCache = true, Private = true, NoStore = true

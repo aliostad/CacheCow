@@ -20,10 +20,9 @@ namespace CacheCow.LoadTesting.Server
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new
                 {
-                    controller = "Pricing",
+                    controller = "Test",
                     id = RouteParameter.Optional
-                }
-                );
+                });
 
             config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 

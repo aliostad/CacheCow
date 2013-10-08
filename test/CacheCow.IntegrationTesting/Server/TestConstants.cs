@@ -8,6 +8,6 @@ namespace CacheCow.IntegrationTesting.Server
 {
     class TestConstants
     {
-        public const string BaseUrl = "http://localhost:12321/IntegrationTesting";
+        public const string BaseUrl = "http://localhost:12321/";
     }
 }

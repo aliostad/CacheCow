@@ -28,6 +28,10 @@ namespace CacheCow.IntegrationTesting.Server
             return new string(id.Reverse().ToArray());
         }
 
+        public void Post(string id)
+        {
+            
+        }
 
     }
 }

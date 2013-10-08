@@ -11,13 +11,19 @@ namespace CacheCow.IntegrationTesting.Server
     class InMemoryServer : IDisposable
     {
         private HttpSelfHostServer _server;
+        private HttpSelfHostConfiguration _configuration;
+
+        public HttpSelfHostConfiguration Configuration
+        {
+            get { return _configuration; }
+        }
 
         public void Start()
         {
 
-            var configuration = new HttpSelfHostConfiguration(TestConstants.BaseUrl);
-            WebApiConfig.Register(configuration);
-            _server = new HttpSelfHostServer(configuration);
+            _configuration = new HttpSelfHostConfiguration(TestConstants.BaseUrl);
+            WebApiConfig.Register(Configuration);
+            _server = new HttpSelfHostServer(Configuration);
             _server.OpenAsync().Wait(); // yeah this looks bad ... :)
         }
 
