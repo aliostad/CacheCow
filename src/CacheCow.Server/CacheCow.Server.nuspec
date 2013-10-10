@@ -13,7 +13,7 @@
     <tags>aspnetwebapi http caching webapi cachecow etag</tags>
     <dependencies>
       <dependency id="CacheCow.Common" version="$version$" />
-      <dependency id="Microsoft.AspNet.WebApi.WebHost" version="[4.0.30506.0]"  />	  
+      <dependency id="Microsoft.AspNet.WebApi.WebHost" version="4.0.30506.0"  />	  
     </dependencies>
   </metadata>
 </package>

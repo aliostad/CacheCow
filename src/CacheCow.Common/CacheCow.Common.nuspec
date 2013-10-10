@@ -12,7 +12,7 @@
     <copyright>Copyright 2012</copyright>
     <tags>aspnetwebapi http caching webapi cachecow</tags>
 	<dependencies>
-      <dependency id="Microsoft.AspNet.WebApi.Client" version="[4.0.30506]" />	  
+      <dependency id="Microsoft.AspNet.WebApi.Client" version="4.0.30506" />	  
     </dependencies>
 	
   </metadata>
