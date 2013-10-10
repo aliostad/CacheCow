@@ -71,8 +71,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.LoadTesting", "tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.IntegrationTesting", "test\CacheCow.IntegrationTesting\CacheCow.IntegrationTesting.csproj", "{F65D37F5-2F97-4CD2-BC90-E67670108FC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Testing.Common", "test\CacheCow.Testing.Common\CacheCow.Testing.Common.csproj", "{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,10 +181,6 @@ Global
 		{F65D37F5-2F97-4CD2-BC90-E67670108FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F65D37F5-2F97-4CD2-BC90-E67670108FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F65D37F5-2F97-4CD2-BC90-E67670108FC5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -218,6 +212,5 @@ Global
 		{BC711491-8102-4504-9E42-63D42F8D108B} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{F8652DD6-6031-4BFC-8387-2175ABA211A0} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{F65D37F5-2F97-4CD2-BC90-E67670108FC5} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
-		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 	EndGlobalSection
 EndGlobal
