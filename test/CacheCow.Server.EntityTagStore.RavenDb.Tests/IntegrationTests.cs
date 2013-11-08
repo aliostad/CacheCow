@@ -5,7 +5,6 @@ using Raven.Client;
 using Raven.Client.Document;
 using Raven.Client.Embedded;
 using Raven.Client.Indexes;
-using Raven.Smuggler;
 
 namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 {
