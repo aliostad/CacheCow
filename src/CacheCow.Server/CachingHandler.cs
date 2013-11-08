@@ -46,21 +46,11 @@ namespace CacheCow.Server
 
 		public bool AddVaryHeader { get; set; }
 
-		public CachingHandler(params string[] varyByHeader)
-			: this(new InMemoryEntityTagStore(), varyByHeader)
+		public CachingHandler(HttpConfiguration configuration, params string[] varyByHeader)
+			: this(configuration, new InMemoryEntityTagStore(), varyByHeader)
 		{
 
 		}
-
-        /// <summary>
-        /// Assumes Web host and uses GlobalConfiguration.Configuration
-        /// </summary>
-        /// <param name="entityTagStore"></param>
-        /// <param name="varyByHeaders"></param>
-	    public CachingHandler(IEntityTagStore entityTagStore, params string[] varyByHeaders)
-            : this(GlobalConfiguration.Configuration, entityTagStore, varyByHeaders)
-	    {
-	    }
 
 	    public CachingHandler(HttpConfiguration configuration, IEntityTagStore entityTagStore, params string[] varyByHeaders)
 		{
