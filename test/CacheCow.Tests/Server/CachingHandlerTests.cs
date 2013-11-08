@@ -16,6 +16,7 @@ using Rhino.Mocks;
 namespace CacheCow.Tests.Server
 {
     using System.IO;
+    using System.Web.Http;
 
     public class CachingHandlerTests
 	{
@@ -36,7 +37,7 @@ namespace CacheCow.Tests.Server
 			string routePattern = "http://myserver/api/stuffs/*";
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
 			var linkedUrls = new []{"url1", "url2"};
-			var cachingHandler = new CachingHandler(entityTagStore)
+			var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
 									{
 										LinkedRoutePatternProvider = (url, mthd) => linkedUrls
 									};
@@ -67,7 +68,7 @@ namespace CacheCow.Tests.Server
 			string routePattern = "http://myserver/api/stuffs/*";
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
 			var linkedUrls = new[] { "url1", "url2" };
-			var cachingHandler = new CachingHandler(entityTagStore)
+			var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
 			{
 				LinkedRoutePatternProvider = (url, mthd) => linkedUrls
 			};
@@ -96,7 +97,7 @@ namespace CacheCow.Tests.Server
             var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
             request.Headers.Add(HttpHeaderNames.Accept, "text/xml");
             var entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"");
-            var cachingHandler = new CachingHandler()
+            var cachingHandler = new CachingHandler(new HttpConfiguration())
             {              
                 ETagValueGenerator = (x, y) => entityTagHeaderValue,
                 CacheControlHeaderProvider = (r, c) =>
@@ -134,7 +135,7 @@ namespace CacheCow.Tests.Server
 			request.Headers.Add(HttpHeaderNames.AcceptLanguage, "en-GB");
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
 			var entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"");
-			var cachingHandler = new CachingHandler(entityTagStore, varyByHeader)
+			var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore, varyByHeader)
 			{
 				AddLastModifiedHeader = addLastModifiedHeader,
 				AddVaryHeader = addVaryHeader,
@@ -196,7 +197,7 @@ namespace CacheCow.Tests.Server
             
             var entityTagStore = mocks.StrictMock<IEntityTagStore>();
             var linkedUrls = new[] { "url1", "url2" };
-            var cachingHandler = new CachingHandler(entityTagStore)
+            var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
             {
                 LinkedRoutePatternProvider = (url, mthd) => linkedUrls,
                 CacheKeyGenerator = (url, headers) =>

@@ -27,7 +27,7 @@ namespace CacheCow.LoadTesting.Server
             config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
             config.Formatters.XmlFormatter.UseXmlSerializer = true;
-            var cachingHandler = new CachingHandler("Accept", "Accept-Encoding");
+            var cachingHandler = new CachingHandler(config, "Accept", "Accept-Encoding");
             cachingHandler.CacheControlHeaderProvider = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue()
                 {
                     NoCache = true, Private = true, NoStore = true

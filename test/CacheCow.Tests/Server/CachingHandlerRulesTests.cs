@@ -13,6 +13,7 @@ using Rhino.Mocks;
 using Rhino.Mocks.Constraints;
 using Rhino.Mocks.Expectations;
 using Rhino.Mocks.Impl;
+using System.Web.Http;
 
 namespace CacheCow.Tests.Server
 {
@@ -34,7 +35,7 @@ namespace CacheCow.Tests.Server
 			// setup 
 			var mocks = new MockRepository();
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-			var entityTagHandler = new CachingHandler(entityTagStore);
+			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore);
 			var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
 			request.Headers.Add(headerName, values);
 			TimedEntityTagHeaderValue entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"");
@@ -63,7 +64,7 @@ namespace CacheCow.Tests.Server
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Put, TestUrl);
-			var entityTagHandler = new CachingHandler();
+            var entityTagHandler = new CachingHandler(new HttpConfiguration());
 			var getRule = entityTagHandler.GetIfMatchNoneMatch();
 			
 			// run
@@ -80,7 +81,7 @@ namespace CacheCow.Tests.Server
 			var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
 			request.Headers.Add(HttpHeaderNames.IfMatch, "\"123\"");
 			request.Headers.Add(HttpHeaderNames.IfNoneMatch, "\"123\"");
-			var entityTagHandler = new CachingHandler();
+            var entityTagHandler = new CachingHandler(new HttpConfiguration());
 			var getRule = entityTagHandler.GetIfMatchNoneMatch();
 
 			// run
@@ -102,7 +103,7 @@ namespace CacheCow.Tests.Server
 			// setup 
 			var mocks = new MockRepository();
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-			var entityTagHandler = new CachingHandler(entityTagStore);
+			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore);
 			var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
 			DateTimeOffset lastChanged = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7));
 			DateTimeOffset lastModifiedInQuestion = resourceHasChanged
@@ -139,7 +140,7 @@ namespace CacheCow.Tests.Server
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Put, TestUrl);
-			var entityTagHandler = new CachingHandler();
+            var entityTagHandler = new CachingHandler(new HttpConfiguration());
 			var getRule = entityTagHandler.GetIfModifiedUnmodifiedSince();
 			// run
 			var task = getRule(request);
@@ -153,7 +154,7 @@ namespace CacheCow.Tests.Server
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
-			var entityTagHandler = new CachingHandler();
+            var entityTagHandler = new CachingHandler(new HttpConfiguration());
 			var getRule = entityTagHandler.GetIfModifiedUnmodifiedSince();
 			// run
 			var task = getRule(request);
@@ -169,7 +170,7 @@ namespace CacheCow.Tests.Server
 			var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
 			request.Headers.Add(HttpHeaderNames.IfModifiedSince, DateTimeOffset.Now.ToString("r"));
 			request.Headers.Add(HttpHeaderNames.IfUnmodifiedSince, DateTimeOffset.Now.ToString("r"));
-			var entityTagHandler = new CachingHandler();
+            var entityTagHandler = new CachingHandler(new HttpConfiguration());
 			var getRule = entityTagHandler.GetIfModifiedUnmodifiedSince();
 
 			// run
@@ -190,7 +191,7 @@ namespace CacheCow.Tests.Server
 			// setup 
 			var mocks = new MockRepository();
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-			var entityTagHandler = new CachingHandler(entityTagStore);
+			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore);
 			var request = new HttpRequestMessage(HttpMethod.Put, TestUrl);
 			DateTimeOffset lastChanged = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7));
 			DateTimeOffset lastModifiedInQuestion = resourceHasChanged
@@ -232,7 +233,7 @@ namespace CacheCow.Tests.Server
 			// setup 
 			var mocks = new MockRepository();
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-			var entityTagHandler = new CachingHandler(entityTagStore);
+			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore);
 			var request = new HttpRequestMessage(HttpMethod.Put, TestUrl);
 			request.Headers.Add(HttpHeaderNames.IfMatch, values);
 			TimedEntityTagHeaderValue entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"");
@@ -260,7 +261,7 @@ namespace CacheCow.Tests.Server
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
-			var entityTagHandler = new CachingHandler();
+            var entityTagHandler = new CachingHandler(new HttpConfiguration());
 			var getRule = entityTagHandler.PutIfUnmodifiedSince();
 			// run
 			var task = getRule(request);
@@ -274,7 +275,7 @@ namespace CacheCow.Tests.Server
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
-			var entityTagHandler = new CachingHandler();
+            var entityTagHandler = new CachingHandler(new HttpConfiguration());
 			var getRule = entityTagHandler.PutIfMatch();
 
 			// run
