@@ -8,19 +8,32 @@ using System.Web.Http.Routing;
 
 namespace CacheCow.Server.RoutePatternPolicy
 {
+    /// <summary>
+    /// This class provides routePatterns for flat or hierarchical collection/instance routes.
+    /// Currently supports only 1 level of hierarchy.
+    /// For example: in case of PUT to /api/{grandparent}/{grandparentId}/{parent}/{parentId}/{child}/{childId} linked patterns will inclue 
+    /// only grandparent/grandparentid/api/parent/parentid and not grandparent/grandparentid
+    /// </summary>
     public class ConventionalRoutePatternProvider
     {
         public static string CollectionPatternSign = "*";
-        public static string InstancePatternSign = "+";
 
         private readonly HttpConfiguration _configuration;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configuration">configuration</param>
         public ConventionalRoutePatternProvider(HttpConfiguration configuration)
         {
             _configuration = configuration;
         }
-
-        public string GetRoutePattern(HttpRequestMessage request)
+        /// <summary>
+        /// This method must be used inside CacheKeyGenerator
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public virtual string GetRoutePattern(HttpRequestMessage request)
         {
             var routeData = request.GetRouteData();
             if (routeData == null)
@@ -36,10 +49,8 @@ namespace CacheCow.Server.RoutePatternPolicy
             // deal with catchall
             if (routeInfo.Parameters.Any(x => x.IsCatchAll))
                 return GetDefaultRoutePattern(request);
-
-            var lastParameter = routeInfo.Parameters.Last();
-            if (routeData.Values[lastParameter.Name] == RouteParameter.Optional ||
-                lastParameter.Name == "action")
+         
+            if (routeInfo.IsCollection(routeData))
             {
                 return routeInfo.BuildCollectionPattern(request.RequestUri, routeData);
             }
@@ -49,20 +60,58 @@ namespace CacheCow.Server.RoutePatternPolicy
             }
         }
 
-        private string GetDefaultRoutePattern(HttpRequestMessage message)
+        protected virtual string GetDefaultRoutePattern(HttpRequestMessage message)
         {
             return message.RequestUri.AbsolutePath;
         }
 
 
-        public string GetLinkedRoutePattern(HttpRequestMessage message)
+        /// <summary>
+        /// This method must be set to LinkedRoutePatternProvider of CachingHandler
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns>All linked route patterns</returns>
+        public virtual IEnumerable<string> GetLinkedRoutePatterns(HttpRequestMessage request)
         {
-            throw new NotImplementedException();
+            var routeData = request.GetRouteData();
+            if (routeData == null)
+                return new string[0];
+
+            var routeInfo = new RouteInfo(routeData.Route);
+
+            // deal with no parameters
+            if (routeInfo.Parameters.Count == 0)
+                return new string[0];
+
+            // deal with catchall
+            if (routeInfo.Parameters.Any(x => x.IsCatchAll))
+                return new string[0];
+
+            var linkedRoutePatterns = new List<string>();
+
+            if (!routeInfo.IsCollection(routeData))
+            {
+                linkedRoutePatterns.Add(routeInfo.BuildCollectionPattern(request.RequestUri, routeData));
+            }
+
+            // now we go one level down by creating a pattern up to controller
+            if (routeData.Values.ContainsKey("controller") && routeData.Values["controller"]!=null)
+            {
+                var routePattern = request.RequestUri.AbsolutePath;
+                var controllerIndex = routePattern.LastIndexOf(routeData.Values["controller"].ToString());
+                routePattern = routePattern.Substring(0, controllerIndex);
+                var lastSlashIndex = routePattern.LastIndexOf("/"); // have to do this since maybe: /something{controller}
+                routePattern = routePattern.Substring(0, lastSlashIndex);
+                linkedRoutePatterns.Add(routePattern);
+            }
+
+            return linkedRoutePatterns;
+
         }
 
     }
 
-    internal class RouteInfo
+    public class RouteInfo
     {
         private const string RouteParameterPattern = @"\{([\w\*]+)\}";
         private IHttpRoute _route;
@@ -90,17 +139,17 @@ namespace CacheCow.Server.RoutePatternPolicy
 
         }
 
+        public bool IsCollection(IHttpRouteData routeData)
+        {
+
+            // if last parameter has optional value or is action then it is a collection 
+            var lastParameter = Parameters.Last();
+            return (routeData.Values[lastParameter.Name] == RouteParameter.Optional ||
+                    lastParameter.Name == "action");
+
+        }
+
         public string BuildCollectionPattern(Uri uri, IHttpRouteData routeData)
-        {
-            return BuildPattern(uri, routeData, ConventionalRoutePatternProvider.CollectionPatternSign);
-        }
-
-        public string BuildInstancePattern(Uri uri, IHttpRouteData routeData)
-        {
-            return BuildPattern(uri, routeData, ConventionalRoutePatternProvider.InstancePatternSign);
-        }
-
-        private string BuildPattern(Uri uri, IHttpRouteData routeData, string sign)
         {
             var last = _parameters.Last();
             var routePattern = "/" + _route.RouteTemplate;
@@ -108,16 +157,24 @@ namespace CacheCow.Server.RoutePatternPolicy
             {
                 if (parameter == last)
                 {
-                    routePattern = routePattern.Replace("{" + parameter.Name + "}", sign);
+                    routePattern = routePattern.Replace("{" + parameter.Name + "}", 
+                        ConventionalRoutePatternProvider.CollectionPatternSign);
                 }
                 else
                 {
-                    routePattern = routePattern.Replace("{" + parameter.Name + "}", routeData.Values[parameter.Name].ToString());
+                    routePattern = routePattern.Replace("{" + parameter.Name + "}", 
+                        routeData.Values[parameter.Name].ToString());
                 }
             }
 
             return routePattern;
         }
+
+        public string BuildInstancePattern(Uri uri, IHttpRouteData routeData)
+        {
+            return uri.AbsolutePath;
+        }
+
 
         public ICollection<RouteParameterInfo> Parameters
         {
@@ -125,7 +182,7 @@ namespace CacheCow.Server.RoutePatternPolicy
         }
     }
 
-    internal class RouteParameterInfo
+    public class RouteParameterInfo
     {
 
         public RouteParameterInfo(string name, int index, object defaultValue)
