@@ -8,7 +8,6 @@ using System.Text;
 namespace CacheCow.Server.CacheControlPolicy
 {
 
-    [Obsolete("This class is moving to its own dll after version 0.5: CacheCow.Server.WebHost.CachePolicies")]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class HttpCacheControlPolicyAttribute : Attribute
     {

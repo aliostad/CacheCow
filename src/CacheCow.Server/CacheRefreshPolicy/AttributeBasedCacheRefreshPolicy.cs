@@ -9,7 +9,6 @@ using CacheCow.Server.CacheControlPolicy;
 
 namespace CacheCow.Server.CacheRefreshPolicy
 {
-    [Obsolete("This class is moving to its own dll after version 0.5: CacheCow.Server.WebHost.CachePolicies")]
     public class AttributeBasedCacheRefreshPolicy : CacheRefreshPolicyBase
     {
         public AttributeBasedCacheRefreshPolicy() : base()
