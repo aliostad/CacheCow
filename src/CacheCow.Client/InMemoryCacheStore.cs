@@ -38,7 +38,7 @@ namespace CacheCow.Client
 			var memoryStream = new MemoryStream();
 			_messageSerializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream).Wait();
 			response.RequestMessage = req;
-			_responseCache.Set(key.HashBase64, memoryStream.ToArray(), DateTimeOffset.MaxValue);
+			_responseCache.Set(key.HashBase64, memoryStream.ToArray(), DateTimeOffset.Now);
 		}
 
 		public bool TryRemove(CacheKey key)
