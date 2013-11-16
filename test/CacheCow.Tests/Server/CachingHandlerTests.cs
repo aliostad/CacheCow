@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using CacheCow.Common;
 using CacheCow.Common.Helpers;
 using CacheCow.Server;
@@ -36,9 +37,9 @@ namespace CacheCow.Tests.Server
 			string routePattern = "http://myserver/api/stuffs/*";
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
 			var linkedUrls = new []{"url1", "url2"};
-			var cachingHandler = new CachingHandler(entityTagStore)
+			var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
 									{
-										LinkedRoutePatternProvider = (url, mthd) => linkedUrls
+										LinkedRoutePatternProvider = (req) => linkedUrls
 									};
 			var entityTagKey = new CacheKey(TestUrl, new string[0], routePattern);
 			var response = new HttpResponseMessage();
@@ -67,9 +68,9 @@ namespace CacheCow.Tests.Server
 			string routePattern = "http://myserver/api/stuffs/*";
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
 			var linkedUrls = new[] { "url1", "url2" };
-			var cachingHandler = new CachingHandler(entityTagStore)
+			var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
 			{
-				LinkedRoutePatternProvider = (url, mthd) => linkedUrls
+				LinkedRoutePatternProvider = (req) => linkedUrls
 			};
 			var entityTagKey = new CacheKey(TestUrl, new string[0], routePattern);
 			var response = new HttpResponseMessage();
@@ -96,7 +97,7 @@ namespace CacheCow.Tests.Server
             var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
             request.Headers.Add(HttpHeaderNames.Accept, "text/xml");
             var entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"");
-            var cachingHandler = new CachingHandler()
+            var cachingHandler = new CachingHandler(new HttpConfiguration())
             {              
                 ETagValueGenerator = (x, y) => entityTagHeaderValue,
                 CacheControlHeaderProvider = (r, c) =>
@@ -134,7 +135,7 @@ namespace CacheCow.Tests.Server
 			request.Headers.Add(HttpHeaderNames.AcceptLanguage, "en-GB");
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
 			var entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"");
-			var cachingHandler = new CachingHandler(entityTagStore, varyByHeader)
+			var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore, varyByHeader)
 			{
 				AddLastModifiedHeader = addLastModifiedHeader,
 				AddVaryHeader = addVaryHeader,
@@ -196,9 +197,9 @@ namespace CacheCow.Tests.Server
             
             var entityTagStore = mocks.StrictMock<IEntityTagStore>();
             var linkedUrls = new[] { "url1", "url2" };
-            var cachingHandler = new CachingHandler(entityTagStore)
+            var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
             {
-                LinkedRoutePatternProvider = (url, mthd) => linkedUrls,
+                LinkedRoutePatternProvider = (req) => linkedUrls,
                 CacheKeyGenerator = (url, headers) =>
                     {
                         if (url == "/api/stuff/") return new CacheKey(url, headers.SelectMany(h => h.Value), routePattern1);

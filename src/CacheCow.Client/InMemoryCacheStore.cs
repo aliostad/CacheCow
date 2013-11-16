@@ -14,12 +14,24 @@ namespace CacheCow.Client
 	public class InMemoryCacheStore : ICacheStore
 	{
         private const string CacheStoreEntryName = "###InMemoryCacheStore_###";
-
+	    private static TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(6);
 
         private MemoryCache _responseCache = new MemoryCache(CacheStoreEntryName);
 		private MessageContentHttpMessageSerializer _messageSerializer = new MessageContentHttpMessageSerializer(true);
+	    private readonly TimeSpan _defaultExpiry;
 
-		public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
+	    public InMemoryCacheStore()
+            : this(DefaultCacheExpiry)
+        {
+            
+        }
+
+        public InMemoryCacheStore(TimeSpan defaultExpiry)
+        {
+            _defaultExpiry = defaultExpiry;
+        }
+
+	    public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
 		{
 			response = null;
 			var result = _responseCache.Get(key.HashBase64);
@@ -38,8 +50,25 @@ namespace CacheCow.Client
 			var memoryStream = new MemoryStream();
 			_messageSerializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream).Wait();
 			response.RequestMessage = req;
-			_responseCache.Set(key.HashBase64, memoryStream.ToArray(), DateTimeOffset.Now);
+            _responseCache.Set(key.HashBase64, memoryStream.ToArray(), GetExpiry(response));
 		}
+
+        private DateTimeOffset GetExpiry(HttpResponseMessage response)
+        {
+            if (response.Content == null)
+            {
+                return response.Headers.CacheControl !=null && response.Headers.CacheControl.MaxAge.HasValue
+                           ? DateTimeOffset.UtcNow.Add(response.Headers.CacheControl.MaxAge.Value)
+                           : DateTimeOffset.UtcNow.Add(_defaultExpiry);
+                
+            }
+            else
+            {
+                return response.Content.Headers.Expires.HasValue
+                           ? response.Content.Headers.Expires.Value
+                           : DateTimeOffset.UtcNow.Add(_defaultExpiry);
+            }
+        }
 
 		public bool TryRemove(CacheKey key)
 		{
@@ -52,5 +81,10 @@ namespace CacheCow.Client
 			_responseCache.Dispose();
             _responseCache = new MemoryCache(CacheStoreEntryName);
 		}
+
+	    public void Dispose()
+	    {
+	        _responseCache.Dispose();
+	    }
 	}
 }

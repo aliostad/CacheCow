@@ -277,5 +277,10 @@ namespace CacheCow.Client.FileCacheStore
 				.Take(1)
 				.FirstOrDefault();
 		}
+
+	    public void Dispose()
+	    {
+	        // none
+	    }
 	}
 }

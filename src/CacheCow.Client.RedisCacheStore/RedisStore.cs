@@ -47,7 +47,7 @@ namespace CacheCow.Client.RedisCacheStore
 	/// 
 	/// 
 	/// </summary>
-	public class RedisStore : ICacheStore, ICacheMetadataProvider, IDisposable
+	public class RedisStore : ICacheStore, ICacheMetadataProvider
 	{
 
 		private RedisConnection _connection;

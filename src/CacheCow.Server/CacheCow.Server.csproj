@@ -59,9 +59,6 @@
     <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Core.4.0.20710.0\lib\net40\System.Web.Http.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.30506.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -78,14 +75,14 @@
     <Compile Include="..\Common\TaskHelpersExtensions.cs">
       <Link>Common\TaskHelpersExtensions.cs</Link>
     </Compile>
+    <Compile Include="CacheControlPolicy\AttributeBasedCacheControlPolicy.cs" />
+    <Compile Include="CacheControlPolicy\CacheControlPolicyBase.cs" />
+    <Compile Include="CacheControlPolicy\HttpCacheControlPolicyAttribute.cs" />
+    <Compile Include="CacheControlPolicy\ICacheControlPolicy.cs" />
     <Compile Include="CacheRefreshPolicy\AttributeBasedCacheRefreshPolicy.cs" />
     <Compile Include="CacheRefreshPolicy\CacheRefreshPolicyBase.cs" />
     <Compile Include="CacheRefreshPolicy\HttpCacheRefreshPolicyAttribute.cs" />
     <Compile Include="CacheRefreshPolicy\ICacheRefreshPolicy.cs" />
-    <Compile Include="CacheControlPolicy\AttributeBasedCacheControlPolicy.cs" />
-    <Compile Include="CacheControlPolicy\HttpCacheControlPolicyAttribute.cs" />
-    <Compile Include="CacheControlPolicy\CacheControlPolicyBase.cs" />
-    <Compile Include="CacheControlPolicy\ICacheControlPolicy.cs" />
     <Compile Include="CachingHandler.cs" />
     <Compile Include="ETagGeneration\ContentHashETagAttribute.cs" />
     <Compile Include="ETagGeneration\ContentHashETagGenerator.cs" />

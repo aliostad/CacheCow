@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CacheCow.Common
 {
-	public interface ICacheStore
+	public interface ICacheStore : IDisposable
 	{
 
 		bool TryGetValue(CacheKey key, out HttpResponseMessage response);

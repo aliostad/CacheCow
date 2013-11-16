@@ -46,21 +46,11 @@ namespace CacheCow.Server
 
 		public bool AddVaryHeader { get; set; }
 
-		public CachingHandler(params string[] varyByHeader)
-			: this(new InMemoryEntityTagStore(), varyByHeader)
+        public CachingHandler(HttpConfiguration configuration, params string[] varyByHeader)
+			: this(configuration, new InMemoryEntityTagStore(), varyByHeader)
 		{
 
 		}
-
-        /// <summary>
-        /// Assumes Web host and uses GlobalConfiguration.Configuration
-        /// </summary>
-        /// <param name="entityTagStore"></param>
-        /// <param name="varyByHeaders"></param>
-	    public CachingHandler(IEntityTagStore entityTagStore, params string[] varyByHeaders)
-            : this(GlobalConfiguration.Configuration, entityTagStore, varyByHeaders)
-	    {
-	    }
 
 	    public CachingHandler(HttpConfiguration configuration, IEntityTagStore entityTagStore, params string[] varyByHeaders)
 		{
@@ -73,7 +63,7 @@ namespace CacheCow.Server
 			CacheKeyGenerator = (resourceUri, headers) =>
 				new CacheKey(resourceUri, headers.SelectMany(h => h.Value));
 
-			LinkedRoutePatternProvider = (uri, method) => new string[0]; // a dummy
+			LinkedRoutePatternProvider = (req) => new string[0]; // a dummy
 			UriTrimmer = (uri) => uri.PathAndQuery;
 
             // infinite - Never refresh
@@ -136,7 +126,7 @@ namespace CacheCow.Server
 		/// Current resourceUri and HttpMethod is passed and a list of URLs
 		/// is retrieved and cache is invalidated for those URLs.
 		/// </summary>
-		public Func<string, HttpMethod, IEnumerable<string>> LinkedRoutePatternProvider { get; set; }
+		public Func<HttpRequestMessage, IEnumerable<string>> LinkedRoutePatternProvider { get; set; }
 
 		/// <summary>
 		/// A function that gets the Uri (normally request) and extracts important bits
@@ -154,11 +144,11 @@ namespace CacheCow.Server
 
                 // remove pattern
                 this.InvalidateResource(cacheKey.RoutePattern);
-                linkedUrls.AddRange(this.LinkedRoutePatternProvider(trimmedUri, method));
+                linkedUrls.AddRange(this.LinkedRoutePatternProvider(BuildRequest(trimmedUri, method)));
 	        }
 
             // remove all related URIs - only need to do this once per uri
-            this.InvalidateLinkedUrls(linkedUrls.Distinct());
+            this.InvalidateLinkedRoutePattern(linkedUrls.Distinct());
 	    }
 
 		protected void ExecuteCacheInvalidationRules(CacheKey cacheKey,
@@ -367,20 +357,25 @@ namespace CacheCow.Server
                     this.InvalidateResource(cacheKey.RoutePattern);
 
                     // remove all related URIs
-                    var linkedUrls = this.LinkedRoutePatternProvider(trimmedUri, request.Method);
-                    this.InvalidateLinkedUrls(linkedUrls);
+                    var linkedUrls = this.LinkedRoutePatternProvider(BuildRequest(trimmedUri, request.Method));
+                    this.InvalidateLinkedRoutePattern(linkedUrls);
 				};
 
 		}
+
+        private HttpRequestMessage BuildRequest(string trimmedUri, HttpMethod method) // TODO: !!!
+        {
+            return new HttpRequestMessage();
+        }
 
 	    internal void InvalidateResource(string routePattern)
 	    {
 	        this._entityTagStore.RemoveAllByRoutePattern(routePattern);
 	    }
 
-	    private void InvalidateLinkedUrls(IEnumerable<string> linkedUrls)
+	    private void InvalidateLinkedRoutePattern(IEnumerable<string> linkedRoutePatterns)
 	    {
-	        foreach (var linkedUrl in linkedUrls)
+	        foreach (var linkedUrl in linkedRoutePatterns)
 	        {
 	            this._entityTagStore.RemoveAllByRoutePattern(linkedUrl);
 	        }

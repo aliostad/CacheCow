@@ -169,5 +169,10 @@ namespace CacheCow.Client.SqlCacheStore
 		{
 		    return GetEarliestAccessedItem("");
 		}
+
+	    public void Dispose()
+	    {
+	        // none
+	    }
 	}
 }

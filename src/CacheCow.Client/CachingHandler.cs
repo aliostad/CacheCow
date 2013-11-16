@@ -412,8 +412,13 @@ namespace CacheCow.Client
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            if(disposing)
+            if (disposing)
+            {
                 VaryHeaderStore.Dispose();
+                var disposable = _cacheStore as IDisposable;
+                if(disposable!=null)
+                    disposable.Dispose();
+            }
         }
 
 	}
