@@ -14,9 +14,10 @@ namespace CacheCow.Server.RoutePatternPolicy
     /// For example: in case of PUT to /api/{grandparent}/{grandparentId}/{parent}/{parentId}/{child}/{childId} linked patterns will inclue 
     /// only grandparent/grandparentid/api/parent/parentid and not grandparent/grandparentid
     /// </summary>
-    public class ConventionalRoutePatternProvider
+    public class ConventionalRoutePatternProvider : IRoutePatternProvider
     {
         public static string CollectionPatternSign = "*";
+        public static string InstancePatternSign = "+";
 
         private readonly HttpConfiguration _configuration;
 
@@ -27,7 +28,10 @@ namespace CacheCow.Server.RoutePatternPolicy
         public ConventionalRoutePatternProvider(HttpConfiguration configuration)
         {
             _configuration = configuration;
+            ControllerNameHierarchy = new Dictionary<string, IEnumerable<string>>();
         }
+
+
         /// <summary>
         /// This method must be used inside CacheKeyGenerator
         /// </summary>
@@ -37,7 +41,7 @@ namespace CacheCow.Server.RoutePatternPolicy
         {
             var routeData = request.GetRouteData();
             if (routeData == null)
-               return GetDefaultRoutePattern(request);
+                routeData = _configuration.Routes.GetRouteData(request);
 
             var routeInfo = new RouteInfo(routeData.Route);
 
@@ -109,6 +113,7 @@ namespace CacheCow.Server.RoutePatternPolicy
 
         }
 
+        public IDictionary<string, IEnumerable<string>> ControllerNameHierarchy { get; private set; }
     }
 
     public class RouteInfo
@@ -145,11 +150,16 @@ namespace CacheCow.Server.RoutePatternPolicy
             // if last parameter has optional value or is action then it is a collection 
             var lastParameter = Parameters.Last();
             return (routeData.Values[lastParameter.Name] == RouteParameter.Optional ||
-                    lastParameter.Name == "action");
+                    lastParameter.IsAction);
 
         }
 
         public string BuildCollectionPattern(Uri uri, IHttpRouteData routeData)
+        {
+            return BuildPattern(uri, routeData, true);
+        }
+
+        private string BuildPattern(Uri uri, IHttpRouteData routeData, bool isCollection)
         {
             var last = _parameters.Last();
             var routePattern = "/" + _route.RouteTemplate;
@@ -157,12 +167,14 @@ namespace CacheCow.Server.RoutePatternPolicy
             {
                 if (parameter == last)
                 {
-                    routePattern = routePattern.Replace("{" + parameter.Name + "}", 
-                        ConventionalRoutePatternProvider.CollectionPatternSign);
+                    routePattern = routePattern.Replace("{" + parameter.Name + "}",
+                        isCollection ? 
+                            ConventionalRoutePatternProvider.CollectionPatternSign : 
+                            ConventionalRoutePatternProvider.InstancePatternSign );
                 }
                 else
                 {
-                    routePattern = routePattern.Replace("{" + parameter.Name + "}", 
+                    routePattern = routePattern.Replace("{" + parameter.Name + "}",
                         routeData.Values[parameter.Name].ToString());
                 }
             }
@@ -170,9 +182,10 @@ namespace CacheCow.Server.RoutePatternPolicy
             return routePattern;
         }
 
+
         public string BuildInstancePattern(Uri uri, IHttpRouteData routeData)
         {
-            return uri.AbsolutePath;
+            return BuildPattern(uri, routeData, false);
         }
 
 
@@ -210,7 +223,7 @@ namespace CacheCow.Server.RoutePatternPolicy
 
         public bool IsController
         {
-            get { return Name == "action"; }
+            get { return Name == "controller"; }
         }
 
         public bool IsOptional

@@ -32,5 +32,20 @@ namespace CacheCow.Common.Helpers
 			}
 
 		}
+
+
+        /// <summary>
+        /// Extracts all headers provided. Does a case-insensitive selection.
+        /// </summary>
+        /// <param name="headers">this parameter</param>
+        /// <param name="headerNames">Name of the headers</param>
+        /// <returns></returns>
+        public static IEnumerable<KeyValuePair<string, IEnumerable<string>>> ExtractHeadersValues(
+            this HttpRequestHeaders headers, 
+            params string[] headerNames)
+        {
+            return headers.Where(x =>
+                headerNames.Any(h => h.Equals(x.Key, StringComparison.CurrentCultureIgnoreCase)));
+        }
 	}
 }

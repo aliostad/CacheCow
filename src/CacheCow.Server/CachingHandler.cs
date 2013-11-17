@@ -13,6 +13,7 @@ using CacheCow.Common;
 using CacheCow.Common.Helpers;
 using CacheCow.Common.Http;
 using CacheCow.Server.ETagGeneration;
+using CacheCow.Server.RoutePatternPolicy;
 
 namespace CacheCow.Server
 {
@@ -34,7 +35,8 @@ namespace CacheCow.Server
 		private readonly string[] _varyByHeaders;
 		private object _padLock = new object();
 	    private HttpConfiguration _configuration;
-        
+	    private IRoutePatternProvider _routePatternProvider;
+
 	    /// <summary>
 		/// A Chain of responsibility of rules for handling various scenarios. 
 		/// List is ordered. First one to return a non-null task will break the chain and 
@@ -60,11 +62,13 @@ namespace CacheCow.Server
 			_varyByHeaders = varyByHeaders;
 			_entityTagStore = entityTagStore;
 	        ETagValueGenerator = new DefaultETagGenerator().Generate;
-			CacheKeyGenerator = (resourceUri, headers) =>
-				new CacheKey(resourceUri, headers.SelectMany(h => h.Value));
+
 
 			LinkedRoutePatternProvider = (req) => new string[0]; // a dummy
 			UriTrimmer = (uri) => uri.PathAndQuery;
+            
+            _routePatternProvider = new ConventionalRoutePatternProvider(configuration);
+
 
             // infinite - Never refresh
 	        CacheRefreshPolicyProvider = (message, httpConfiguration) => TimeSpan.MaxValue;
@@ -89,16 +93,6 @@ namespace CacheCow.Server
 			EntityTagHeaderValue> ETagValueGenerator { get; set; }
 
 		/// <summary>
-		/// A function which receives URL of the resource and generates a value for ETag key
-		/// It also receives varyByHeaders request headers.
-		/// Default value is a function that appends URL and all varyByHeader header values.
-		/// This extensibility points allows for selected values from the varyByHeader headers
-		/// selected and passed in.
-		/// </summary>
-		public Func<string, IEnumerable<KeyValuePair<string, IEnumerable<string>>>, CacheKey>
-			 CacheKeyGenerator { get; set; }
-
-		/// <summary>
 		/// This is a function that decides whether caching for a particular request
 		/// is supported.
 		/// Function can return null to negate any caching. In this case, responses will not be cached
@@ -107,7 +101,6 @@ namespace CacheCow.Server
 		/// By default value is set so that all requests are cachable with immediate expiry.
 		/// </summary>
 		public Func<HttpRequestMessage, HttpConfiguration, CacheControlHeaderValue> CacheControlHeaderProvider { get; set; }
-
 
         /// <summary>
         /// This is a function responsible for controlling server's cache expiry
@@ -134,21 +127,29 @@ namespace CacheCow.Server
 		/// </summary>
 		public Func<Uri, string> UriTrimmer { get; set; }
 
-	    public void InvalidateResources(HttpMethod method, params Uri[] resourceUris)
+        /// <summary>
+        /// Provides route pattern and linked route pattern
+        /// </summary>
+	    public IRoutePatternProvider RoutePatternProvider { get; set; }
+
+        public CacheKey GenerateCacheKey(HttpRequestMessage request)
+        {            
+            return new CacheKey(UriTrimmer(request.RequestUri), 
+                request.Headers.ExtractHeadersValues(_varyByHeaders)
+                .SelectMany(h => h.Value),
+                _routePatternProvider.GetRoutePattern(request));
+        }
+        
+				
+
+
+	    public void InvalidateResource(HttpRequestMessage request)
 	    {
-	        var linkedUrls = new List<string>();
-	        foreach (var resourceUri in resourceUris)
-	        {
-	            var trimmedUri = UriTrimmer(resourceUri);
-	            var cacheKey = CacheKeyGenerator(trimmedUri, new List<KeyValuePair<string, IEnumerable<string>>>());
-
-                // remove pattern
-                this.InvalidateResource(cacheKey.RoutePattern);
-                linkedUrls.AddRange(this.LinkedRoutePatternProvider(BuildRequest(trimmedUri, method)));
-	        }
-
+            
+            // Todo: !!! individual
+	        
             // remove all related URIs - only need to do this once per uri
-            this.InvalidateLinkedRoutePattern(linkedUrls.Distinct());
+            this.InvalidateLinkedRoutePattern(_routePatternProvider.GetLinkedRoutePatterns(request));
 	    }
 
 		protected void ExecuteCacheInvalidationRules(CacheKey cacheKey,
@@ -185,7 +186,7 @@ namespace CacheCow.Server
             if(cacheExpiry == TimeSpan.MaxValue)
                 return; // infinity
 
-            var cacheKey = BuildCacheKey(request);
+            var cacheKey = GenerateCacheKey(request);
             TimedEntityTagHeaderValue value = null;
             if(!_entityTagStore.TryGetValue(cacheKey, out value))
                 return;
@@ -388,14 +389,11 @@ namespace CacheCow.Server
 				if (!response.IsSuccessStatusCode) // only if successful carry on processing
 					return response;
 
-				string uri = UriTrimmer(request.RequestUri);
-				var varyHeaders = request.Headers.Where(h =>
-						 _varyByHeaders.Any(v => v.Equals(h.Key, StringComparison.CurrentCultureIgnoreCase)));
+			    var cacheKey = GenerateCacheKey(request);
 
-				var eTagKey = CacheKeyGenerator(uri, varyHeaders);
-
-				ExecuteCacheInvalidationRules(eTagKey, request, response);
-				ExecuteCacheAdditionRules(eTagKey, request, response, varyHeaders);
+                ExecuteCacheInvalidationRules(cacheKey, request, response);
+                // TODO: redesign parameters!!! 
+                // ExecuteCacheAdditionRules(cacheKey, request, response, varyHeaders);
 
 				return response;
 			};
@@ -446,7 +444,7 @@ namespace CacheCow.Server
 				var isNoneMatch = noneMatchTags.Count > 0;
 				var etags = isNoneMatch ? noneMatchTags : matchTags;
 
-			    var entityTagKey = BuildCacheKey(request);
+			    var entityTagKey = GenerateCacheKey(request);
 				// compare the Etag with the one in the cache
 				// do conditional get.
 				TimedEntityTagHeaderValue actualEtag = null;
@@ -464,15 +462,6 @@ namespace CacheCow.Server
 			};
 
 		}
-
-        protected CacheKey BuildCacheKey(HttpRequestMessage request)
-        {
-            var resource = UriTrimmer(request.RequestUri);
-            var headers =
-                request.Headers.Where(h => _varyByHeaders.Any(v => v.Equals(h.Key, StringComparison.CurrentCultureIgnoreCase)));
-            return CacheKeyGenerator(resource, headers);
-            
-        }
 
 		internal Func<HttpRequestMessage, Task<HttpResponseMessage>> GetIfModifiedUnmodifiedSince()
 		{
@@ -493,10 +482,8 @@ namespace CacheCow.Server
 				bool ifModified = (ifUnmodifiedSince == null);
 				DateTimeOffset modifiedInQuestion = ifModified ? ifModifiedSince.Value : ifUnmodifiedSince.Value;
 
-				var headers =
-					request.Headers.Where(h => _varyByHeaders.Any(v => v.Equals(h.Key, StringComparison.CurrentCultureIgnoreCase)));
-				var resource = UriTrimmer(request.RequestUri);
-				var entityTagKey = CacheKeyGenerator(resource, headers);
+				
+				var entityTagKey = GenerateCacheKey(request);
 
 				TimedEntityTagHeaderValue actualEtag = null;
 
@@ -526,10 +513,7 @@ namespace CacheCow.Server
 
 				DateTimeOffset modifiedInQuestion = ifUnmodifiedSince.Value;
 
-				var headers =
-					request.Headers.Where(h => _varyByHeaders.Any(v => v.Equals(h.Key, StringComparison.CurrentCultureIgnoreCase)));
-				var resource = UriTrimmer(request.RequestUri);
-				var entityTagKey = CacheKeyGenerator(resource, headers);
+				var entityTagKey = GenerateCacheKey(request);
 				TimedEntityTagHeaderValue actualEtag = null;
 
 				bool isModified = true;
@@ -555,10 +539,7 @@ namespace CacheCow.Server
 				if (matchTags == null || matchTags.Count == 0)
 					return null;
 
-				var headers =
-					request.Headers.Where(h => _varyByHeaders.Any(v => v.Equals(h.Key, StringComparison.CurrentCultureIgnoreCase)));
-				var resource = UriTrimmer(request.RequestUri);
-				var entityTagKey = CacheKeyGenerator(resource, headers);
+				var entityTagKey = GenerateCacheKey(request);
 				TimedEntityTagHeaderValue actualEtag = null;
 
 				bool matchFound = false;

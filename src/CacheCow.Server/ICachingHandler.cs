@@ -1,4 +1,6 @@
-﻿namespace CacheCow.Server
+﻿using CacheCow.Common;
+
+namespace CacheCow.Server
 {
     using System;
     using System.Net.Http;
@@ -9,11 +11,16 @@
     public interface ICachingHandler
     {
         /// <summary>
-        /// Invalidates resources passed in
-        /// All related to the same method
+        /// Invalidates the request. 
         /// </summary>
-        /// <param name="method"></param>
-        /// <param name="resourceUris"></param>
-        void InvalidateResources(HttpMethod method, params Uri[] resourceUris);
+        /// <param name="request"></param>
+        void InvalidateResource(HttpRequestMessage request);
+
+        /// <summary>
+        /// Generates cacheKey. Sometimes can be useful
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        CacheKey GenerateCacheKey(HttpRequestMessage request);
     }
 }

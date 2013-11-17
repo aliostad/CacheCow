@@ -24,14 +24,15 @@ namespace CacheCow.Tests.Server.RoutePatternPolicy
 
         }
 
-        [TestCase("api/{controller}/{id}", "http://x/api/y/123", "/api/y/123")]
+        [TestCase("api/{controller}/{id}", "http://x/api/y/123", "/api/y/+")]
         [TestCase("api/{controller}/{id}", "http://x/api/y/", "/api/y/*")]
         [TestCase("api/{controller}/{id}", "http://x/api/y", "/api/y/*")]
         [TestCase("api/{topcontroller}/{topid}/{controller}/{id}", "http://x/api/y/1/x", "/api/y/1/x/*")]
-        [TestCase("api/{topcontroller}/{topid}/{controller}/{id}", "http://x/api/y/1/x/aliostad", "/api/y/1/x/aliostad")]
+        [TestCase("api/{topcontroller}/{topid}/{controller}/{id}", "http://x/api/y/1/x/aliostad", "/api/y/1/x/+")]
         [TestCase("api/{topcontroller}/{topid}/{controller}/{action}", "http://x/api/y/1/x/aliostad", "/api/y/1/x/*")]
         public void BuildRoutePattern(string routeTemplate, string url, string exptectedPattern)
         {
+            // arg
             var configuration = new HttpConfiguration();
             configuration.Routes.MapHttpRoute("test", routeTemplate, new {id = RouteParameter.Optional});
             var request = new HttpRequestMessage(HttpMethod.Get, url);
@@ -39,8 +40,10 @@ namespace CacheCow.Tests.Server.RoutePatternPolicy
             var routeData = configuration.Routes.GetRouteData(request);
             request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, routeData);
 
+            // act
             var routePattern = routePatternProvider.GetRoutePattern(request);
 
+            // asrt
             Assert.AreEqual(exptectedPattern, routePattern);
         }
 
