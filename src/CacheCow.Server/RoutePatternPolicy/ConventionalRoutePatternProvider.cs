@@ -101,7 +101,7 @@ namespace CacheCow.Server.RoutePatternPolicy
                 linkedRoutePatterns.Add(routeInfo.BuildCollectionPattern(request.RequestUri, routeData));
             }
 
-            // now we go one level down by creating a pattern up to controller
+            // now we go one level up by creating a pattern up to controller
             if (routeData.Values.ContainsKey("controller") && routeData.Values["controller"]!=null)
             {
                 var routePattern = request.RequestUri.AbsolutePath;

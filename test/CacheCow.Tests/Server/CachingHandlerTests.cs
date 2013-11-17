@@ -181,7 +181,6 @@ namespace CacheCow.Tests.Server
 
 		}
 
-        // TODO: fix !!!
         [TestCase("DELETE")]
         [TestCase("PUT")]
         [TestCase("POST")]
