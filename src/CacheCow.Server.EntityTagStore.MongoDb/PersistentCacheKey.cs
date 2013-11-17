@@ -13,7 +13,9 @@
 
 		public byte[] Hash { get; set; }
 
-		public string RoutePattern { get; set; }
+        public string RoutePattern { get; set; }
+        
+        public string ResourceUri { get; set; }
 
 		public string ETag { get; set; }
 

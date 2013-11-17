@@ -81,7 +81,8 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 					Hash = key.Hash,
 					RoutePattern = key.RoutePattern,
 					ETag = eTag.Tag,
-					LastModified = eTag.LastModified
+					LastModified = eTag.LastModified,
+                    ResourceUri = key.ResourceUri
 				};
 				using (var session = _documentStore.OpenSession())
 				{
@@ -98,17 +99,38 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 						session.Query<PersistentCacheKey>()
 						.Customize(x => x.WaitForNonStaleResults())
 						.FirstOrDefault(x => x.Hash == key.Hash);
+
 					cacheKey.ETag = eTag.Tag;
 					cacheKey.LastModified = eTag.LastModified;
+                    cacheKey.ResourceUri = key.ResourceUri;
+                    cacheKey.RoutePattern = key.RoutePattern;
 					session.Store(cacheKey);
 					session.SaveChanges();
 				}
 			}
 		}
 
-	    public int RemoveResource(string url)
+	    public int RemoveResource(string resourceUri)
 	    {
-	        throw new NotImplementedException();
+
+            var count = 0;
+            using (var session = _documentStore.OpenSession())
+            {
+                var persistentCacheKeys =
+                    session.Query<PersistentCacheKey>()
+                    .Customize(x => x.WaitForNonStaleResults()).
+                    Where(p => p.ResourceUri == resourceUri);
+
+                count = persistentCacheKeys.Count();
+
+                foreach (var key in persistentCacheKeys)
+                {
+                    session.Delete(key);
+                }
+
+                session.SaveChanges();
+            }
+            return count;
 	    }
 
 	    public bool TryRemove(CacheKey key)

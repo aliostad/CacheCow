@@ -80,21 +80,48 @@ namespace CacheCow.Server.EntityTagStore.Memcached
 
         }
 
-        public int RemoveResource(string url)
+        public int RemoveResource(string resourceUri)
         {
-            throw new NotImplementedException();
+            return Remove(GetResourceUriEntries(resourceUri));
         }
+        
+        private int Remove(IEnumerable<string> entries)
+        {
+            int count = 0;
+            foreach (var entry in entries)
+            {
+                var removed = _memcachedClient.Remove(entry);
+                if (removed)
+                    count++;
+            }
+            return count;
+        }
+
 
         internal static string GetKeyForRoutePattern(string routePattern)
         {
             return "___ROUTE_PATTERN___" + routePattern;
         }
 
+        internal static string GetKeyForResourceUri(string resourceUri)
+        {
+            return "___RESOURCE_URI___" + resourceUri;
+        }
+
+        private IEnumerable<string> GetResourceUriEntries(string resourceUri)
+        {
+            return GetEntries(GetKeyForResourceUri(resourceUri));
+        }
+
         private IEnumerable<string> GetRoutePatternEntries(string routePattern)
         {
+            return GetEntries(GetKeyForRoutePattern(routePattern));
+        }
+
+        private IEnumerable<string> GetEntries(string key)
+        {
             var list = new List<string>();
-            string keyForRoutePattern = GetKeyForRoutePattern(routePattern);
-            var bytes = _memcachedClient.Get<byte[]>(keyForRoutePattern);
+            var bytes = _memcachedClient.Get<byte[]>(key);
             if (bytes == null)
                 return list;
             LengthedPrefixedString prefixedString;
@@ -106,6 +133,8 @@ namespace CacheCow.Server.EntityTagStore.Memcached
 
             return list;
         }
+
+
 
         // TODO: !!! routePattern implementation needs to be changed to Cas
         public bool TryRemove(CacheKey key)
@@ -134,15 +163,7 @@ namespace CacheCow.Server.EntityTagStore.Memcached
 
         public int RemoveAllByRoutePattern(string routePattern)
         {
-            int count = 0;
-            var routePatternEntries = GetRoutePatternEntries(routePattern);
-            foreach (var routePatternEntry in routePatternEntries)
-            {
-                var removed = _memcachedClient.Remove(routePatternEntry);
-                if (removed)
-                    count++;
-            }
-            return count;
+            return Remove(GetRoutePatternEntries(routePattern));
         }
 
         public void Clear()

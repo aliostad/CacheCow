@@ -49,17 +49,17 @@ namespace CacheCow.Server
             return _eTagCache.Remove(key.HashBase64) != null;
         }
 
-	    public int RemoveResource(string url)
+	    public int RemoveResource(string resourceUri)
 	    {
             int count = 0;
-            var keys = (ConcurrentBag<CacheKey>)_routePatternCache.Get(url);
+            var keys = (ConcurrentBag<CacheKey>)_routePatternCache.Get(resourceUri);
 
             if (keys != null)
             {
                 count = keys.Count;
                 foreach (var entityTagKey in keys)
                     this.TryRemove(entityTagKey);
-                _routePatternCache.Remove(url);
+                _resourceCache.Remove(resourceUri);
             }
 
             return count;

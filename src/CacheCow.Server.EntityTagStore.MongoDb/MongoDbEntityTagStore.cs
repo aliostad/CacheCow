@@ -64,7 +64,8 @@
 					Hash = key.Hash,
 					RoutePattern = key.RoutePattern,
 					ETag = eTag.Tag,
-					LastModified = eTag.LastModified
+					LastModified = eTag.LastModified,
+                    ResourceUri = key.ResourceUri
 				};
 
 				using (var connection = new MongoEntiryStoreConnection(this.connectionString))
@@ -87,9 +88,24 @@
 			}
 		}
 
-	    public int RemoveResource(string url)
+	    public int RemoveResource(string resourceUri)
 	    {
-	        throw new NotImplementedException();
+            int count;
+            using (var connection = new MongoEntiryStoreConnection(this.connectionString))
+            {
+                var persistentCacheKeys = connection.DocumentStore.AsQueryable()
+                    .Where(p => p.ResourceUri == resourceUri);
+
+                count = persistentCacheKeys.Count();
+
+                foreach (var query in persistentCacheKeys
+                    .Select(cacheKey => Query.EQ("_id", ObjectId.Parse(cacheKey.Id))))
+                {
+                    connection.DocumentStore.Remove(query);
+                }
+            }
+
+            return count;
 	    }
 
 	    public bool TryRemove(CacheKey key)

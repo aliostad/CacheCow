@@ -79,6 +79,7 @@
     <None Include="Scripts\combine_scripts.bat" />
     <None Include="Scripts\ClearCache.sp" />
     <None Include="Scripts\DeleteCacheById.sp" />
+    <None Include="Scripts\DeleteCacheByResourceUri.sp" />
     <None Include="Scripts\DeleteCacheByRoutePattern.sp" />
     <None Include="Scripts\GetCache.sp" />
   </ItemGroup>

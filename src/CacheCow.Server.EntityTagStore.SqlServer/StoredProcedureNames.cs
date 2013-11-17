@@ -7,10 +7,11 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 {
 	internal static class StoredProcedureNames
 	{
-		public static string GetCache = "GetCache";
-		public static string AddUpdateCache = "AddUpdateCache";
-		public static string DeleteCacheById = "DeleteCacheById";
-		public static string DeleteCacheByRoutePattern = "DeleteCacheByRoutePattern";
-		public static string Clear = "ClearCache";
+		public static string GetCache = "Server_GetCache";
+		public static string AddUpdateCache = "Server_AddUpdateCache";
+        public static string DeleteCacheById = "Server_DeleteCacheById";
+        public static string DeleteCacheByResourceUri = "Server_DeleteCacheByResourceUri";
+        public static string DeleteCacheByRoutePattern = "Server_DeleteCacheByRoutePattern";
+        public static string Clear = "Server_ClearCache";
 	}
 }

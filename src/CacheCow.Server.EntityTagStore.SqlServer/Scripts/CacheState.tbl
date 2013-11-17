@@ -18,6 +18,7 @@ GO
 CREATE TABLE [dbo].[CacheState](
 	[CacheKeyHash] [binary](20) NOT NULL,
 	[RoutePattern] [nvarchar](256) NOT NULL,
+	[ResourceUri] [nvarchar](256) NOT NULL,
 	[ETag] [nvarchar](100) NOT NULL,
 	[LastModified] [datetime] NOT NULL,
  CONSTRAINT [PK_CacheState] PRIMARY KEY CLUSTERED 

@@ -81,9 +81,17 @@ namespace CacheCow.Server.EntityTagStore.Memcached12
             }
         }
 
-        public int RemoveResource(string url)
+        public int RemoveResource(string resourceUri)
         {
-            throw new NotImplementedException();
+            int count = 0;
+            var resourceUriEntries = GetResourceUriEntries(resourceUri);
+            foreach (var entry in resourceUriEntries)
+            {
+                var removed = _memcachedClient.Remove(entry);
+                if (removed)
+                    count++;
+            }
+            return count;
         }
 
         internal static string GetKeyForRoutePattern(string routePattern)
@@ -91,11 +99,15 @@ namespace CacheCow.Server.EntityTagStore.Memcached12
             return "___ROUTE_PATTERN___" + routePattern;
         }
 
-        private IEnumerable<string> GetRoutePatternEntries(string routePattern)
+        internal static string GetKeyForResourceUri(string resourceUri)
+        {
+            return "___RESOURCE_URI___" + resourceUri;
+        }
+
+        private IEnumerable<string> GetEntries(string key)
         {
             var list = new List<string>();
-            string keyForRoutePattern = GetKeyForRoutePattern(routePattern);
-            var bytes = _memcachedClient.Get<byte[]>(keyForRoutePattern);
+            var bytes = _memcachedClient.Get<byte[]>(key);
 
             if (bytes == null)
                 return list;
@@ -110,6 +122,17 @@ namespace CacheCow.Server.EntityTagStore.Memcached12
             }
 
             return list;
+
+        }
+
+        private IEnumerable<string> GetRoutePatternEntries(string routePattern)
+        {
+            return GetEntries(GetKeyForRoutePattern(routePattern));
+        }
+
+        private IEnumerable<string> GetResourceUriEntries(string routePattern)
+        {
+            return GetEntries(GetKeyForRoutePattern(routePattern));
         }
 
         // TODO: !!! routePattern implementation needs to be changed to Cas

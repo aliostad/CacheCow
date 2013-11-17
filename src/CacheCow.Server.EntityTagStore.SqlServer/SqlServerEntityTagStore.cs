@@ -86,16 +86,26 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 				command.CommandText = this.GetStoredProcedureName(StoredProcedureNames.AddUpdateCache);
 				command.CommandType = CommandType.StoredProcedure;
 				command.Parameters.AddWithValue(ColumnNames.CacheKeyHash, key.Hash);
-				command.Parameters.AddWithValue(ColumnNames.RoutePattern, key.RoutePattern);
+                command.Parameters.AddWithValue(ColumnNames.RoutePattern, key.RoutePattern);
+                command.Parameters.AddWithValue(ColumnNames.ResourceUri, key.ResourceUri);
 				command.Parameters.AddWithValue(ColumnNames.ETag, eTag.Tag);
 				command.Parameters.AddWithValue(ColumnNames.LastModified, eTag.LastModified);
 				command.ExecuteNonQuery();
 			}
 		}
 
-	    public int RemoveResource(string url)
+	    public int RemoveResource(string resourceUri)
 	    {
-	        throw new NotImplementedException();
+            using (var connection = new SqlConnection(this._connectionString))
+            using (var command = new SqlCommand())
+            {
+                connection.Open();
+                command.Connection = connection;
+                command.CommandText = this.GetStoredProcedureName(StoredProcedureNames.DeleteCacheByResourceUri);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue(ColumnNames.ResourceUri, resourceUri);
+                return command.ExecuteNonQuery();
+            }
 	    }
 
 	    public bool TryRemove(CacheKey key)

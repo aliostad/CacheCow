@@ -3,8 +3,8 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AddUpdateCache]') AND type in (N'P', N'PC'))
-DROP PROCEDURE [dbo].AddUpdateCache
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Server_AddUpdateCache]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].Server_AddUpdateCache
 GO
 
 -- =============================================
@@ -12,9 +12,10 @@ GO
 -- Create date: 2012-07-12
 -- Description:	Adds or updates cache entry
 -- =============================================
-CREATE PROCEDURE AddUpdateCache
+CREATE PROCEDURE Server_AddUpdateCache
 	@cacheKeyHash	BINARY(20),
 	@routePattern	NVARCHAR(256),
+	@resourceUri	NVARCHAR(256),
 	@eTag			NVARCHAR(100),
 	@lastModified	DATETIME
 	 
@@ -30,16 +31,18 @@ BEGIN
 		BEGIN
 			UPDATE dbo.CacheState SET 
 					ETag = @eTag,
-					LastModified = @lastModified
+					LastModified = @lastModified,
+					RoutePattern = @routePattern,
+					ResourceUri	 = @resourceUri
 				WHERE CacheKeyHash = @cacheKeyHash
 		END
 	ELSE
 	
 		BEGIN
 			INSERT INTO dbo.CacheState 
-				(CacheKeyHash, RoutePattern, ETag, LastModified)
+				(CacheKeyHash, RoutePattern, ResourceUri, ETag, LastModified)
 			values 
-				(@cacheKeyHash, @routePattern, @eTag, @lastModified)
+				(@cacheKeyHash, @routePattern, @resourceUri, @eTag, @lastModified)
 		END
 	COMMIT TRAN
 

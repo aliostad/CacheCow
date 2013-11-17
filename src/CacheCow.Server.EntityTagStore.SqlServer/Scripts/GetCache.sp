@@ -3,8 +3,8 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GetCache]') AND type in (N'P', N'PC'))
-DROP PROCEDURE [dbo].GetCache
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Server_GetCache]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].Server_GetCache
 GO
 
 -- =============================================
@@ -12,7 +12,7 @@ GO
 -- Create date: 2012-07-12
 -- Description:	returns cache entry by its Id
 -- =============================================
-CREATE PROCEDURE GetCache
+CREATE PROCEDURE Server_GetCache
 	@cacheKeyHash		BINARY(20)
 	 
 AS
