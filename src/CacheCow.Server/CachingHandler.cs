@@ -31,6 +31,11 @@ namespace CacheCow.Server
 	/// </summary>
 	public class CachingHandler : DelegatingHandler, ICachingHandler
 	{
+
+        // NOTE: !!!
+        // This class is heavily functional. The reason is ease of unit testing each 
+        // individual function/ 
+
 		protected readonly IEntityTagStore _entityTagStore;
 		private readonly string[] _varyByHeaders;
 		private object _padLock = new object();
@@ -65,7 +70,7 @@ namespace CacheCow.Server
 
 
 			LinkedRoutePatternProvider = (req) => new string[0]; // a dummy
-			UriTrimmer = (uri) => uri.PathAndQuery;
+	        UriTrimmer = (uri) => uri.PathAndQuery;
             
             _routePatternProvider = new ConventionalRoutePatternProvider(configuration);
 
@@ -139,17 +144,19 @@ namespace CacheCow.Server
                 .SelectMany(h => h.Value),
                 _routePatternProvider.GetRoutePattern(request));
         }
-        
-				
-
 
 	    public void InvalidateResource(HttpRequestMessage request)
 	    {
-            
-            // Todo: !!! individual
-	        
+
+            // remove resource
+	        _entityTagStore.RemoveResource(UriTrimmer(request.RequestUri));
+
             // remove all related URIs - only need to do this once per uri
-            this.InvalidateLinkedRoutePattern(_routePatternProvider.GetLinkedRoutePatterns(request));
+	        var routePatterns = _routePatternProvider.GetLinkedRoutePatterns(request);
+	        foreach (var routePattern in routePatterns)
+	        {
+	            _entityTagStore.RemoveAllByRoutePattern(routePattern);
+	        }
 	    }
 
 		protected void ExecuteCacheInvalidationRules(CacheKey cacheKey,
@@ -166,12 +173,11 @@ namespace CacheCow.Server
 
 		protected void ExecuteCacheAdditionRules(CacheKey cacheKey,
 			HttpRequestMessage request,
-			HttpResponseMessage response,
-			IEnumerable<KeyValuePair<string, IEnumerable<string>>> varyHeaders)
+			HttpResponseMessage response)
 		{
 			new[]
 				{
-					AddCaching(cacheKey, request, response, varyHeaders), // general caching
+					AddCaching(cacheKey, request, response), // general adding caching
 				}
 				.Chain()();
 		}
@@ -270,8 +276,7 @@ namespace CacheCow.Server
 		internal Action AddCaching(
 			CacheKey cacheKey,
 			HttpRequestMessage request,
-			HttpResponseMessage response,
-			IEnumerable<KeyValuePair<string, IEnumerable<string>>> varyHeaders)
+			HttpResponseMessage response)
 		{
 			return
 				() =>
@@ -352,35 +357,12 @@ namespace CacheCow.Server
 					if (!request.Method.Method.IsIn("PUT", "DELETE", "POST", "PATCH"))
 						return;
 
-				    var trimmedUri = this.UriTrimmer(request.RequestUri);
+                    // remove resource
+                    this.InvalidateResource(request);
                     
-                    // remove pattern
-                    this.InvalidateResource(cacheKey.RoutePattern);
-
-                    // remove all related URIs
-                    var linkedUrls = this.LinkedRoutePatternProvider(BuildRequest(trimmedUri, request.Method));
-                    this.InvalidateLinkedRoutePattern(linkedUrls);
 				};
 
 		}
-
-        private HttpRequestMessage BuildRequest(string trimmedUri, HttpMethod method) // TODO: !!!
-        {
-            return new HttpRequestMessage();
-        }
-
-	    internal void InvalidateResource(string routePattern)
-	    {
-	        this._entityTagStore.RemoveAllByRoutePattern(routePattern);
-	    }
-
-	    private void InvalidateLinkedRoutePattern(IEnumerable<string> linkedRoutePatterns)
-	    {
-	        foreach (var linkedUrl in linkedRoutePatterns)
-	        {
-	            this._entityTagStore.RemoveAllByRoutePattern(linkedUrl);
-	        }
-	    }
 
 	    internal Func<HttpResponseMessage, HttpResponseMessage> GetCachingContinuation(HttpRequestMessage request)
 		{
@@ -392,8 +374,8 @@ namespace CacheCow.Server
 			    var cacheKey = GenerateCacheKey(request);
 
                 ExecuteCacheInvalidationRules(cacheKey, request, response);
-                // TODO: redesign parameters!!! 
-                // ExecuteCacheAdditionRules(cacheKey, request, response, varyHeaders);
+
+                ExecuteCacheAdditionRules(cacheKey, request, response);
 
 				return response;
 			};

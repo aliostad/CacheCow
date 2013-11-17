@@ -9,7 +9,6 @@ namespace CacheCow.Common
 	public class CacheKey
 	{
 		private readonly string _resourceUri;
-		private readonly IEnumerable<string> _headerValues;
 		private readonly string _toString;
 		private readonly string _routePattern;
 		private readonly byte[] _hash;
@@ -39,8 +38,7 @@ namespace CacheCow.Common
 		public CacheKey(string resourceUri, IEnumerable<string> headerValues, string routePattern)
 		{
 			_routePattern = routePattern;
-			_headerValues = headerValues.ToList();
-			_resourceUri = resourceUri;
+
 			_toString = string.Format(CacheKeyFormat, resourceUri, string.Join("-", headerValues));
 			using (var sha1 = new SHA1CryptoServiceProvider())
 			{
@@ -48,7 +46,18 @@ namespace CacheCow.Common
 			}
 			_hashBase64 = Convert.ToBase64String(_hash);
 
+            _resourceUri = resourceUri;
+
+            // Starting with v0.5, query string parameters are removed from the resourceUri
+		    var indexOfQuestionMark = _resourceUri.IndexOf('?');
+            if (indexOfQuestionMark > 0)
+		    {
+		        _resourceUri = _resourceUri.Substring(0, indexOfQuestionMark);
+		    }
+
 		}
+
+
 
 		public string ResourceUri
 		{

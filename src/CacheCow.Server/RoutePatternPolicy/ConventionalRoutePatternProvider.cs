@@ -43,6 +43,9 @@ namespace CacheCow.Server.RoutePatternPolicy
             if (routeData == null)
                 routeData = _configuration.Routes.GetRouteData(request);
 
+            if(routeData == null)
+                return GetDefaultRoutePattern(request);
+
             var routeInfo = new RouteInfo(routeData.Route);
 
             // deal with no parameters

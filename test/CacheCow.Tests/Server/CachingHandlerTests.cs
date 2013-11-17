@@ -44,9 +44,8 @@ namespace CacheCow.Tests.Server
 			var entityTagKey = new CacheKey(TestUrl, new string[0], routePattern);
 			var response = new HttpResponseMessage();
 			var invalidateCache = cachingHandler.InvalidateCache(entityTagKey, request, response);
-			entityTagStore.Expect(x => x.RemoveAllByRoutePattern(routePattern)).Return(1);
-			entityTagStore.Expect(x => x.RemoveAllByRoutePattern(linkedUrls[0])).Return(0);
-			entityTagStore.Expect(x => x.RemoveAllByRoutePattern(linkedUrls[1])).Return(0);
+            entityTagStore.Expect(x => x.RemoveResource("/api/stuff/")).Return(1);
+
 			mocks.ReplayAll();
 
 			// run
@@ -111,8 +110,7 @@ namespace CacheCow.Tests.Server
             };
             var response = request.CreateResponse(HttpStatusCode.Accepted);
 
-            cachingHandler.AddCaching(new CacheKey(TestUrl, new string[0]), request, response, 
-                new List<KeyValuePair<string, IEnumerable<string>>>())();
+            cachingHandler.AddCaching(new CacheKey(TestUrl, new string[0]), request, response)();
             Assert.IsTrue(response.Headers.Pragma.Any(x=>x.Name == "no-cache"), "no-cache not in pragma");
 
         }
@@ -160,7 +158,7 @@ namespace CacheCow.Tests.Server
 			if (alreadyHasLastModified)
 				response.Content.Headers.Add(HttpHeaderNames.LastModified, DateTimeOffset.Now.ToString("r"));
 
-			var cachingContinuation = cachingHandler.AddCaching(entityTagKey, request, response, request.Headers);
+			var cachingContinuation = cachingHandler.AddCaching(entityTagKey, request, response);
 			mocks.ReplayAll();
 
 			// run
@@ -201,18 +199,19 @@ namespace CacheCow.Tests.Server
             var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
             {
                 LinkedRoutePatternProvider = (req) => linkedUrls,
-                
+
+              
             };
 
-            entityTagStore.Expect(x => x.RemoveAllByRoutePattern(routePattern1)).Return(1);
-            entityTagStore.Expect(x => x.RemoveAllByRoutePattern(routePattern2)).Return(1);
+            entityTagStore.Expect(x => x.RemoveResource("/api/stuff/")).Return(1);
+            entityTagStore.Expect(x => x.RemoveResource("/api/more/")).Return(1);
 
-            entityTagStore.Expect(x => x.RemoveAllByRoutePattern(linkedUrls[0])).Return(0);
-            entityTagStore.Expect(x => x.RemoveAllByRoutePattern(linkedUrls[1])).Return(0);
+
             mocks.ReplayAll();
 
             // run
-            //cachingHandler.InvalidateResources(new HttpMethod(method), new Uri(TestUrl), new Uri(TestUrl2));
+            cachingHandler.InvalidateResource(new HttpRequestMessage(new HttpMethod(method), new Uri(TestUrl)));
+            cachingHandler.InvalidateResource(new HttpRequestMessage(new HttpMethod(method), new Uri(TestUrl2)));  
 
             // verify
             mocks.VerifyAll();
