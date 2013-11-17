@@ -93,7 +93,12 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 			}
 		}
 
-		public bool TryRemove(CacheKey key)
+	    public int RemoveResource(string url)
+	    {
+	        throw new NotImplementedException();
+	    }
+
+	    public bool TryRemove(CacheKey key)
 		{
 			using (var connection = new SqlConnection(this._connectionString))
 			using (var command = new SqlCommand())

@@ -87,7 +87,12 @@
 			}
 		}
 
-		public bool TryRemove(CacheKey key)
+	    public int RemoveResource(string url)
+	    {
+	        throw new NotImplementedException();
+	    }
+
+	    public bool TryRemove(CacheKey key)
 		{
 			int count;
 			using (var connection = new MongoEntiryStoreConnection(this.connectionString))

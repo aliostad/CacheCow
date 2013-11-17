@@ -106,7 +106,12 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 			}
 		}
 
-		public bool TryRemove(CacheKey key)
+	    public int RemoveResource(string url)
+	    {
+	        throw new NotImplementedException();
+	    }
+
+	    public bool TryRemove(CacheKey key)
 		{
 			var count = 0;
 			using (var session = _documentStore.OpenSession())

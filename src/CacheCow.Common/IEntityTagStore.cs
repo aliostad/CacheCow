@@ -18,8 +18,8 @@ namespace CacheCow.Common
 	{
 		bool TryGetValue(CacheKey key, out TimedEntityTagHeaderValue eTag);
 		void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag);
-		bool TryRemove(CacheKey key);
-        
+        int RemoveResource(string url);
+        bool TryRemove(CacheKey key);
 		int RemoveAllByRoutePattern(string routePattern);
 		void Clear();
 	}

@@ -81,6 +81,11 @@ namespace CacheCow.Server.EntityTagStore.Memcached12
             }
         }
 
+        public int RemoveResource(string url)
+        {
+            throw new NotImplementedException();
+        }
+
         internal static string GetKeyForRoutePattern(string routePattern)
         {
             return "___ROUTE_PATTERN___" + routePattern;
