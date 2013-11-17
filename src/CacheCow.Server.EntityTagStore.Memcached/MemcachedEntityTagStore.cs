@@ -59,10 +59,12 @@ namespace CacheCow.Server.EntityTagStore.Memcached
         {
             // add item
             _memcachedClient.ExecuteStore(StoreMode.Set, key.HashBase64, eTag.ToString());
-            
+
             // add route pattern if not there
             string keyForRoutePattern = GetKeyForRoutePattern(key.RoutePattern);
+            string keyForResourceUri = GetKeyForResourceUri(key.ResourceUri);
             var routePatternEntries = GetRoutePatternEntries(key.RoutePattern);
+            var resourceUriEntries = GetResourceUriEntries(key.ResourceUri);
 
            
             if (!routePatternEntries.Contains(key.HashBase64))
@@ -74,6 +76,18 @@ namespace CacheCow.Server.EntityTagStore.Memcached
                 }
                 bytes.AddRange(new LengthedPrefixedString(key.HashBase64).ToByteArray());
                 _memcachedClient.ExecuteStore(StoreMode.Set, keyForRoutePattern, bytes.ToArray());
+
+            }
+
+            if (!resourceUriEntries.Contains(key.HashBase64))
+            {
+                var bytes = new List<byte>();
+                foreach (var routePatternEntry in resourceUriEntries)
+                {
+                    bytes.AddRange(new LengthedPrefixedString(routePatternEntry).ToByteArray());
+                }
+                bytes.AddRange(new LengthedPrefixedString(key.HashBase64).ToByteArray());
+                _memcachedClient.ExecuteStore(StoreMode.Set, keyForResourceUri, bytes.ToArray());
 
             }
 

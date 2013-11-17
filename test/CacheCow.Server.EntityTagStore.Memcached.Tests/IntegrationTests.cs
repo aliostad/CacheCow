@@ -67,9 +67,29 @@ namespace CacheCow.Server.EntityTagStore.Memcached.Tests
 
         }
 
-        private CacheKey GetCacheKey()
+        [Ignore]
+        [Test]
+        public void RemoveByResourceUriTest()
         {
-            return new CacheKey("/api/1/2/3", new string[0]);
+            var cacheKey = GetCacheKey(true);
+            var cacheKey2 = GetCacheKey(true);
+            var original = GetETag();
+            _memcachedEntityTagStore.AddOrUpdate(cacheKey, original);
+            _memcachedEntityTagStore.AddOrUpdate(cacheKey2, original);
+
+            var result = _memcachedEntityTagStore.RemoveResource(cacheKey.ResourceUri);
+            Assert.AreEqual(2, result);
+
+        }
+
+        private CacheKey GetCacheKey(bool differentRoutPattern = false)
+        {
+            const string url = "/api/1/2/3";
+            return new CacheKey(url, new string[]{Guid.NewGuid().ToString()},
+                differentRoutPattern ? 
+                url + Guid.NewGuid().ToString() :
+                url
+            );
         }
 
         private TimedEntityTagHeaderValue GetETag()

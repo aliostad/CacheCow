@@ -48,6 +48,7 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 
 		}
 
+
 		[Test]
 		[Ignore]
 		public void UpdateTest()
@@ -142,6 +143,34 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 
 
 		}
+
+        [Test]
+        [Ignore]
+        public void RemoveByIdResourceUriTest()
+        {
+            var cacheKey = new CacheKey("/api/Cars", new[] { "1234", "abcdef" }, "/api/Cars/*");
+            var cacheKey2 = new CacheKey("/api/Cars", new[] { "1234", "abcdefgh", "/api/Cars/+" });
+            var documentStore = new EmbeddableDocumentStore()
+            {
+                RunInMemory = true
+            }.Initialize();
+
+            var store = new RavenDbEntityTagStore(documentStore);
+            var value = new TimedEntityTagHeaderValue("\"abcdef1234\"") { LastModified = DateTime.Now };
+
+
+            // first remove them
+            store.RemoveAllByRoutePattern(cacheKey.RoutePattern);
+
+            // add
+            store.AddOrUpdate(cacheKey, value);
+            store.AddOrUpdate(cacheKey2, value);
+
+            // delete
+            Assert.AreEqual(2, store.RemoveResource("/api/Cars"));
+
+
+        }
 
 	}
 }
