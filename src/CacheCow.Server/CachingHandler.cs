@@ -149,7 +149,7 @@ namespace CacheCow.Server
 	    {
 
             // remove resource
-	        _entityTagStore.RemoveResource(UriTrimmer(request.RequestUri));
+	        _entityTagStore.RemoveResource(request.RequestUri.AbsolutePath);
 
             // remove all related URIs - only need to do this once per uri
 	        var routePatterns = _routePatternProvider.GetLinkedRoutePatterns(request);

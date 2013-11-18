@@ -52,7 +52,7 @@ namespace CacheCow.Server
 	    public int RemoveResource(string resourceUri)
 	    {
             int count = 0;
-            var keys = (ConcurrentBag<CacheKey>)_routePatternCache.Get(resourceUri);
+            var keys = (ConcurrentBag<CacheKey>)_resourceCache.Get(resourceUri);
 
             if (keys != null)
             {

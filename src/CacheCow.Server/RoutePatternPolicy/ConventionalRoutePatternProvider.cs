@@ -139,8 +139,9 @@ namespace CacheCow.Server.RoutePatternPolicy
 
             // if last parameter has optional value or is action then it is a collection 
             var lastParameter = Parameters.Last();
-            return (routeData.Values[lastParameter.Name] == RouteParameter.Optional ||
-                    lastParameter.IsAction);
+            return !routeData.Values.ContainsKey(lastParameter.Name) ||
+                routeData.Values[lastParameter.Name] == RouteParameter.Optional ||
+                    lastParameter.IsAction;
 
         }
 
