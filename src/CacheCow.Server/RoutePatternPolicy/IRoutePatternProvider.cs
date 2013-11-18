@@ -27,10 +27,5 @@ namespace CacheCow.Server.RoutePatternPolicy
         /// <returns>All linked route patterns for this request</returns>
         IEnumerable<string> GetLinkedRoutePatterns(HttpRequestMessage request);
 
-        /// <summary>
-        /// Hierarchy of controllers names (without "Controller")
-        /// For examples: "Car" -> {"Wheel", "Mirror", "Door"}
-        /// </summary>
-        IDictionary<string, IEnumerable<string>> ControllerNameHierarchy { get; } 
     }
 }

@@ -9,10 +9,9 @@ using System.Web.Http.Routing;
 namespace CacheCow.Server.RoutePatternPolicy
 {
     /// <summary>
-    /// This class provides routePatterns for flat or hierarchical collection/instance routes.
-    /// Currently supports only 1 level of hierarchy.
-    /// For example: in case of PUT to /api/{grandparent}/{grandparentId}/{parent}/{parentId}/{child}/{childId} linked patterns will inclue 
-    /// only grandparent/grandparentid/api/parent/parentid and not grandparent/grandparentid
+    /// This class provides routePatterns for flat and conventional collection/instance ASP.NET routes.
+    /// If you have hierarchies which get invalidated, you need to invalidate yourself.
+    /// Rules for hierarchical can get very complex and hairy and is not possible to get right with conventional routing.
     /// </summary>
     public class ConventionalRoutePatternProvider : IRoutePatternProvider
     {
@@ -28,7 +27,6 @@ namespace CacheCow.Server.RoutePatternPolicy
         public ConventionalRoutePatternProvider(HttpConfiguration configuration)
         {
             _configuration = configuration;
-            ControllerNameHierarchy = new Dictionary<string, IEnumerable<string>>();
         }
 
 
@@ -101,22 +99,11 @@ namespace CacheCow.Server.RoutePatternPolicy
                 linkedRoutePatterns.Add(routeInfo.BuildCollectionPattern(request.RequestUri, routeData));
             }
 
-            // now we go one level up by creating a pattern up to controller
-            if (routeData.Values.ContainsKey("controller") && routeData.Values["controller"]!=null)
-            {
-                var routePattern = request.RequestUri.AbsolutePath;
-                var controllerIndex = routePattern.LastIndexOf(routeData.Values["controller"].ToString());
-                routePattern = routePattern.Substring(0, controllerIndex);
-                var lastSlashIndex = routePattern.LastIndexOf("/"); // have to do this since maybe: /something{controller}
-                routePattern = routePattern.Substring(0, lastSlashIndex);
-                linkedRoutePatterns.Add(routePattern);
-            }
-
             return linkedRoutePatterns;
 
         }
 
-        public IDictionary<string, IEnumerable<string>> ControllerNameHierarchy { get; private set; }
+
     }
 
     public class RouteInfo
