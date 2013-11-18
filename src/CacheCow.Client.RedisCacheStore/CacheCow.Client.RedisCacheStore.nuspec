@@ -13,7 +13,6 @@
     <tags>aspnetwebapi http caching webapi cachecow etag redisstore redis booksleeve</tags>
 	<dependencies>
       <dependency id="CacheCow.Client" version="$version$"  />
-      <dependency id="Simple.Data.Sqlite" version="0.16.0.0"  />
       <dependency id="BookSleeve" version="1.2.0.1"  />
     </dependencies>	
   </metadata>
