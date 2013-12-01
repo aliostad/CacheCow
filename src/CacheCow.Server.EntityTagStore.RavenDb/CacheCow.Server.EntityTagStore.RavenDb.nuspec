@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>$version$-Unstable</version>
+    <version>$version$-alpha</version>
     <title>$title$</title>
     <authors>AlexZeitler $author$</authors>
     <owners>$author$</owners>
@@ -12,8 +12,8 @@
     <copyright>Copyright 2012</copyright>
     <tags>aspnetwebapi http caching webapi cachecow etag ravendb</tags>
     <dependencies>
-      <dependency id="CacheCow.Server" version="$version$" />
-      <dependency id="RavenDB.Client" version="1.2.2096-Unstable" />
+      <dependency id="CacheCow.Server" version="$version$-alpha" />
+      <dependency id="RavenDB.Client" version="2.5.2750" />
     </dependencies>
   </metadata>
 </package>
