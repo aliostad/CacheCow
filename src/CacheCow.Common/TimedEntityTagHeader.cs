@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Text;
 
 namespace CacheCow.Common
 {
@@ -26,7 +23,7 @@ namespace CacheCow.Common
 		public TimedEntityTagHeaderValue(string tag, bool isWeak)
 			: base(tag, isWeak)
 		{
-			LastModified = DateTimeOffset.Parse(DateTimeOffset.UtcNow.ToString("r")); // to remove milliseconds
+			LastModified = DateTimeOffset.UtcNow.UtcDateTime; // to remove milliseconds
 		}
 
 
