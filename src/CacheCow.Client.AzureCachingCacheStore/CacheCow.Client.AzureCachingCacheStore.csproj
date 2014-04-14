@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CacheCow.Client.AzureCachingCacheStore</RootNamespace>
     <AssemblyName>CacheCow.Client.AzureCachingCacheStore</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -70,11 +71,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\src\Common\CommonAssemblyInfo.cs">
+    <Compile Include="..\Common\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\src\Common\TaskHelpers.cs">
-      <Link>TaskHelpers.cs</Link>
+    <Compile Include="..\common\TaskHelpers.cs">
+      <Link>Internal\TaskHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\common\TaskHelpersExtensions.cs">
+      <Link>Internal\TaskHelpersExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\common\TraceWriter.cs">
+      <Link>Internal\TraceWriter.cs</Link>
     </Compile>
     <Compile Include="AzureCacheStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -95,11 +102,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\CacheCow.Client\CacheCow.Client.csproj">
+    <ProjectReference Include="..\CacheCow.Client\CacheCow.Client.csproj">
       <Project>{943325CB-7189-42FE-9DA4-E513DB3E0E87}</Project>
       <Name>CacheCow.Client</Name>
     </ProjectReference>
-    <ProjectReference Include="..\src\CacheCow.Common\CacheCow.Common.csproj">
+    <ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj">
       <Project>{88E170E4-B857-42FE-963C-0505502B548C}</Project>
       <Name>CacheCow.Common</Name>
     </ProjectReference>
