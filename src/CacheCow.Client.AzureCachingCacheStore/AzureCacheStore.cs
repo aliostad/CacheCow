@@ -14,11 +14,22 @@
 		private const string CacheRegion = "CacheCowClient";
 		private IHttpMessageSerializerAsync serializer = new MessageContentHttpMessageSerializer();
 
+
+        /// <summary>
+        /// Default cacheName is "CacheCow"
+        /// </summary>
 		public AzureCacheStore()
+            : this("CacheCow")
 		{
-			cache = new DataCache("CacheCow");
-			cache.CreateRegion(CacheRegion);
+			
 		}
+
+        public AzureCacheStore(string cacheName)
+        {
+            cache = new DataCache(cacheName);
+            cache.CreateRegion(CacheRegion);
+        }
+
 
 		public void AddOrUpdate(CacheKey key, HttpResponseMessage response)
 		{
