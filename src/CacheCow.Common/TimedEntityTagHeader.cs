@@ -23,7 +23,7 @@ namespace CacheCow.Common
 		public TimedEntityTagHeaderValue(string tag, bool isWeak)
 			: base(tag, isWeak)
 		{
-			LastModified = DateTimeOffset.UtcNow.UtcDateTime; // to remove milliseconds
+			LastModified = DateTimeOffset.Parse(DateTimeOffset.UtcNow.ToString("r"));
 		}
 
 
