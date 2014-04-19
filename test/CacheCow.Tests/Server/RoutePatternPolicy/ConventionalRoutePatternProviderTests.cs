@@ -48,10 +48,10 @@ namespace CacheCow.Tests.Server.RoutePatternPolicy
         }
 
         [TestCase("api/{controller}/{id}", "http://x/api/y/123", new[] { "/api/y/*" })]
-        [TestCase("api/{controller}/{id}", "http://x/api/y/", new[] { "/api" })]
-        [TestCase("api/{controller}/{id}", "http://x/api/y", new[] { "/api" })]
-        [TestCase("api/{parentController}/{parentdId}/{controller}/{id}", "http://x/api/y/123/z/12", new[] { "/api/y/123" })]
-        [TestCase("api/{parentController}/{parentdId}/{controller}/{id}", "http://x/api/y/123/z/", new[] { "/api/y/123" })]
+        [TestCase("api/{controller}/{id}", "http://x/api/y/", new [] {"/api"} )]
+        [TestCase("api/{controller}/{id}", "http://x/api/y", new []{"/api"})]
+        [TestCase("api/{parentController}/{parentId}/{controller}/{id}", "http://x/api/y/123/z/12", new[] { "/api/y/123" })]
+        [TestCase("api/{parentController}/{parentId}/{controller}/{id}", "http://x/api/y/123/z/", new[] { "/api/y/123" })]
         public void GetLinkedRoutePatterns(string routeTemplate, string url, string[] exptectedPatterns)
         {
             var configuration = new HttpConfiguration();

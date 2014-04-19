@@ -12,7 +12,7 @@ namespace CacheCow.Client.SqlCacheStore.Tests
     [TestFixture]
     public class IntegrationTests
     {
-        
+        [Ignore]
         [Test]
         public void TestClear()
         {
@@ -20,6 +20,7 @@ namespace CacheCow.Client.SqlCacheStore.Tests
             sqlStore.Clear();
         }
 
+        [Ignore]
         [Test]
         public void FullTests()
         {
@@ -38,6 +39,7 @@ namespace CacheCow.Client.SqlCacheStore.Tests
             Assert.IsTrue(sqlStore.TryRemove(cacheKey));
         }
 
+        [Ignore]
         [Test]
         public void GetDomains()
         {

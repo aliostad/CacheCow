@@ -15,11 +15,19 @@
 		private readonly DataCache cache;
 		private const string CacheRegion = "CacheCowServer";
 
+
+
 		public AzureCachingEntityTagStore()
+            : this("default")
 		{
-			cache = new DataCache();
-			cache.CreateRegion(CacheRegion);
+			
 		}
+
+        public AzureCachingEntityTagStore(string cacheName)
+        {
+            cache = new DataCache(cacheName);
+            cache.CreateRegion(CacheRegion);
+        }
 
 		public void Dispose()
 		{

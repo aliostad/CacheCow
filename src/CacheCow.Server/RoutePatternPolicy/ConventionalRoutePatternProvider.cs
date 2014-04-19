@@ -57,7 +57,7 @@ namespace CacheCow.Server.RoutePatternPolicy
          
             if (routeInfo.IsCollection(routeData))
             {
-                return routeInfo.BuildCollectionPattern(request.RequestUri, routeData);
+                return routeInfo.BuildCollectionPattern( routeData);
             }
             else
             {
@@ -93,10 +93,11 @@ namespace CacheCow.Server.RoutePatternPolicy
                 return new string[0];
 
             var linkedRoutePatterns = new List<string>();
+            linkedRoutePatterns.Add(routeInfo.GetRoot(routeData));
 
             if (!routeInfo.IsCollection(routeData))
             {
-                linkedRoutePatterns.Add(routeInfo.BuildCollectionPattern(request.RequestUri, routeData));
+                linkedRoutePatterns.Add(routeInfo.BuildCollectionPattern(routeData));
             }
 
             return linkedRoutePatterns;
@@ -134,6 +135,15 @@ namespace CacheCow.Server.RoutePatternPolicy
 
         }
 
+        public string GetRoot(IHttpRouteData routeData)
+        {
+            var collectionPattern = BuildCollectionPattern(routeData);
+            var uptoController = collectionPattern.Replace("/*","");
+            var lastIndexOf = uptoController.LastIndexOf('/');
+            return uptoController.Substring(0, lastIndexOf).TrimEnd('/');
+        }
+
+
         public bool IsCollection(IHttpRouteData routeData)
         {
 
@@ -145,12 +155,12 @@ namespace CacheCow.Server.RoutePatternPolicy
 
         }
 
-        public string BuildCollectionPattern(Uri uri, IHttpRouteData routeData)
+        public string BuildCollectionPattern(IHttpRouteData routeData)
         {
-            return BuildPattern(uri, routeData, true);
+            return BuildPattern(routeData, true);
         }
 
-        private string BuildPattern(Uri uri, IHttpRouteData routeData, bool isCollection)
+        private string BuildPattern(IHttpRouteData routeData, bool isCollection)
         {
             var last = _parameters.Last();
             var routePattern = "/" + _route.RouteTemplate;
@@ -176,7 +186,7 @@ namespace CacheCow.Server.RoutePatternPolicy
 
         public string BuildInstancePattern(Uri uri, IHttpRouteData routeData)
         {
-            return BuildPattern(uri, routeData, false);
+            return BuildPattern(routeData, false);
         }
 
 

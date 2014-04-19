@@ -19,7 +19,7 @@
         /// Default cacheName is "CacheCow"
         /// </summary>
 		public AzureCacheStore()
-            : this("CacheCow")
+            : this("default")
 		{
 			
 		}
