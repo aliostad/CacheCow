@@ -18,7 +18,7 @@ namespace CacheCow.Server.ETagGeneration
                 x.Key == ContentHashETagAttribute.ContentHashHeaderName);
 
             return keyValuePair.Key == null ? base.Generate(url, requestHeaders) : 
-                new EntityTagHeaderValue("\"" + keyValuePair.Value.First() + "\"", false);
+                new EntityTagHeaderValue("w\"" + keyValuePair.Value.First() + "\"", false);
         }
     }
 }
