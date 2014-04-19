@@ -6,6 +6,7 @@ using System.Text;
 using System.Web.Http;
 using CacheCow.Common;
 using CacheCow.Server;
+using CacheCow.Server.ETagGeneration;
 using CacheCow.Tests.Server.Integration.MiniServer;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
@@ -21,6 +22,7 @@ namespace CacheCow.Tests.Server.Integration
         {
             public const string Client = "Client";
             public const string ItemId = "Id";
+            public const string CacheHandler = "CacheHandler";
         }
 
         private const string ServerUrl = "http://gypsylife/api/";
@@ -45,12 +47,15 @@ namespace CacheCow.Tests.Server.Integration
                 defaults: new { id = RouteParameter.Optional }
             );
 
-            var client = new HttpClient(new CachingHandler(configuration, store, "Accept")
-                                            {
-                                                InnerHandler = new InMemoryServer(configuration)
-                                            });
+            var inMemoryServer = new InMemoryServer(configuration);
+            var cachingHandler = new CachingHandler(configuration, store, "Accept")
+            {
+                InnerHandler = inMemoryServer
+            };
+            var client = new HttpClient(cachingHandler);
 
             ScenarioContext.Current[Keys.Client] = client;
+            ScenarioContext.Current[Keys.CacheHandler] = cachingHandler;
         }
 
         [Given(@"I Create a new item")]
@@ -109,6 +114,15 @@ namespace CacheCow.Tests.Server.Integration
             var result = client.GetAsync(ServerUrl + "Item/" + ScenarioContext.Current[Keys.ItemId]).Result;
             ScenarioContext.Current[etagName] = result.Headers.ETag.Tag;
         }
+
+        [Given(@"I use Content Based Hash Generation")]
+        public void GivenIUseContentBasedHashGeneration()
+        {
+            var handler = (CachingHandler)ScenarioContext.Current[Keys.CacheHandler];
+            handler.ETagValueGenerator = new ContentHashETagGenerator().Generate;
+        }
+
+
 
     }
 }

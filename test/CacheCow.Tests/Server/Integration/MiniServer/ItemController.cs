@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
+using CacheCow.Server.ETagGeneration;
 
 namespace CacheCow.Tests.Server.Integration.MiniServer
 {
@@ -15,6 +16,7 @@ namespace CacheCow.Tests.Server.Integration.MiniServer
             return Item.Items.Values;
         }
 
+        [ContentHashETag]
         public Item Get(int id)
         {
             return Item.Items[id];

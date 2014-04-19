@@ -8,7 +8,7 @@ using System.Web.Http.Filters;
 namespace CacheCow.Server.ETagGeneration
 {
     /// <summary>
-    /// Generates H
+    /// Generates ETag based on MD5 hash of the content.
     /// </summary>
     public class ContentHashETagAttribute : ActionFilterAttribute
     {
