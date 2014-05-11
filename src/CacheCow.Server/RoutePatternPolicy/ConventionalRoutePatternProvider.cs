@@ -166,6 +166,10 @@ namespace CacheCow.Server.RoutePatternPolicy
             var routePattern = "/" + _route.RouteTemplate;
             foreach (var parameter in Parameters)
             {
+                string parameterValue = routeData.Values.ContainsKey(parameter.Name)
+                    ? routeData.Values[parameter.Name].ToString()
+                    : "___";
+
                 if (parameter == last)
                 {
                     routePattern = routePattern.Replace("{" + parameter.Name + "}",
@@ -176,7 +180,7 @@ namespace CacheCow.Server.RoutePatternPolicy
                 else
                 {
                     routePattern = routePattern.Replace("{" + parameter.Name + "}",
-                        routeData.Values[parameter.Name].ToString());
+                        parameterValue);
                 }
             }
 
