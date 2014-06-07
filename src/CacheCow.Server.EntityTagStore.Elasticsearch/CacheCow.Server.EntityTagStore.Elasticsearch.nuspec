@@ -4,11 +4,11 @@
     <id>$id$</id>
     <version>$version$</version>
     <title>$title$</title>
-    <authors>damienbod, Ali Kheyrollahi</authors>
-    <owners>Ali Kheyrollahi</owners>
+    <authors>damienbod, $author$</authors>
+    <owners>$author$</owners>
     <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Elasticsearch storage for CacheCow entity tag store</description>
+    <description>$description$</description>
     <copyright>Copyright 2014</copyright>
     <tags>aspnetwebapi http caching webapi cachecow elasticsearch etag</tags>
 	<dependencies>

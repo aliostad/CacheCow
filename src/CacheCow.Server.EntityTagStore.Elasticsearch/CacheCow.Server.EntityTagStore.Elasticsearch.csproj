@@ -51,6 +51,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Common\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="NestEntityTagStore.cs" />
     <Compile Include="PersistentCacheKey.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
