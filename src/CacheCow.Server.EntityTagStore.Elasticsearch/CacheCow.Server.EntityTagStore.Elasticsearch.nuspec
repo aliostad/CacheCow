@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>damienbod, Ali Kheyrollahi</authors>
+    <owners>Ali Kheyrollahi</owners>
+    <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Elasticsearch storage for CacheCow entity tag store</description>
+    <copyright>Copyright 2014</copyright>
+    <tags>aspnetwebapi http caching webapi cachecow elasticsearch etag</tags>
+	<dependencies>
+      <dependency id="CacheCow.Server" version="$version$" />
+      <dependency id="NEST" version="0.12.0.0"  />
+	  <dependency id="Newtonsoft.Json" version="6.0.3"  />
+    </dependencies>
+  </metadata>
+</package>
