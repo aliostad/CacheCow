@@ -12,8 +12,9 @@
 
 		public MongoEntiryStoreConnection(string connectionString)
 		{
+            
 			this.server = MongoServer.Create(connectionString);
-			this.database = server.GetDatabase("EntityTagStore");
+            this.database = server.GetDatabase(new MongoUrl(connectionString).DatabaseName);
 		}
 
 		public MongoCollection<PersistentCacheKey> DocumentStore
