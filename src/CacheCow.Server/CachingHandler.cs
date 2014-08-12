@@ -135,7 +135,10 @@ namespace CacheCow.Server
         /// <summary>
         /// Provides route pattern and linked route pattern
         /// </summary>
-	    public IRoutePatternProvider RoutePatternProvider { get; set; }
+	    public IRoutePatternProvider RoutePatternProvider {
+            get{ return _routePatternProvider;  }
+            set { _routePatternProvider = value; } 
+        }
 
         public CacheKey GenerateCacheKey(HttpRequestMessage request)
         {            
