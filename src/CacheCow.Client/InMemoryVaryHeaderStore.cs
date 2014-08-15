@@ -17,7 +17,7 @@ namespace CacheCow.Client
 		public bool TryGetValue(string uri, out IEnumerable<string> headers)
 		{
             headers = (string[])_cache.Get(uri);
-			return headers!=null;
+            return (!(headers == null || headers.ToArray().Length == 0));
 		}
 
 		public void AddOrUpdate(string uri, IEnumerable<string> headers)

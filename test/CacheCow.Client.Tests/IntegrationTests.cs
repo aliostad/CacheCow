@@ -25,7 +25,8 @@ namespace CacheCow.Client.Tests
 													InnerHandler = new HttpClientHandler()
 												});
 
-			
+            httpClient.DefaultRequestHeaders.Add("Accept", "image/png");
+
 			var httpResponseMessage = httpClient.GetAsync(Url).Result;
 			var httpResponseMessage2 = httpClient.GetAsync(Url).Result;
 			var cacheCowHeader = httpResponseMessage2.Headers.GetCacheCowHeader();
