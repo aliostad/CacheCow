@@ -60,8 +60,9 @@ namespace CacheCow.Tests.Server
         [TestCase("PATCH")]
 		public static void TestCacheInvalidationForPost(string method)
 		{
+		    const string relatedUrl = "http://api/SomeLocationUrl/";
 			// setup
-			var locationUrl = new Uri("http://api/SomeLocationUrl");
+			var locationUrl = new Uri(relatedUrl);
 			var mocks = new MockRepository();
 			var request = new HttpRequestMessage(new HttpMethod(method), TestUrl);
 			string routePattern = "http://myserver/api/stuffs/*";
@@ -77,7 +78,7 @@ namespace CacheCow.Tests.Server
 			var invalidateCacheForPost = cachingHandler.PostInvalidationRule(entityTagKey, request, response);
 			if(method == "POST")
 			{
-				entityTagStore.Expect(x => x.RemoveAllByRoutePattern(locationUrl.ToString())).Return(1);				
+                entityTagStore.Expect(x => x.RemoveAllByRoutePattern("/SomeLocationUrl/")).Return(1);				
 			}
 			mocks.ReplayAll();
 

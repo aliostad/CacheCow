@@ -13,6 +13,8 @@ namespace CacheCow.Client.MemcachedCacheStore.Tests
     public class IntegrationTests
     {
 
+        // NOTE: Memcached expected to run @ port 11211
+
         private HttpResponseMessage _response;
         private CacheKey _key;
         public IntegrationTests()

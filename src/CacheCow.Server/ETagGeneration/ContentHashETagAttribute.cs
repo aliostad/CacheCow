@@ -24,8 +24,10 @@ namespace CacheCow.Server.ETagGeneration
 
             using (var md5 = new MD5CryptoServiceProvider())
             {
-                var hash = Convert.ToBase64String(md5.ComputeHash(bytes));
-                actionExecutedContext.Request.Headers.TryAddWithoutValidation(ContentHashHeaderName, hash);
+                var hash = md5.ComputeHash(bytes);
+                string hex = BitConverter.ToString(hash);
+                hex = hex.Replace("-", "");
+                actionExecutedContext.Request.Headers.TryAddWithoutValidation(ContentHashHeaderName, hex);
             }
         }       
     }

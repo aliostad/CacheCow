@@ -382,7 +382,8 @@ namespace CacheCow.Client
 						        if (serverResponse.Headers.Vary != null)
 						        {
 						            varyHeaders = serverResponse.Headers.Vary.Select(x => x).ToArray();
-                                    if(!VaryHeaderStore.TryGetValue(uri, out varyHeaders))
+						            IEnumerable<string> temp;
+                                    if(!VaryHeaderStore.TryGetValue(uri, out temp))
 			                        {
 				                        VaryHeaderStore.AddOrUpdate(uri, varyHeaders);
 			                        }

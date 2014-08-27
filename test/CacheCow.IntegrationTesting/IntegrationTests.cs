@@ -12,6 +12,9 @@ using NUnit.Framework;
 
 namespace CacheCow.IntegrationTesting
 {
+
+    // NOTE!! Run with Administrative rights
+
     [TestFixture]
     public class IntegrationTests
     {
