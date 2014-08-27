@@ -259,7 +259,8 @@ namespace CacheCow.Server
 				// but releasing a non-existent item from cache should not have a big overhead
 				if (response.Headers.Location != null)
 				{
-					_entityTagStore.RemoveAllByRoutePattern(UriTrimmer(response.Headers.Location));
+					_entityTagStore.RemoveAllByRoutePattern(_routePatternProvider.GetRoutePattern(
+                        new HttpRequestMessage(HttpMethod.Get, response.Headers.Location)));
 				}
 
 			};

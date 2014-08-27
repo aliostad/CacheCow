@@ -374,14 +374,33 @@ namespace CacheCow.Client
 
 								TraceWriter.WriteLine("{0} - Before AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
 
-								// store the cache
+								
+
+                                // re-create cacheKey with real server accept
+
+                                // if there is a vary header, store it
+						        if (serverResponse.Headers.Vary != null)
+						        {
+						            varyHeaders = serverResponse.Headers.Vary.Select(x => x).ToArray();
+                                    if(!VaryHeaderStore.TryGetValue(uri, out varyHeaders))
+			                        {
+				                        VaryHeaderStore.AddOrUpdate(uri, varyHeaders);
+			                        }
+						        }
+
+                                // create real cacheKey with correct Vary headers 
+                                cacheKey = new CacheKey(uri, 
+				                    request.Headers.Where(x=> varyHeaders.Any(y=> y.Equals(x.Key, 
+					                    StringComparison.CurrentCultureIgnoreCase)))
+					                    .SelectMany(z=>z.Value)
+				                    );
+
+                                // store the cache
 								_cacheStore.AddOrUpdate(cacheKey, serverResponse);
 
 								TraceWriter.WriteLine("{0} - Before AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
 
-								// if there is a vary header, store it
-								if(serverResponse.Headers.Vary!=null)
-									VaryHeaderStore.AddOrUpdate(uri, serverResponse.Headers.Vary.Select(x=>x).ToArray());
+								
 								break;
 							default:
 								TraceWriter.WriteLine("{0} - ResponseValidationResult. Other",
