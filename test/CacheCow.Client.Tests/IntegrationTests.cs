@@ -17,14 +17,14 @@ namespace CacheCow.Client.Tests
 	{
 		[Test]
 		[Ignore]
-		public void Test_GoogleImage()
+		public void Test_GoogleImage_WorksOnFirstSecondRequestNotThird()
 		{
 			const string Url = "https://ssl.gstatic.com/gb/images/j_e6a6aca6.png";
 			var httpClient = new HttpClient(new CachingHandler()
 												{
 													InnerHandler = new HttpClientHandler()
 												});
-
+            httpClient.DefaultRequestHeaders.Add("Accept", "image/png");
 			
 			var httpResponseMessage = httpClient.GetAsync(Url).Result;
 			var httpResponseMessage2 = httpClient.GetAsync(Url).Result;
