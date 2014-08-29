@@ -10,6 +10,6 @@ using System.Reflection;
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyConfiguration("")]
 
-[assembly: AssemblyVersion("0.5.5.0")]
-[assembly: AssemblyFileVersion("0.5.5.0")]
-[assembly: AssemblyInformationalVersion("0.5.5")]
+[assembly: AssemblyVersion("0.5.6.0")]
+[assembly: AssemblyFileVersion("0.5.6.0")]
+[assembly: AssemblyInformationalVersion("0.5.6")]

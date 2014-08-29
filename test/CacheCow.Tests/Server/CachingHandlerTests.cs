@@ -36,10 +36,9 @@ namespace CacheCow.Tests.Server
 			var request = new HttpRequestMessage(new HttpMethod(method), TestUrl);
 			string routePattern = "http://myserver/api/stuffs/*";
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-			var linkedUrls = new []{"url1", "url2"};
 			var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
 									{
-										LinkedRoutePatternProvider = (req) => linkedUrls
+										
 									};
 			var entityTagKey = new CacheKey(TestUrl, new string[0], routePattern);
 			var response = new HttpResponseMessage();
@@ -55,6 +54,9 @@ namespace CacheCow.Tests.Server
 			mocks.VerifyAll();
 		}
 
+
+     
+
 		[TestCase("PUT")]
 		[TestCase("POST")]
         [TestCase("PATCH")]
@@ -67,10 +69,10 @@ namespace CacheCow.Tests.Server
 			var request = new HttpRequestMessage(new HttpMethod(method), TestUrl);
 			string routePattern = "http://myserver/api/stuffs/*";
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-			var linkedUrls = new[] { "url1", "url2" };
+
 			var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
 			{
-				LinkedRoutePatternProvider = (req) => linkedUrls
+				
 			};
 			var entityTagKey = new CacheKey(TestUrl, new string[0], routePattern);
 			var response = new HttpResponseMessage();
@@ -191,16 +193,10 @@ namespace CacheCow.Tests.Server
             // setup
             var mocks = new MockRepository();
             
-            string routePattern1 = "http://myserver/api/stuffs/*";
-            string routePattern2 = "http://myserver/api/more/*";
-            
             var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-            var linkedUrls = new[] { "url1", "url2" };
             var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
             {
-                LinkedRoutePatternProvider = (req) => linkedUrls,
-
-              
+               
             };
 
             entityTagStore.Expect(x => x.RemoveResource("/api/stuff/")).Return(1);
@@ -216,5 +212,8 @@ namespace CacheCow.Tests.Server
             // verify
             mocks.VerifyAll();
         }
+
+ 
+
 	}
 }

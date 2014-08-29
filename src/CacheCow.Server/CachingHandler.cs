@@ -69,7 +69,6 @@ namespace CacheCow.Server
 	        ETagValueGenerator = new DefaultETagGenerator().Generate;
 
 
-			LinkedRoutePatternProvider = (req) => new string[0]; // a dummy
 	        UriTrimmer = (uri) => uri.PathAndQuery;
             
             _routePatternProvider = new ConventionalRoutePatternProvider(configuration);
@@ -124,6 +123,8 @@ namespace CacheCow.Server
 		/// Current request is passed and a list of URLs
 		/// is retrieved and cache is invalidated for those URLs.
 		/// </summary>
+
+        [Obsolete("This is obsolte and is not hooked anymore. Please use IRoutePatternProvider interface.")]
 		public Func<HttpRequestMessage, IEnumerable<string>> LinkedRoutePatternProvider { get; set; }
 
 		/// <summary>
@@ -160,12 +161,6 @@ namespace CacheCow.Server
 	        {
 	            _entityTagStore.RemoveAllByRoutePattern(routePattern);
 	        }
-
-	        var linkedPatterns = LinkedRoutePatternProvider(request);
-            foreach (var routePattern in linkedPatterns)
-            {
-                _entityTagStore.RemoveAllByRoutePattern(routePattern);
-            }
 	    }
 
 		protected void ExecuteCacheInvalidationRules(CacheKey cacheKey,
