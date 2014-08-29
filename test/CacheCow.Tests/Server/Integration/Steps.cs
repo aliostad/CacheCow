@@ -7,6 +7,7 @@ using System.Web.Http;
 using CacheCow.Common;
 using CacheCow.Server;
 using CacheCow.Server.ETagGeneration;
+using CacheCow.Server.RoutePatternPolicy;
 using CacheCow.Tests.Server.Integration.MiniServer;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
@@ -99,6 +100,23 @@ namespace CacheCow.Tests.Server.Integration
         }
 
 
+        [Given(@"in my custom RoutePatternProvider I return all the same pattern")]
+        public void GivenInMyCustomRoutePatternProviderIReturnAllTheSamePattern()
+        {
+            var handler = (CachingHandler) ScenarioContext.Current[Keys.CacheHandler];
+            handler.RoutePatternProvider = new CustomRoutePatternProvider();
+        }
+
+       
+        [When(@"I Create another new item in a different path")]
+        public void WhenICreateAnotherNewItemInADifferentPath()
+        {
+            var client = (HttpClient)ScenarioContext.Current[Keys.Client];
+            var result = client.PostAsync(ServerUrl + "Item/123?name=Ccchipish", null).Result;
+            ScenarioContext.Current[Keys.ItemId] = result.Headers.Location.Segments.Last();
+        }
+
+
         [When(@"I update the item")]
         public void WhenIUpdateTheItem()
         {
@@ -124,5 +142,18 @@ namespace CacheCow.Tests.Server.Integration
 
 
 
+    }
+
+    class CustomRoutePatternProvider : IRoutePatternProvider
+    {
+        public string GetRoutePattern(HttpRequestMessage request)
+        {
+            return "/api/jambalaya";
+        }
+
+        public IEnumerable<string> GetLinkedRoutePatterns(HttpRequestMessage request)
+        {
+            return new string[0];
+        }
     }
 }

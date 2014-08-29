@@ -155,7 +155,10 @@ namespace CacheCow.Server
             // remove resource
 	        _entityTagStore.RemoveResource(request.RequestUri.AbsolutePath);
 
-            // remove all related URIs - only need to do this once per uri
+            // remove by pattern
+	        _entityTagStore.RemoveAllByRoutePattern(_routePatternProvider.GetRoutePattern(request));
+
+            // remove all linked patterns - only need to do this once per uri
 	        var routePatterns = _routePatternProvider.GetLinkedRoutePatterns(request);
 	        foreach (var routePattern in routePatterns)
 	        {
@@ -260,8 +263,7 @@ namespace CacheCow.Server
 				// but releasing a non-existent item from cache should not have a big overhead
 				if (response.Headers.Location != null)
 				{
-					_entityTagStore.RemoveAllByRoutePattern(_routePatternProvider.GetRoutePattern(
-                        new HttpRequestMessage(HttpMethod.Get, response.Headers.Location)));
+                    InvalidateResource(new HttpRequestMessage(HttpMethod.Get, response.Headers.Location));
 				}
 
 			};

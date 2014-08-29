@@ -44,8 +44,8 @@ namespace CacheCow.Common
 			{
 				_hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(_toString));
 			}
-			_hashBase64 = Convert.ToBase64String(_hash);
 
+			_hashBase64 = Convert.ToBase64String(_hash);
             _resourceUri = resourceUri;
 
             // Starting with v0.5, query string parameters are removed from the resourceUri

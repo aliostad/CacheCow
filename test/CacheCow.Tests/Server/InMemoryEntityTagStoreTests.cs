@@ -29,6 +29,8 @@ namespace CacheCow.Tests.Server
             }
         }
 
+
+
         [Test]
         public void AddRemoveTest()
         {
@@ -40,6 +42,28 @@ namespace CacheCow.Tests.Server
                 store.TryRemove(cacheKey);
                 TimedEntityTagHeaderValue storedHeader;
                 Assert.False(store.TryGetValue(cacheKey, out storedHeader));
+                Assert.IsNull(storedHeader);
+            }
+        }
+
+        [Test]
+        public void AddRemoveByPatternTest()
+        {
+
+            const string RoutePattern = "stuff";
+
+            using (var store = new InMemoryEntityTagStore())
+            {
+                var cacheKey = new CacheKey(Url, new[] { "Accept" }, RoutePattern);
+                var cacheKey2 = new CacheKey(Url + "/chaja", new[] { "Accept" }, RoutePattern);
+                var headerValue = new TimedEntityTagHeaderValue("\"abcdefghijkl\"");
+                store.AddOrUpdate(cacheKey, headerValue);
+                store.AddOrUpdate(cacheKey2, headerValue);
+                store.RemoveAllByRoutePattern(RoutePattern);
+                store.TryRemove(cacheKey);
+                TimedEntityTagHeaderValue storedHeader;
+                Assert.False(store.TryGetValue(cacheKey, out storedHeader));
+                Assert.False(store.TryGetValue(cacheKey2, out storedHeader));
                 Assert.IsNull(storedHeader);
             }
         }

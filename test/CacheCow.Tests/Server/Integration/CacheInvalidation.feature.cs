@@ -190,6 +190,39 @@ this.ScenarioSetup(scenarioInfo);
 #line hidden
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Invalidate linked patterns when I use custom RoutePatternProvider")]
+        [NUnit.Framework.CategoryAttribute("cachecow_server")]
+        [NUnit.Framework.TestCaseAttribute("InMemory", null)]
+        public virtual void InvalidateLinkedPatternsWhenIUseCustomRoutePatternProvider(string entityTagStore, string[] exampleTags)
+        {
+            string[] @__tags = new string[] {
+                    "cachecow_server"};
+            if ((exampleTags != null))
+            {
+                @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
+            }
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Invalidate linked patterns when I use custom RoutePatternProvider", @__tags);
+#line 64
+this.ScenarioSetup(scenarioInfo);
+#line 65
+ testRunner.Given(string.Format("I have an API running CacheCow Server and using {0} storage", entityTagStore), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 66
+ testRunner.And("in my custom RoutePatternProvider I return all the same pattern", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 67
+ testRunner.And("I Create a new item", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 68
+ testRunner.And("Get the collection ETag as ETag1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 69
+ testRunner.When("I Create another new item in a different path", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 70
+ testRunner.And("Get the collection ETag as ETag2", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 71
+ testRunner.Then("I expect ETag1 to be different from ETag2", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore

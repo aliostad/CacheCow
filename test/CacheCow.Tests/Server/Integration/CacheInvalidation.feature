@@ -59,3 +59,17 @@ Scenario Outline: Invalidate collection when instance changes
 Examples: 
 | EntityTagStore |
 | InMemory       |
+
+@cachecow_server
+Scenario Outline: Invalidate linked patterns when I use custom RoutePatternProvider
+	Given I have an API running CacheCow Server and using <EntityTagStore> storage 
+	And in my custom RoutePatternProvider I return all the same pattern 
+	And I Create a new item
+	And Get the collection ETag as ETag1
+	When I Create another new item in a different path
+	And Get the collection ETag as ETag2
+	Then I expect ETag1 to be different from ETag2
+
+Examples: 
+| EntityTagStore |
+| InMemory       |
