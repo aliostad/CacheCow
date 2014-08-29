@@ -121,7 +121,7 @@ namespace CacheCow.Server
 		/// <summary>
 		/// This is a function to allow the clients to invalidate the cache
 		/// for related URLs.
-		/// Current resourceUri and HttpMethod is passed and a list of URLs
+		/// Current request is passed and a list of URLs
 		/// is retrieved and cache is invalidated for those URLs.
 		/// </summary>
 		public Func<HttpRequestMessage, IEnumerable<string>> LinkedRoutePatternProvider { get; set; }
@@ -160,6 +160,12 @@ namespace CacheCow.Server
 	        {
 	            _entityTagStore.RemoveAllByRoutePattern(routePattern);
 	        }
+
+	        var linkedPatterns = LinkedRoutePatternProvider(request);
+            foreach (var routePattern in linkedPatterns)
+            {
+                _entityTagStore.RemoveAllByRoutePattern(routePattern);
+            }
 	    }
 
 		protected void ExecuteCacheInvalidationRules(CacheKey cacheKey,
