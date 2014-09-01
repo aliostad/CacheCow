@@ -14,7 +14,7 @@
 	{
 		private readonly DataCache _cache;
 	    private string _regionName;
-	    private const string DefaultCacheRegion = "###__CacheCowServer__###";
+	    private const string DefaultCacheRegion = "CacheCowServer";
 
 
 

@@ -11,7 +11,7 @@
 	public class AzureCacheStore : ICacheStore
 	{
 		private readonly DataCache _cache;
-		private const string DefaultCacheRegion = "###__CacheCowClient__###";
+		private const string DefaultCacheRegion = "CacheCowClient";
 		private IHttpMessageSerializerAsync serializer = new MessageContentHttpMessageSerializer();
 	    private string _cacheRegion;
 
