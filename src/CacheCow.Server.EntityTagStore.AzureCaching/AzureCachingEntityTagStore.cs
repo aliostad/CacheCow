@@ -13,7 +13,8 @@
 	public class AzureCachingEntityTagStore : IEntityTagStore
 	{
 		private readonly DataCache cache;
-		private const string CacheRegion = "CacheCowServer";
+	    private string _regionName;
+	    private const string DefaultCacheRegion = "###__CacheCowServer__###";
 
 
 
@@ -24,9 +25,16 @@
 		}
 
         public AzureCachingEntityTagStore(string cacheName)
+            : this(cacheName, DefaultCacheRegion)
         {
+           
+        }
+
+        public AzureCachingEntityTagStore(string cacheName, string regionName)
+        {
+            _regionName = regionName;
             cache = new DataCache(cacheName);
-            cache.CreateRegion(CacheRegion);
+            cache.CreateRegion(regionName);
         }
 
 		public void Dispose()
@@ -36,7 +44,7 @@
 
 		public bool TryGetValue(CacheKey key, out TimedEntityTagHeaderValue eTag)
 		{
-			var cacheObject = cache.Get(key.HashBase64, CacheRegion) as string;
+            var cacheObject = cache.Get(key.HashBase64, _regionName) as string;
 
 			if (!TimedEntityTagHeaderValue.TryParse(cacheObject, out eTag))
 				return false;
@@ -50,12 +58,12 @@
 				                               {
 					                               new DataCacheTag(key.ResourceUri),
 												   new DataCacheTag(key.RoutePattern),
-				                               }, CacheRegion);
+				                               }, _regionName);
 		}
 
 		public int RemoveResource(string resourceUri)
 		{
-			List<KeyValuePair<string, object>> cacheObjects = cache.GetObjectsByTag(new DataCacheTag(resourceUri), CacheRegion).ToList();
+            List<KeyValuePair<string, object>> cacheObjects = cache.GetObjectsByTag(new DataCacheTag(resourceUri), _regionName).ToList();
 
 			if (!cacheObjects.Any())
 			{
@@ -72,7 +80,7 @@
 					continue;
 				}
 
-				cache.Remove(cacheObject.Key, CacheRegion);
+                cache.Remove(cacheObject.Key, _regionName);
 				rowsCount++;
 			}
 
@@ -86,7 +94,7 @@
 
 		public int RemoveAllByRoutePattern(string routePattern)
 		{
-			List<KeyValuePair<string, object>> cacheObjects = cache.GetObjectsByTag(new DataCacheTag(routePattern), CacheRegion).ToList();
+            List<KeyValuePair<string, object>> cacheObjects = cache.GetObjectsByTag(new DataCacheTag(routePattern), _regionName).ToList();
 
 			if (!cacheObjects.Any())
 			{
@@ -102,7 +110,7 @@
 					continue;
 				}
 
-				cache.Remove(cacheObject.Key, CacheRegion);
+                cache.Remove(cacheObject.Key, _regionName);
 				rowsCount++;
 			}
 
@@ -111,7 +119,7 @@
 
 		public void Clear()
 		{
-			cache.ClearRegion(CacheRegion);
+            cache.ClearRegion(_regionName);
 		}
 	}
 }
