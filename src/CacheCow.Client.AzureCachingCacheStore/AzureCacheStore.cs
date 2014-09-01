@@ -10,13 +10,14 @@
 
 	public class AzureCacheStore : ICacheStore
 	{
-		private readonly DataCache cache;
-		private const string CacheRegion = "CacheCowClient";
+		private readonly DataCache _cache;
+		private const string DefaultCacheRegion = "###__CacheCowClient__###";
 		private IHttpMessageSerializerAsync serializer = new MessageContentHttpMessageSerializer();
+	    private string _cacheRegion;
 
 
-        /// <summary>
-        /// Default cacheName is "CacheCow"
+	    /// <summary>
+        /// Default cacheName is "default"
         /// </summary>
 		public AzureCacheStore()
             : this("default")
@@ -25,10 +26,31 @@
 		}
 
         public AzureCacheStore(string cacheName)
+            : this(cacheName, DefaultCacheRegion)
+
         {
-            cache = new DataCache(cacheName);
-            cache.CreateRegion(CacheRegion);
+            
         }
+
+        public AzureCacheStore(string cacheName, string cacheRegion)
+        {
+            _cacheRegion = cacheRegion;
+            _cache = new DataCache(cacheName);
+            _cache.CreateRegion(_cacheRegion);
+        }
+
+	    public AzureCacheStore(DataCache cache)
+            : this(cache, DefaultCacheRegion)
+	    {
+	    }
+
+	    public AzureCacheStore(DataCache cache, string cacheRegion)
+        {
+            _cacheRegion = cacheRegion;
+	        _cache = cache;
+            _cache.CreateRegion(_cacheRegion);
+        }
+
 
 
 		public void AddOrUpdate(CacheKey key, HttpResponseMessage response)
@@ -38,12 +60,12 @@
             this.serializer.SerializeAsync(TaskHelpers.FromResult(response), ms)
                 .Wait();
 
-			this.cache.Add(key.HashBase64, ms.ToArray(), CacheRegion);
+            this._cache.Add(key.HashBase64, ms.ToArray(), _cacheRegion);
 		}
 
 		public void Clear()
 		{
-			this.cache.ClearRegion(CacheRegion);
+            this._cache.ClearRegion(_cacheRegion);
 		}
 
 		public void Dispose()
@@ -53,7 +75,7 @@
 
 		public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
 		{
-			var cacheObject = cache.Get(key.HashBase64, CacheRegion) as byte[];
+            var cacheObject = _cache.Get(key.HashBase64, _cacheRegion) as byte[];
 
 			if (cacheObject != null)
 			{
@@ -70,7 +92,7 @@
 
 		public bool TryRemove(CacheKey key)
 		{
-			return cache.Remove(key.HashBase64);
+			return _cache.Remove(key.HashBase64);
 		}
 	}
 }
