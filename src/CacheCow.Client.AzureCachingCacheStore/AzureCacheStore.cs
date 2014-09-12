@@ -60,7 +60,7 @@
             this.serializer.SerializeAsync(TaskHelpers.FromResult(response), ms)
                 .Wait();
 
-            this._cache.Add(key.HashBase64, ms.ToArray(), _cacheRegion);
+            this._cache.Put(key.HashBase64, ms.ToArray(), _cacheRegion);
 		}
 
 		public void Clear()
