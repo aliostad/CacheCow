@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
@@ -24,6 +25,8 @@ namespace CacheCow.Tests.Server.Integration
             public const string Client = "Client";
             public const string ItemId = "Id";
             public const string CacheHandler = "CacheHandler";
+            public const string Response = "Response";
+            public const string Exception = "Exception";
         }
 
         private const string ServerUrl = "http://gypsylife/api/";
@@ -37,6 +40,9 @@ namespace CacheCow.Tests.Server.Integration
             {
                 case "InMemory":
                     store = new InMemoryEntityTagStore();
+                    break;
+                case "InMemoryFaulty":
+                    store = new FaultyInMemoryStore();
                     break;
                 default:
                     throw new ArgumentException("Store unknown: " + storage);
@@ -63,8 +69,17 @@ namespace CacheCow.Tests.Server.Integration
         public void GivenICreateANewItem()
         {
             var client = (HttpClient)ScenarioContext.Current[Keys.Client];
-            var result = client.PostAsync(ServerUrl + "Item?name=Chipish", null).Result;
-            ScenarioContext.Current[Keys.ItemId] = result.Headers.Location.Segments.Last();
+            try
+            {
+                var result = client.PostAsync(ServerUrl + "Item?name=Chipish", null).Result;
+                ScenarioContext.Current[Keys.ItemId] = result.Headers.Location.Segments.Last();
+                ScenarioContext.Current[Keys.Response] = result;
+            }
+            catch (Exception e)
+            {
+                ScenarioContext.Current[Keys.Exception] = e;               
+            }
+            
         }
 
         [Given(@"Get the collection ETag as (.*)")]
@@ -113,6 +128,7 @@ namespace CacheCow.Tests.Server.Integration
         {
             var client = (HttpClient)ScenarioContext.Current[Keys.Client];
             var result = client.PostAsync(ServerUrl + "Item/123?name=Ccchipish", null).Result;
+            ScenarioContext.Current[Keys.Response] = result;
             ScenarioContext.Current[Keys.ItemId] = result.Headers.Location.Segments.Last();
         }
 
@@ -123,6 +139,8 @@ namespace CacheCow.Tests.Server.Integration
             var client = (HttpClient)ScenarioContext.Current[Keys.Client];
             var result = client.PutAsync(ServerUrl + "Item/" + 
                 ScenarioContext.Current[Keys.ItemId] + "?name=newName", null).Result;
+            ScenarioContext.Current[Keys.Response] = result;
+
         }
 
         [When(@"Get the instance ETag as (.*)")]
@@ -130,6 +148,7 @@ namespace CacheCow.Tests.Server.Integration
         {
             var client = (HttpClient)ScenarioContext.Current[Keys.Client];
             var result = client.GetAsync(ServerUrl + "Item/" + ScenarioContext.Current[Keys.ItemId]).Result;
+            ScenarioContext.Current[Keys.Response] = result;
             ScenarioContext.Current[etagName] = result.Headers.ETag.Tag;
         }
 
@@ -140,7 +159,26 @@ namespace CacheCow.Tests.Server.Integration
             handler.ETagValueGenerator = new ContentHashETagGenerator().Generate;
         }
 
+        [Then(@"Get a successful response")]
+        public void ThenGetASuccessfulResponse()
+        {
+            var response = (HttpResponseMessage)ScenarioContext.Current[Keys.Response];
+            response.EnsureSuccessStatusCode();
+        }
 
+        [Given(@"my error policy is set to ignore")]
+        public void GivenMyErrorPolicyIsSetToIgnore()
+        {
+            var handler = (CachingHandler)ScenarioContext.Current[Keys.CacheHandler];
+            handler.ExceptionHandler = CachingHandler.IgnoreExceptionPolicy;
+        }
+
+        [Then(@"Get an unsuccessful response")]
+        public void ThenGetAnUnsuccessfulResponse()
+        {
+            var ex = ScenarioContext.Current[Keys.Exception];
+            Assert.NotNull(ex);
+        }
 
     }
 
@@ -154,6 +192,44 @@ namespace CacheCow.Tests.Server.Integration
         public IEnumerable<string> GetLinkedRoutePatterns(HttpRequestMessage request)
         {
             return new string[0];
+        }
+    }
+
+    public class FaultyInMemoryStore : IEntityTagStore
+    {
+        public void Dispose()
+        {
+            
+        }
+
+        public bool TryGetValue(CacheKey key, out TimedEntityTagHeaderValue eTag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int RemoveResource(string resourceUri)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryRemove(CacheKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int RemoveAllByRoutePattern(string routePattern)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Clear()
+        {
+            
         }
     }
 }

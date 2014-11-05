@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -52,6 +53,11 @@ namespace CacheCow.Server
 		public bool AddLastModifiedHeader { get; set; }
 
 		public bool AddVaryHeader { get; set; }
+
+        static CachingHandler()
+        {
+            IgnoreExceptionPolicy = (e) => { };
+        }
 
         public CachingHandler(HttpConfiguration configuration, params string[] varyByHeader)
 			: this(configuration, new InMemoryEntityTagStore(), varyByHeader)
@@ -133,6 +139,20 @@ namespace CacheCow.Server
 		/// </summary>
 		public Func<Uri, string> UriTrimmer { get; set; }
 
+
+        /// <summary>
+        /// Allowing clients to customise how to handle caching errors. Mainly designed for Cache Store temporary errors or persistent erros.
+        /// Throw in the action if you do not want to ignore. You can use for logging purposes.
+        /// A common usage is to use set it to IgnoreExceptionPolicy which basically would ignore exceptions as if the CachingHandler is not used
+        /// You can also use it to filter for some exceptions while throwing the rest.
+        /// </summary>
+        public Action<Exception> ExceptionHandler { get; set; }
+
+        /// <summary>
+        /// Ignores all exceptions. Set it to ExceptionHandler
+        /// </summary>
+        public static Action<Exception> IgnoreExceptionPolicy { get; private set; }
+
         /// <summary>
         /// Provides route pattern and linked route pattern
         /// </summary>
@@ -213,25 +233,40 @@ namespace CacheCow.Server
 		{
 			EnsureRulesSetup();
 
-			var varyByHeaders = request.Headers.Where(h => _varyByHeaders.Any(
-				v => v.Equals(h.Key, StringComparison.CurrentCultureIgnoreCase)));
+	        try
+	        {
+                // do the expiry
+                CheckExpiry(request);
 
-            // do the expiry
-		    CheckExpiry(request);
+                Task<HttpResponseMessage> task = null;
 
-			Task<HttpResponseMessage> task = null;
+                RequestInterceptionRules.Values.FirstOrDefault(r =>
+                {
+                    task = r(request);
+                    return task != null;
+                });
 
-			RequestInterceptionRules.Values.FirstOrDefault(r =>
-			{
-				task = r(request);
-				return task != null;
-			});
+                if (task == null)
+                    return base.SendAsync(request, cancellationToken)
+                        .Then(GetCachingContinuation(request));
+                else
+                    return task;
+	        }
+	        catch (CacheCowServerException cacheCowServerException)
+	        {
+                if (ExceptionHandler == null)
+                    throw;
+                else
+                {
+                    ExceptionHandler(cacheCowServerException);
+                    Trace.TraceWarning("Exception was swalloed in CacheCow: " + cacheCowServerException.ToString());
+                    return base.SendAsync(request, cancellationToken);
+                }
+	        }
+           
 
-			if (task == null)
-				return base.SendAsync(request, cancellationToken)
-					.Then(GetCachingContinuation(request));
-			else
-				return task;
+
+			
 		}
 
 		/// <summary>
@@ -378,13 +413,27 @@ namespace CacheCow.Server
 				if (!response.IsSuccessStatusCode) // only if successful carry on processing
 					return response;
 
-			    var cacheKey = GenerateCacheKey(request);
+			    try
+			    {
+                    var cacheKey = GenerateCacheKey(request);
+                    ExecuteCacheInvalidationRules(cacheKey, request, response);
+                    ExecuteCacheAdditionRules(cacheKey, request, response);
+                    return response;
+			    }
+			    catch (Exception ex)
+			    {
 
-                ExecuteCacheInvalidationRules(cacheKey, request, response);
+                    if (ExceptionHandler == null)
+                        throw;
+                    else
+                    {
+                        ExceptionHandler(ex);
+                        Trace.TraceWarning("Exception was swalloed in CacheCow: " + ex.ToString());
+                        return response;
+                    }
+			    }
 
-                ExecuteCacheAdditionRules(cacheKey, request, response);
-
-				return response;
+			   
 			};
 		}
 
@@ -417,37 +466,45 @@ namespace CacheCow.Server
 		{
 			return (request) =>
 			{
-				if (request.Method != HttpMethod.Get)
-					return null;
+			    try
+			    {
+                    if (request.Method != HttpMethod.Get)
+                        return null;
 
-				ICollection<EntityTagHeaderValue> noneMatchTags = request.Headers.IfNoneMatch;
-				ICollection<EntityTagHeaderValue> matchTags = request.Headers.IfMatch;
+                    ICollection<EntityTagHeaderValue> noneMatchTags = request.Headers.IfNoneMatch;
+                    ICollection<EntityTagHeaderValue> matchTags = request.Headers.IfMatch;
 
-				if (matchTags.Count == 0 && noneMatchTags.Count == 0)
-					return null; // no etag
+                    if (matchTags.Count == 0 && noneMatchTags.Count == 0)
+                        return null; // no etag
 
-				if (matchTags.Count > 0 && noneMatchTags.Count > 0) // both if-match and if-none-match exist
-					return request.CreateResponse(HttpStatusCode.BadRequest)
-						.ToTask();
+                    if (matchTags.Count > 0 && noneMatchTags.Count > 0) // both if-match and if-none-match exist
+                        return request.CreateResponse(HttpStatusCode.BadRequest)
+                            .ToTask();
 
-				var isNoneMatch = noneMatchTags.Count > 0;
-				var etags = isNoneMatch ? noneMatchTags : matchTags;
+                    var isNoneMatch = noneMatchTags.Count > 0;
+                    var etags = isNoneMatch ? noneMatchTags : matchTags;
 
-			    var entityTagKey = GenerateCacheKey(request);
-				// compare the Etag with the one in the cache
-				// do conditional get.
-				TimedEntityTagHeaderValue actualEtag = null;
+                    var entityTagKey = GenerateCacheKey(request);
+                    // compare the Etag with the one in the cache
+                    // do conditional get.
+                    TimedEntityTagHeaderValue actualEtag = null;
 
-				bool matchFound = false;
-				if (_entityTagStore.TryGetValue(entityTagKey, out actualEtag))
-				{
-					if (etags.Any(etag => etag.Tag == actualEtag.Tag))
-					{
-						matchFound = true;
-					}
-				}
-				return matchFound ^ isNoneMatch ? null : new NotModifiedResponse(request,
-					actualEtag.ToEntityTagHeaderValue()).ToTask();
+                    bool matchFound = false;
+                    if (_entityTagStore.TryGetValue(entityTagKey, out actualEtag))
+                    {
+                        if (etags.Any(etag => etag.Tag == actualEtag.Tag))
+                        {
+                            matchFound = true;
+                        }
+                    }
+                    return matchFound ^ isNoneMatch ? null : new NotModifiedResponse(request,
+                        actualEtag.ToEntityTagHeaderValue()).ToTask();
+
+			    }
+			    catch (Exception e)
+                {
+                    throw new CacheCowServerException("Error in GetIfMatchNoneMatch", e);
+			    }
 			};
 
 		}
@@ -456,35 +513,44 @@ namespace CacheCow.Server
 		{
 			return (request) =>
 			{
-				if (request.Method != HttpMethod.Get)
-					return null;
 
-				DateTimeOffset? ifModifiedSince = request.Headers.IfModifiedSince;
-				DateTimeOffset? ifUnmodifiedSince = request.Headers.IfUnmodifiedSince;
+			    try
+			    {
+                    if (request.Method != HttpMethod.Get)
+                        return null;
 
-				if (ifModifiedSince == null && ifUnmodifiedSince == null)
-					return null; // no etag
+                    DateTimeOffset? ifModifiedSince = request.Headers.IfModifiedSince;
+                    DateTimeOffset? ifUnmodifiedSince = request.Headers.IfUnmodifiedSince;
 
-				if (ifModifiedSince != null && ifUnmodifiedSince != null) // both exist
-					return request.CreateResponse(HttpStatusCode.BadRequest)
-						.ToTask();
-				bool ifModified = (ifUnmodifiedSince == null);
-				DateTimeOffset modifiedInQuestion = ifModified ? ifModifiedSince.Value : ifUnmodifiedSince.Value;
+                    if (ifModifiedSince == null && ifUnmodifiedSince == null)
+                        return null; // no etag
 
-				
-				var entityTagKey = GenerateCacheKey(request);
+                    if (ifModifiedSince != null && ifUnmodifiedSince != null) // both exist
+                        return request.CreateResponse(HttpStatusCode.BadRequest)
+                            .ToTask();
+                    bool ifModified = (ifUnmodifiedSince == null);
+                    DateTimeOffset modifiedInQuestion = ifModified ? ifModifiedSince.Value : ifUnmodifiedSince.Value;
 
-				TimedEntityTagHeaderValue actualEtag = null;
 
-				bool isModified = true;
-				if (_entityTagStore.TryGetValue(entityTagKey, out actualEtag))
-				{
-					isModified = actualEtag.LastModified > modifiedInQuestion;
-				}
+                    var entityTagKey = GenerateCacheKey(request);
 
-				return isModified ^ ifModified
-						? new NotModifiedResponse(request, actualEtag.ToEntityTagHeaderValue()).ToTask()
-						: null;
+                    TimedEntityTagHeaderValue actualEtag = null;
+
+                    bool isModified = true;
+                    if (_entityTagStore.TryGetValue(entityTagKey, out actualEtag))
+                    {
+                        isModified = actualEtag.LastModified > modifiedInQuestion;
+                    }
+
+                    return isModified ^ ifModified
+                            ? new NotModifiedResponse(request, actualEtag.ToEntityTagHeaderValue()).ToTask()
+                            : null;
+
+			    }
+			    catch (Exception e)
+			    {
+                    throw new CacheCowServerException("Error in GetIfModifiedUnmodifiedSince", e);
+			    }
 
 			};
 		}
@@ -493,56 +559,71 @@ namespace CacheCow.Server
 		{
 			return (request) =>
 			{
-				if (request.Method != HttpMethod.Put)
-					return null;
 
-				DateTimeOffset? ifUnmodifiedSince = request.Headers.IfUnmodifiedSince;
-				if (ifUnmodifiedSince == null)
-					return null;
+			    try
+			    {
+                    if (request.Method != HttpMethod.Put)
+                        return null;
 
-				DateTimeOffset modifiedInQuestion = ifUnmodifiedSince.Value;
+                    DateTimeOffset? ifUnmodifiedSince = request.Headers.IfUnmodifiedSince;
+                    if (ifUnmodifiedSince == null)
+                        return null;
 
-				var entityTagKey = GenerateCacheKey(request);
-				TimedEntityTagHeaderValue actualEtag = null;
+                    DateTimeOffset modifiedInQuestion = ifUnmodifiedSince.Value;
 
-				bool isModified = true;
-				if (_entityTagStore.TryGetValue(entityTagKey, out actualEtag))
-				{
-					isModified = actualEtag.LastModified > modifiedInQuestion;
-				}
+                    var entityTagKey = GenerateCacheKey(request);
+                    TimedEntityTagHeaderValue actualEtag = null;
 
-				return isModified ? request.CreateResponse(HttpStatusCode.PreconditionFailed)
-					.ToTask()
-					: null;
+                    bool isModified = true;
+                    if (_entityTagStore.TryGetValue(entityTagKey, out actualEtag))
+                    {
+                        isModified = actualEtag.LastModified > modifiedInQuestion;
+                    }
 
+                    return isModified ? request.CreateResponse(HttpStatusCode.PreconditionFailed)
+                        .ToTask()
+                        : null;
+			    }
+			    catch (Exception e)
+			    {
+                    throw new CacheCowServerException("Error in PutIfUnmodifiedSince", e);
+			    }
 			};
 		}
 		internal Func<HttpRequestMessage, Task<HttpResponseMessage>> PutIfMatch()
 		{
 			return (request) =>
 			{
-				if (request.Method != HttpMethod.Put)
-					return null;
+			    try
+			    {
+                    if (request.Method != HttpMethod.Put)
+                        return null;
 
-				ICollection<EntityTagHeaderValue> matchTags = request.Headers.IfMatch;
-				if (matchTags == null || matchTags.Count == 0)
-					return null;
+                    ICollection<EntityTagHeaderValue> matchTags = request.Headers.IfMatch;
+                    if (matchTags == null || matchTags.Count == 0)
+                        return null;
 
-				var entityTagKey = GenerateCacheKey(request);
-				TimedEntityTagHeaderValue actualEtag = null;
+                    var entityTagKey = GenerateCacheKey(request);
+                    TimedEntityTagHeaderValue actualEtag = null;
 
-				bool matchFound = false;
-				if (_entityTagStore.TryGetValue(entityTagKey, out actualEtag))
-				{
-					if (matchTags.Any(etag => etag.Tag == actualEtag.Tag))
-					{
-						matchFound = true;
-					}
-				}
+                    bool matchFound = false;
+                    if (_entityTagStore.TryGetValue(entityTagKey, out actualEtag))
+                    {
+                        if (matchTags.Any(etag => etag.Tag == actualEtag.Tag))
+                        {
+                            matchFound = true;
+                        }
+                    }
 
-				return matchFound ? null
-					: request.CreateResponse(HttpStatusCode.PreconditionFailed)
-						.ToTask();
+                    return matchFound ? null
+                        : request.CreateResponse(HttpStatusCode.PreconditionFailed)
+                            .ToTask();
+			    }
+			    catch (Exception e)
+			    {
+                    throw new CacheCowServerException("Error in PutIfMatch", e);
+                }
+				
 
 			};
 		}

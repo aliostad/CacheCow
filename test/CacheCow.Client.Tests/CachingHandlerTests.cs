@@ -417,6 +417,52 @@ namespace CacheCow.Client.Tests
 
 		}
 
+        [Test]
+        public void IgnoreExceptionPolicy_Ignores_CacheStore_Exceptions()
+        {
+            // setup 
+            var request = new HttpRequestMessage(HttpMethod.Put, DummyUrl);
+            var responseFromServer = GetOkMessage();
+            _messageHandler.Response = responseFromServer;
+           _cacheStore = new FaultyCacheStore();
+           _cachingHandler = new CachingHandler(_cacheStore)
+           {
+               InnerHandler = _messageHandler
+           };
+            _cachingHandler.ExceptionHandler = CachingHandler.IgnoreExceptionPolicy;
+           _client = new HttpClient(_cachingHandler);
+
+
+            // run
+            var task = _client.SendAsync(request);
+            var responseReturned = task.Result;
+
+            // verify
+            Assert.AreEqual(responseFromServer, responseReturned);
+        }
+
+        [Test]
+        [ExpectedException(typeof(NotImplementedException))]
+        public void DefaultExceptionPolicy_Throws_CacheStore_Exceptions()
+        {
+            // setup 
+            var request = new HttpRequestMessage(HttpMethod.Put, DummyUrl);
+            var responseFromServer = GetOkMessage();
+            _messageHandler.Response = responseFromServer;
+            _cacheStore = new FaultyCacheStore();
+            _cachingHandler = new CachingHandler(_cacheStore)
+            {
+                InnerHandler = _messageHandler
+            };
+            _client = new HttpClient(_cachingHandler);
+
+
+            // run
+            var task = _client.SendAsync(request);
+            var responseReturned = task.Result;
+
+        }
+
 		private HttpResponseMessage GetOkMessage(bool mustRevalidate = false)
 		{
 			var response = new HttpResponseMessage(HttpStatusCode.OK);
@@ -433,4 +479,33 @@ namespace CacheCow.Client.Tests
 
 
 	}
+
+    public class FaultyCacheStore : ICacheStore
+    {
+        public void Dispose()
+        {
+            
+        }
+
+        public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddOrUpdate(CacheKey key, HttpResponseMessage response)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryRemove(CacheKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Clear()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 }

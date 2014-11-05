@@ -85,6 +85,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CacheInvalidation.feature</DependentUpon>
     </Compile>
+    <Compile Include="Server\Integration\ExceptionHandling.feature.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExceptionHandling.feature</DependentUpon>
+    </Compile>
     <Compile Include="Server\Integration\MiniServer\InMemoryServer.cs" />
     <Compile Include="Server\Integration\MiniServer\Item.cs" />
     <Compile Include="Server\Integration\MiniServer\ItemController.cs" />
@@ -104,6 +109,10 @@
     <None Include="Server\Integration\CacheInvalidation.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>CacheInvalidation.feature.cs</LastGenOutput>
+    </None>
+    <None Include="Server\Integration\ExceptionHandling.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>ExceptionHandling.feature.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
