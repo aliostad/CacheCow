@@ -11,7 +11,7 @@
 	public class AzureCacheStore : ICacheStore
 	{
 		private readonly DataCache _cache;
-		private const string DefaultCacheRegion = "CacheCowClient";
+		private const string DefaultCacheRegion = "";
 		private IHttpMessageSerializerAsync serializer = new MessageContentHttpMessageSerializer();
 	    private string _cacheRegion;
 
@@ -48,7 +48,9 @@
         {
             _cacheRegion = cacheRegion;
 	        _cache = cache;
-            _cache.CreateRegion(_cacheRegion);
+
+            if (!string.IsNullOrEmpty(_cacheRegion))
+                _cache.CreateRegion(_cacheRegion);
         }
 
 
@@ -60,12 +62,18 @@
             this.serializer.SerializeAsync(TaskHelpers.FromResult(response), ms)
                 .Wait();
 
-            this._cache.Put(key.HashBase64, ms.ToArray(), _cacheRegion);
+		    if (string.IsNullOrEmpty(_cacheRegion))
+                this._cache.Put(key.HashBase64, ms.ToArray());
+		    else
+                this._cache.Put(key.HashBase64, ms.ToArray(), _cacheRegion);
 		}
 
 		public void Clear()
 		{
-            this._cache.ClearRegion(_cacheRegion);
+            if (string.IsNullOrEmpty(_cacheRegion))
+                this._cache.Clear();
+            else
+               this._cache.ClearRegion(_cacheRegion);
 		}
 
 		public void Dispose()
@@ -75,7 +83,12 @@
 
 		public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
 		{
-            var cacheObject = _cache.Get(key.HashBase64, _cacheRegion) as byte[];
+		    byte[] cacheObject = null;
+
+            if (string.IsNullOrEmpty(_cacheRegion))
+                cacheObject = _cache.Get(key.HashBase64) as byte[];
+            else
+                cacheObject = _cache.Get(key.HashBase64, _cacheRegion) as byte[];
 
 			if (cacheObject != null)
 			{
@@ -92,7 +105,10 @@
 
 		public bool TryRemove(CacheKey key)
 		{
-			return _cache.Remove(key.HashBase64);
+            if (string.IsNullOrEmpty(_cacheRegion))
+                return _cache.Remove(key.HashBase64);
+            else
+			    return _cache.Remove(key.HashBase64, _cacheRegion);
 		}
 	}
 }
