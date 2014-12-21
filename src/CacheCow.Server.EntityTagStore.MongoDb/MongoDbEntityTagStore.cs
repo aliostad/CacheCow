@@ -39,7 +39,7 @@
 		{
 			eTag = null;
 
-			using (var connection = new MongoEntiryStoreConnection(this.connectionString))
+			using (var connection = new MongoEntityStoreConnection(this.connectionString))
 			{
 				var cacheKey = connection.DocumentStore.AsQueryable().FirstOrDefault(x => x.Hash == key.Hash);
 				if (null == cacheKey)
@@ -68,14 +68,14 @@
                     ResourceUri = key.ResourceUri
 				};
 
-				using (var connection = new MongoEntiryStoreConnection(this.connectionString))
+				using (var connection = new MongoEntityStoreConnection(this.connectionString))
 				{
 					connection.DocumentStore.Save(cacheKey);
 				}
 			}
 			else
 			{
-				using (var connection = new MongoEntiryStoreConnection(this.connectionString))
+				using (var connection = new MongoEntityStoreConnection(this.connectionString))
 				{
 					var cacheKey = connection.DocumentStore.AsQueryable().FirstOrDefault(x => x.Hash == key.Hash);
 					if (cacheKey != null)
@@ -91,7 +91,7 @@
 	    public int RemoveResource(string resourceUri)
 	    {
             int count;
-            using (var connection = new MongoEntiryStoreConnection(this.connectionString))
+            using (var connection = new MongoEntityStoreConnection(this.connectionString))
             {
                 var persistentCacheKeys = connection.DocumentStore.AsQueryable()
                     .Where(p => p.ResourceUri == resourceUri);
@@ -111,7 +111,7 @@
 	    public bool TryRemove(CacheKey key)
 		{
 			int count;
-			using (var connection = new MongoEntiryStoreConnection(this.connectionString))
+			using (var connection = new MongoEntityStoreConnection(this.connectionString))
 			{
 				var persistentCacheKeys = connection.DocumentStore.AsQueryable().Where(p => p.Hash == key.Hash);
 				count = persistentCacheKeys.Count();
@@ -127,7 +127,7 @@
 		public int RemoveAllByRoutePattern(string routePattern)
 		{
 			int count;
-			using (var connection = new MongoEntiryStoreConnection(this.connectionString))
+			using (var connection = new MongoEntityStoreConnection(this.connectionString))
 			{
 				var persistentCacheKeys = connection.DocumentStore.AsQueryable().Where(p => p.RoutePattern == routePattern);
 
@@ -144,7 +144,7 @@
 
 		public void Clear()
 		{
-			using (var connection = new MongoEntiryStoreConnection(this.connectionString))
+			using (var connection = new MongoEntityStoreConnection(this.connectionString))
 			{
 				connection.DocumentStore.RemoveAll();
 			}

@@ -4,16 +4,16 @@
 
 	using MongoDB.Driver;
 
-	public class MongoEntiryStoreConnection : IDisposable
+	public class MongoEntityStoreConnection : IDisposable
 	{
 		private readonly MongoServer server;
 
 		private readonly MongoDatabase database;
 
-		public MongoEntiryStoreConnection(string connectionString)
+        public MongoEntityStoreConnection(string connectionString, string databaseName = "EntityTagStore")
 		{
 			this.server = MongoServer.Create(connectionString);
-			this.database = server.GetDatabase("EntityTagStore");
+            this.database = server.GetDatabase(databaseName);
 		}
 
 		public MongoCollection<PersistentCacheKey> DocumentStore
