@@ -37,7 +37,9 @@ namespace CacheCow.Client
 			var result = _responseCache.Get(key.HashBase64);
 			if (result!=null)
 			{
-                response = _messageSerializer.DeserializeToResponseAsync(new MemoryStream((byte[])result)).Result;
+			    Func<HttpResponseMessage> funky =
+			        () => _messageSerializer.DeserializeToResponseAsync(new MemoryStream((byte[]) result)).Result;
+                response = Task.Factory.StartNew(funky).Result;
 			}
 			return result!=null;
 		}
@@ -48,7 +50,7 @@ namespace CacheCow.Client
 			var req = response.RequestMessage;
 			response.RequestMessage = null;
 			var memoryStream = new MemoryStream();
-			_messageSerializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream).Wait();
+			Task.Factory.StartNew(() => _messageSerializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream)).Wait();
 			response.RequestMessage = req;
             _responseCache.Set(key.HashBase64, memoryStream.ToArray(), GetExpiry(response));
 		}
