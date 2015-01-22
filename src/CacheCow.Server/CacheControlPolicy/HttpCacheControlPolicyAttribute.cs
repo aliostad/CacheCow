@@ -21,19 +21,21 @@ namespace CacheCow.Server.CacheControlPolicy
         {
 
             _cacheControl = new CacheControlHeaderValue()
-                                {
-                                    Private = true,
-                                    NoCache = true,
-                                    NoStore = true
-                                };
+            {
+                Private = true,
+                NoCache = true,
+                NoStore = true
+            };
         }
 
 
-        public HttpCacheControlPolicyAttribute(bool isPrivate, 
-            int maxAgeInSeconds, 
+        public HttpCacheControlPolicyAttribute(bool isPrivate,
+            int maxAgeInSeconds,
             bool mustRevalidate = true,
             bool noCache = false,
-            bool noTransform = false) : this()
+            bool noTransform = false,
+            bool nostore = false)
+            : this()
         {
             // copy values to the header
             _cacheControl = new CacheControlHeaderValue()
@@ -43,7 +45,8 @@ namespace CacheCow.Server.CacheControlPolicy
                 MustRevalidate = mustRevalidate,
                 MaxAge = TimeSpan.FromSeconds(maxAgeInSeconds),
                 NoCache = noCache,
-                NoTransform = noTransform   
+                NoTransform = noTransform,
+                NoStore = nostore
             };
         }
 
@@ -61,10 +64,10 @@ namespace CacheCow.Server.CacheControlPolicy
             var method = factory.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .FirstOrDefault(m => m.ReturnType == typeof(CacheControlHeaderValue));
 
-            if(method == null)
+            if (method == null)
                 throw new ArgumentException("This type does not have a factory method: " + cacheControlHeaderValueFactory.FullName);
 
-            _cacheControl = (CacheControlHeaderValue) method.Invoke(factory, new object[0]);
+            _cacheControl = (CacheControlHeaderValue)method.Invoke(factory, new object[0]);
 
         }
 
