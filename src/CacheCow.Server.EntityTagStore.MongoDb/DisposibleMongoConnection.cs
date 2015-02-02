@@ -1,8 +1,7 @@
-﻿namespace CacheCow.Server.EntityTagStore.MongoDb
+﻿using System;
+using MongoDB.Driver;
+namespace CacheCow.Server.EntityTagStore.MongoDb
 {
-	using System;
-
-	using MongoDB.Driver;
 
 	public class MongoEntityStoreConnection : IDisposable
 	{
