@@ -12,7 +12,7 @@
 
         public MongoEntityStoreConnection(string connectionString, string databaseName = "EntityTagStore")
 		{
-			this.server = MongoServer.Create(connectionString);
+            this.server = new MongoClient(connectionString).GetServer();
             this.database = server.GetDatabase(databaseName);
 		}
 
