@@ -69,7 +69,7 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
 
 					eTag= new TimedEntityTagHeaderValue((string) reader[ColumnNames.ETag])
 					      	{
-					      		LastModified = (DateTime) reader[ColumnNames.LastModified]
+					      		LastModified = DateTime.SpecifyKind((DateTime)reader[ColumnNames.LastModified], DateTimeKind.Utc)
 					      	};
 					return true;
 				}
@@ -89,7 +89,7 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
                 command.Parameters.AddWithValue(ColumnNames.RoutePattern, key.RoutePattern);
                 command.Parameters.AddWithValue(ColumnNames.ResourceUri, key.ResourceUri);
 				command.Parameters.AddWithValue(ColumnNames.ETag, eTag.Tag);
-				command.Parameters.AddWithValue(ColumnNames.LastModified, eTag.LastModified);
+				command.Parameters.AddWithValue(ColumnNames.LastModified, eTag.LastModified.ToUniversal());
 				command.ExecuteNonQuery();
 			}
 		}
