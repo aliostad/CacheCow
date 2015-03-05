@@ -89,7 +89,7 @@ namespace CacheCow.Server.EntityTagStore.SqlServer
                 command.Parameters.AddWithValue(ColumnNames.RoutePattern, key.RoutePattern);
                 command.Parameters.AddWithValue(ColumnNames.ResourceUri, key.ResourceUri);
 				command.Parameters.AddWithValue(ColumnNames.ETag, eTag.Tag);
-				command.Parameters.AddWithValue(ColumnNames.LastModified, eTag.LastModified.ToUniversal());
+				command.Parameters.AddWithValue(ColumnNames.LastModified, eTag.LastModified.ToUniversalTime());
 				command.ExecuteNonQuery();
 			}
 		}
