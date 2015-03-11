@@ -360,6 +360,7 @@ namespace CacheCow.Client
                         TraceWriter.WriteLine("{0} - NotModified",
                             TraceLevel.Verbose, request.RequestUri.ToString());
 
+                        UpdateCachedResponse(cacheKey, cachedResponse, serverResponse, _cacheStore);
                         ConsumeAndDisposeResponse(serverResponse);
                         return cachedResponse.AddCacheCowHeader(cacheCowHeader); // EXIT !! _______________
                     }
@@ -431,7 +432,7 @@ namespace CacheCow.Client
         private void DoPutValidation(HttpRequestMessage request, CacheCowHeader cacheCowHeader,
             HttpResponseMessage cachedResponse)
         {
-// add headers for a cache validation. First check ETag since is better 
+            // add headers for a cache validation. First check ETag since is better 
             if (UseConditionalPut)
             {
                 cacheCowHeader.CacheValidationApplied = true;
@@ -445,6 +446,21 @@ namespace CacheCow.Client
                     request.Headers.Add(HttpHeaderNames.IfUnmodifiedSince,
                         cachedResponse.Content.Headers.LastModified.Value.ToString("r"));
                 }
+            }
+        }
+
+        internal static void UpdateCachedResponse(CacheKey cacheKey,
+            HttpResponseMessage cachedResponse,
+            HttpResponseMessage serverResponse,
+            ICacheStore store)
+        {
+            // update only if server had a cachecontrol.
+            // TODO: merge CacheControl headers instead of replace
+            if (serverResponse.Headers.CacheControl != null)
+            {
+                cachedResponse.Headers.CacheControl = serverResponse.Headers.CacheControl;
+                cachedResponse.Headers.Date = DateTimeOffset.UtcNow; // very important
+                store.AddOrUpdate(cacheKey, serverResponse);
             }
         }
 
