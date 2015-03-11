@@ -131,6 +131,8 @@ namespace CacheCow.Client.Tests
 			// setup 
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			var responseFromCache = GetOkMessage();
+		    var then = DateTimeOffset.UtcNow.AddMilliseconds(-1);
+		    responseFromCache.Headers.Date = then;
             responseFromCache.Content.Headers.Expires = DateTimeOffset.Now.AddDays(-1);
             responseFromCache.Content.Headers.LastModified = DateTimeOffset.Now.AddDays(-2);
 			var responseFromServer = GetOkMessage();
@@ -139,6 +141,7 @@ namespace CacheCow.Client.Tests
 			_messageHandler.Response = responseFromServer;
 			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
 				  out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
+            _cacheStore.Expect(x => x.AddOrUpdate(Arg<CacheKey>.Is.Anything, Arg<HttpResponseMessage>.Is.Equal(responseFromCache)));
 
 			_mockRepository.ReplayAll();
 
@@ -155,6 +158,7 @@ namespace CacheCow.Client.Tests
 			Assert.AreSame(responseFromCache, responseReturned);
             Assert.AreEqual(true, cacheCowHeader.WasStale);
             Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
+            Assert.AreNotEqual(then, responseFromCache.Headers.Date);
 
 		}
 

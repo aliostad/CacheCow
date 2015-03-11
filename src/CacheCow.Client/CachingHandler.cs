@@ -460,7 +460,7 @@ namespace CacheCow.Client
             {
                 cachedResponse.Headers.CacheControl = serverResponse.Headers.CacheControl;
                 cachedResponse.Headers.Date = DateTimeOffset.UtcNow; // very important
-                store.AddOrUpdate(cacheKey, serverResponse);
+                store.AddOrUpdate(cacheKey, cachedResponse);
             }
         }
 
