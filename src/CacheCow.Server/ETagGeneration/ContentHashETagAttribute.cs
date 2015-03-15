@@ -12,7 +12,7 @@ namespace CacheCow.Server.ETagGeneration
     /// </summary>
     public class ContentHashETagAttribute : ActionFilterAttribute
     {
-        internal const string ContentHashHeaderName = "x-cachecow-content-hash-md5"; 
+        internal const string ContentHashPropertyName = "x-cachecow-content-hash-md5"; 
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
             base.OnActionExecuted(actionExecutedContext);
@@ -27,7 +27,7 @@ namespace CacheCow.Server.ETagGeneration
                 var hash = md5.ComputeHash(bytes);
                 string hex = BitConverter.ToString(hash);
                 hex = hex.Replace("-", "");
-                actionExecutedContext.Request.Headers.TryAddWithoutValidation(ContentHashHeaderName, hex);
+                actionExecutedContext.Request.Properties.Add(ContentHashPropertyName, hex);
             }
         }       
     }
