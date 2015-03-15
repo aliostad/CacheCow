@@ -99,8 +99,7 @@ namespace CacheCow.Server
 		/// Default value is a function that generates a guid and URL is ignored and
 		/// it generates a weak ETag if no varyByHeaders is passed in
 		/// </summary>
-		public Func<string, IEnumerable<KeyValuePair<string, IEnumerable<string>>>,
-			EntityTagHeaderValue> ETagValueGenerator { get; set; }
+        public Func<HttpRequestMessage, HttpConfiguration, EntityTagHeaderValue> ETagValueGenerator { get; set; }
 
 		/// <summary>
 		/// This is a function that decides whether caching for a particular request
@@ -341,7 +340,7 @@ namespace CacheCow.Server
 						// create new ETag only if it does not already exist
 						if (!_entityTagStore.TryGetValue(cacheKey, out eTagValue))
 						{
-							eTagValue = new TimedEntityTagHeaderValue(ETagValueGenerator(uri, request.Headers));
+                            eTagValue = new TimedEntityTagHeaderValue(ETagValueGenerator(request, _configuration));
 							_entityTagStore.AddOrUpdate(cacheKey, eTagValue);
 						}
 

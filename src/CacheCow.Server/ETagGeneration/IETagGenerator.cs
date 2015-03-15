@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
+using System.Web.Http;
 
 namespace CacheCow.Server.ETagGeneration
 {
@@ -11,6 +9,6 @@ namespace CacheCow.Server.ETagGeneration
     /// </summary>
     public interface IETagGenerator
     {
-        EntityTagHeaderValue Generate(string url, IEnumerable<KeyValuePair<string, IEnumerable<string>>> requestHeaders);
+        EntityTagHeaderValue Generate(HttpRequestMessage request, HttpConfiguration configuration);
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Web.Http;
 
 namespace CacheCow.Server.ETagGeneration
 {
@@ -11,15 +13,16 @@ namespace CacheCow.Server.ETagGeneration
     /// </summary>
     public class ContentHashETagGenerator : DefaultETagGenerator
     {
-        public override EntityTagHeaderValue Generate(string url, 
-            IEnumerable<KeyValuePair<string, IEnumerable<string>>> requestHeaders)
+        public override EntityTagHeaderValue Generate(HttpRequestMessage request, HttpConfiguration configuration)
         {
-            var keyValuePair = requestHeaders.FirstOrDefault(x => 
-                x.Key == ContentHashETagAttribute.ContentHashHeaderName);
+            object hash;
 
-            
-            return keyValuePair.Key == null ? base.Generate(url, requestHeaders) :
-                new EntityTagHeaderValue("\"" + keyValuePair.Value.First() + "\"", false);
+            if (request.Properties.TryGetValue(ContentHashETagAttribute.ContentHashPropertyName, out hash))
+            {
+                return new EntityTagHeaderValue("\"" + hash + "\"", false);
+            }
+
+            return base.Generate(request, configuration);
         }
     }
 }
