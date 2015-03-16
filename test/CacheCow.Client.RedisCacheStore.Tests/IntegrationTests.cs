@@ -6,6 +6,7 @@ using System.Text;
 using CacheCow.Common;
 using NUnit.Framework;
 using CacheCow.Client.Headers;
+using CacheCow.Client.RedisCacheStore;
 
 namespace CacheCow.Client.RedisCacheStore.Tests
 {
@@ -20,12 +21,13 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 
 		private const string CacheableResource1 = "https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js";
 		private const string CacheableResource2 = "http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js";
-		
+	    private const string ConnectionString = "localhost";
+
 		[Ignore]
 		[Test]
 		public void TestConnectivity()
 		{
-			var redisStore = new RedisStore();
+            var redisStore = new RedisStore(ConnectionString);
 			HttpResponseMessage responseMessage = null;
 			Console.WriteLine(redisStore.TryGetValue(new CacheKey("http://google.com", new string[0]), out responseMessage));
 		}
@@ -34,7 +36,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 		[Test]
 		public void AddItemTest()
 		{
-			var client = new HttpClient(new CachingHandler(new RedisStore())
+            var client = new HttpClient(new CachingHandler(new RedisStore(ConnectionString))
 			               	{
 			               		InnerHandler = new HttpClientHandler()
 			               	});
@@ -48,7 +50,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 		[Test]
 		public void GetValue()
 		{
-			var redisStore = new RedisStore();
+            var redisStore = new RedisStore(ConnectionString);
 			var client = new HttpClient(new CachingHandler(redisStore)
 			{
 				InnerHandler = new HttpClientHandler()
@@ -59,24 +61,6 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 			var tryGetValue = redisStore.TryGetValue(new CacheKey(CacheableResource1, new string[0]), out response);
 			Assert.That(tryGetValue);
 			Assert.IsNotNull(response);
-
-		}
-
-		[Ignore]
-		[Test]
-		public void GetLastAccessed()
-		{
-			var redisStore = new RedisStore();
-			var client = new HttpClient(new CachingHandler(redisStore)
-			{
-				InnerHandler = new HttpClientHandler()
-			});
-
-			var httpResponseMessage = client.GetAsync(CacheableResource1).Result;
-			CacheItemMetadata metadata = redisStore.GetEarliestAccessedItem("ajax.googleapis.com");
-			Assert.IsNotNull(metadata);
-			Assert.AreEqual("ajax.googleapis.com", metadata.Domain);
-			Assert.Less(DateTime.Now.Subtract(TimeSpan.FromSeconds(10)), metadata.LastAccessed);
 
 		}
 	}

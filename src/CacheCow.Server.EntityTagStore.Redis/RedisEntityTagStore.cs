@@ -12,26 +12,37 @@ namespace CacheCow.Server.EntityTagStore.Redis
     {
         private ConnectionMultiplexer _connection;
         private IDatabase _database;
+        private TimeSpan? _expiry;
 
-        public RedisEntityTagStore(string connectionString)
+        private const string ResourceFormat = "ResourceUri:{0}";
+        private const string RoutePatternFormat = "RoutePattern:{0}";
+
+        public RedisEntityTagStore(string connectionString, 
+            int databaseId = 0,
+            TimeSpan? expiry = null)
         {
-            Init(ConnectionMultiplexer.Connect(connectionString));
+            _expiry = expiry;
+            Init(ConnectionMultiplexer.Connect(connectionString), databaseId);
         }
 
-        public RedisEntityTagStore(ConnectionMultiplexer connection)
+        public RedisEntityTagStore(ConnectionMultiplexer connection, 
+            int databaseId = 0,
+            TimeSpan? expiry = null)
         {
-            Init(connection);
+            _expiry = expiry;
+            Init(connection, databaseId);
         }
 
-        public RedisEntityTagStore(IDatabase database)
+        public RedisEntityTagStore(IDatabase database, TimeSpan? expiry)
         {
             _database = database;
+            _expiry = expiry;
         }
 
-        private void Init(ConnectionMultiplexer connection)
+        private void Init(ConnectionMultiplexer connection, int databaseId = 0)
         {
             _connection = connection;
-            _database = _connection.GetDatabase();
+            _database = _connection.GetDatabase(databaseId);
         }
 
         public void Dispose()
@@ -40,38 +51,47 @@ namespace CacheCow.Server.EntityTagStore.Redis
                 _connection.Dispose();
         }
 
-        public TimeSpan? Expiry { get; set; }
-
         public bool TryGetValue(CacheKey key, out TimedEntityTagHeaderValue eTag)
         {
             eTag = null;
             string value = _database.StringGet(key.HashBase64);
-            if (value != null)
+            if (!string.IsNullOrEmpty(value))
             {
                 return TimedEntityTagHeaderValue.TryParse(value, out eTag);
             }
+
             return false;
         }
 
         public void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag)
         {
-            _database.StringSet(key.HashBase64, eTag.ToString(), Expiry);
-            _database.SetAdd("ResourceUri_" + key.ResourceUri, key.HashBase64);
-            _database.SetAdd("RoutePattern_" + key.RoutePattern, key.HashBase64);
+            _database.StringSet(key.HashBase64, eTag.ToString(), _expiry);
+            
+            // resource
+            var resourceKey = string.Format(ResourceFormat, key.ResourceUri);
+            _database.SetAdd(resourceKey, key.HashBase64);
+            if (_expiry.HasValue)
+                _database.KeyExpire(resourceKey, _expiry);
+
+            // routePattern
+            var routePatternKey = string.Format(RoutePatternFormat, key.RoutePattern);
+            _database.SetAdd(routePatternKey, key.HashBase64);
+            if (_expiry.HasValue)
+                _database.KeyExpire(routePatternKey, _expiry);
+
         }
 
         public int RemoveResource(string resourceUri)
-        {
-            int i = 0;
-            string key = "ResourceUri_" + resourceUri;
-            var redisValues = _database.SetScan(key);
-            foreach (var value in redisValues)
+        {         
+            string key = string.Format(ResourceFormat, resourceUri);
+            var count = 0;
+            foreach (var member in _database.SetMembers(key))
             {
-                TryRemove(value);
-                i++;
+                if (TryRemove(member))
+                    count++;
             }
-            TryRemove(key);
-            return i;
+
+            return count;
         }
 
         public bool TryRemove(CacheKey key)
@@ -84,24 +104,22 @@ namespace CacheCow.Server.EntityTagStore.Redis
             return _database.KeyDelete(key);
         }
 
-
         public int RemoveAllByRoutePattern(string routePattern)
         {
-            int i = 0;
-            string key = "RoutePattern_" + routePattern;
-            var redisValues = _database.SetScan(key);
-            foreach (var value in redisValues)
+            int count = 0;
+            string key = string.Format(RoutePatternFormat, routePattern);
+            foreach (var member in _database.SetMembers(key))
             {
-                i++;
-                TryRemove(value);
+                if (TryRemove(member))
+                    count++;
             }
-            TryRemove(key);
-            return i;
+
+            return count;
         }
 
         public void Clear()
         {
-            throw new NotSupportedException("Redis does not supprt Clear().");
+            throw new NotSupportedException("StackExchange.Redis does not supprt Clear() but you can use FLUSH through redis-cli.");
         }
     }
 }
