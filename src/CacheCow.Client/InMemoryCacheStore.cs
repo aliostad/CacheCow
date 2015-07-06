@@ -50,7 +50,7 @@ namespace CacheCow.Client
 			var req = response.RequestMessage;
 			response.RequestMessage = null;
 			var memoryStream = new MemoryStream();
-			Task.Factory.StartNew(() => _messageSerializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream)).Wait();
+			Task.Factory.StartNew(() => _messageSerializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream).Wait()).Wait();
 			response.RequestMessage = req;
             _responseCache.Set(key.HashBase64, memoryStream.ToArray(), GetExpiry(response));
 		}
