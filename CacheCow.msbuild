@@ -18,14 +18,17 @@
     <NugetExeDir Include=".\.nuget\" />
   </ItemGroup>
 
-  <Target Name="Default" DependsOnTargets="Compile; Package" />
-  <Target Name="DefaultCI" DependsOnTargets="Compile; Package; Publish" />
+  <Target Name="Default" DependsOnTargets="Restore; Compile; Package" />
+  <Target Name="DefaultCI" DependsOnTargets="Restore; Compile; Package; Publish" />
   
   <Target Name="Clean">
     <RemoveDir Directories="@(BuildArtifactsDir)" />
   </Target>
   <Target Name="Init" DependsOnTargets="Clean">
     <MakeDir Directories="@(BuildArtifactsDir);@(PackageOutputDir)" />
+  </Target>
+  <Target Name="Restore">
+    <Exec Command=".nuget\nuget.exe restore" />
   </Target>
   <Target Name="Compile" DependsOnTargets="Init">
     <MSBuild Projects="@(AppProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
