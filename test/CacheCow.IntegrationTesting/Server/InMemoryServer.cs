@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.SelfHost;
@@ -71,7 +72,7 @@ namespace CacheCow.IntegrationTesting.Server
                 get { return _lastResponse; }
             }
 
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
                 _lastRequest = request;
                 return base.SendAsync(request, cancellationToken)

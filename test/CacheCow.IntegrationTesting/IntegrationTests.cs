@@ -61,5 +61,27 @@ namespace CacheCow.IntegrationTesting
                 Assert.AreEqual(true, response.Headers.GetCacheCowHeader().RetrievedFromCache);
             }
         }
+
+        [Test]
+        public void ZeroMaxAgeShouldAlwaysComeFromCacheIfNotChanged()
+        {
+            // arrange
+            using (var server = new InMemoryServer())
+            using (var client = new HttpClient(new CachingHandler()
+            {
+                InnerHandler = new HttpClientHandler()
+            }))
+            {
+                string id = Guid.NewGuid().ToString();
+                client.BaseAddress = new Uri(new Uri(TestConstants.BaseUrl), "/api/test/");
+                server.Start();
+                var response = client.GetAsync(id).Result;
+                Assert.AreEqual(null, response.Headers.GetCacheCowHeader().RetrievedFromCache);
+                Assert.AreEqual(true, response.Headers.GetCacheCowHeader().DidNotExist);
+                response = client.GetAsync(id).Result;
+                Assert.AreEqual(true, response.Headers.GetCacheCowHeader().RetrievedFromCache);
+            }
+        }
+
     }
 }
