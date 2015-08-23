@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -73,13 +74,39 @@ namespace CacheCow.IntegrationTesting
             }))
             {
                 string id = Guid.NewGuid().ToString();
-                client.BaseAddress = new Uri(new Uri(TestConstants.BaseUrl), "/api/test/");
+                client.BaseAddress = new Uri(new Uri(TestConstants.BaseUrl), "/api/ZeroMaxAge/");
                 server.Start();
+
+                Trace.WriteLine("STARTING FIRST _______________________________________________________________________________");
+
                 var response = client.GetAsync(id).Result;
-                Assert.AreEqual(null, response.Headers.GetCacheCowHeader().RetrievedFromCache);
-                Assert.AreEqual(true, response.Headers.GetCacheCowHeader().DidNotExist);
+                var header = response.Headers.GetCacheCowHeader();
+                Trace.WriteLine("CacheCowHeader=> " + header);
+                Assert.AreEqual(null, header.RetrievedFromCache, "First RetrievedFromCache");
+                Assert.AreEqual(true, header.DidNotExist, "First DidNotExist");
+
+                Thread.Sleep(2000);
+
+
+                // second time
+                Trace.WriteLine("STARTING SECOND _______________________________________________________________________________");
                 response = client.GetAsync(id).Result;
-                Assert.AreEqual(true, response.Headers.GetCacheCowHeader().RetrievedFromCache);
+                header = response.Headers.GetCacheCowHeader();
+                Trace.WriteLine("CacheCowHeader=> " + header);
+                Assert.AreEqual(true, header.RetrievedFromCache, "Second RetrievedFromCache");
+                Assert.AreEqual(true, header.WasStale, "Second WasStale");
+
+                Thread.Sleep(1000);
+
+                // third time
+                Trace.WriteLine("STARTING THIRD _______________________________________________________________________________");
+                response = client.GetAsync(id).Result;
+                header = response.Headers.GetCacheCowHeader();
+                Trace.WriteLine("CacheCowHeader=> " + header);
+                Assert.AreEqual(true, header.RetrievedFromCache, "Third RetrievedFromCache");
+                Assert.AreEqual(true, header.WasStale, "Third WasStale");
+
+
             }
         }
 

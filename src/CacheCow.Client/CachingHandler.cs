@@ -66,8 +66,14 @@ namespace CacheCow.Client
                     response.Headers.CacheControl.NoStore) //  || response.Headers.CacheControl.NoCache was removed. See issue
                     return ResponseValidationResult.NotCacheable;
 
+                if (response.Headers.Date == null)
+                    TraceWriter.WriteLine("Response date is NULL", TraceLevel.Warning);
+
                 response.Headers.Date = response.Headers.Date ?? DateTimeOffset.UtcNow; // this also helps in cache creation
                 var dateTimeOffset = response.Headers.Date;
+
+                TraceWriter.WriteLine(
+                    String.Format("CachedResponse date was => {0} - compraed to UTC.Now => {1}", dateTimeOffset, DateTimeOffset.UtcNow), TraceLevel.Verbose);
 
                 if (response.Content == null)
                     return ResponseValidationResult.NotCacheable;
@@ -277,11 +283,13 @@ namespace CacheCow.Client
 
                 if (!cacheCowHeader.DidNotExist.Value) // so if it EXISTS in cache
                 {
+                    TraceWriter.WriteLine("{0} - Existed in the cache. CacheControl Headers => {1}", TraceLevel.Verbose, request.RequestUri.ToString(),
+                        cachedResponse.Headers.CacheControl.ToString());
                     cachedResponse.RequestMessage = request;
                     validationResultForCachedResponse = ResponseValidator(cachedResponse);
                 }
 
-                TraceWriter.WriteLine("{0} - After ResponseValidator {1}",
+                TraceWriter.WriteLine("{0} - After ResponseValidator => {1}",
                     TraceLevel.Verbose, request.RequestUri, validationResultForCachedResponse);
 
 
@@ -355,6 +363,9 @@ namespace CacheCow.Client
                     if (validationResultForCachedResponse == ResponseValidationResult.MustRevalidate &&
                         serverResponse.StatusCode == HttpStatusCode.NotModified)
                     {
+                        TraceWriter.WriteLine("{0} - Got 304 from the server and ResponseValidationResult.MustRevalidate",
+                            TraceLevel.Verbose, request.RequestUri.ToString());
+
                         cachedResponse.RequestMessage = request;
                         cacheCowHeader.RetrievedFromCache = true;
                         TraceWriter.WriteLine("{0} - NotModified",
@@ -379,8 +390,6 @@ namespace CacheCow.Client
                             ResponseStoragePreparationRules(serverResponse);
 
                             TraceWriter.WriteLine("{0} - Before AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
-
-
 
                             // re-create cacheKey with real server accept
 
@@ -454,10 +463,13 @@ namespace CacheCow.Client
             HttpResponseMessage serverResponse,
             ICacheStore store)
         {
+            TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - response: " + serverResponse.Headers.ToString(), TraceLevel.Verbose);
+            
             // update only if server had a cachecontrol.
             // TODO: merge CacheControl headers instead of replace
             if (serverResponse.Headers.CacheControl != null)
             {
+                TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - response: " + serverResponse.Headers.ToString(), TraceLevel.Verbose);
                 cachedResponse.Headers.CacheControl = serverResponse.Headers.CacheControl;
                 cachedResponse.Headers.Date = DateTimeOffset.UtcNow; // very important
                 store.AddOrUpdate(cacheKey, cachedResponse);
