@@ -21,6 +21,7 @@ namespace CacheCow.IntegrationTesting
     public class IntegrationTests
     {
         [Test]
+        [Ignore]
         public void NotModifiedReturnedAfter5Seconds()
         {
             // arrange
@@ -44,6 +45,7 @@ namespace CacheCow.IntegrationTesting
         }
 
         [Test]
+        [Ignore]
         public void SecondRequestLoadsFromCache()
         {
             // arrange
@@ -65,6 +67,7 @@ namespace CacheCow.IntegrationTesting
         }
 
         [Test]
+        [Ignore]
         public void ZeroMaxAgeShouldAlwaysComeFromCacheIfNotChanged()
         {
             // arrange
