@@ -497,7 +497,8 @@ namespace CacheCow.Server
                             matchFound = true;
                         }
                     }
-                    return matchFound ^ isNoneMatch ? null : new NotModifiedResponse(request,
+			        var value = CacheControlHeaderProvider(request, _configuration);
+			        return matchFound ^ isNoneMatch ? null : new NotModifiedResponse(request, value,
                         actualEtag.ToEntityTagHeaderValue()).ToTask();
 
 			    }
@@ -542,8 +543,9 @@ namespace CacheCow.Server
                         isModified = actualEtag.LastModified > modifiedInQuestion;
                     }
 
-                    return isModified ^ ifModified
-                            ? new NotModifiedResponse(request, actualEtag.ToEntityTagHeaderValue()).ToTask()
+			        var cacheControl = CacheControlHeaderProvider(request, _configuration);
+			        return isModified ^ ifModified
+                            ? new NotModifiedResponse(request, cacheControl, actualEtag.ToEntityTagHeaderValue()).ToTask()
                             : null;
 
 			    }

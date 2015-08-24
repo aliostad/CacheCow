@@ -469,7 +469,7 @@ namespace CacheCow.Client
             // TODO: merge CacheControl headers instead of replace
             if (serverResponse.Headers.CacheControl != null)
             {
-                TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - response: " + serverResponse.Headers.ToString(), TraceLevel.Verbose);
+                TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - CacheControl: " + serverResponse.Headers.CacheControl.ToString(), TraceLevel.Verbose);
                 cachedResponse.Headers.CacheControl = serverResponse.Headers.CacheControl;
                 cachedResponse.Headers.Date = DateTimeOffset.UtcNow; // very important
                 store.AddOrUpdate(cacheKey, cachedResponse);
