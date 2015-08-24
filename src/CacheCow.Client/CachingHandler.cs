@@ -467,7 +467,7 @@ namespace CacheCow.Client
             
             // update only if server had a cachecontrol.
             // TODO: merge CacheControl headers instead of replace
-            if (serverResponse.Headers.CacheControl != null)
+            if (serverResponse.Headers.CacheControl != null && (!serverResponse.Headers.CacheControl.NoCache)) // added to cover issue #139
             {
                 TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - CacheControl: " + serverResponse.Headers.CacheControl.ToString(), TraceLevel.Verbose);
                 cachedResponse.Headers.CacheControl = serverResponse.Headers.CacheControl;
