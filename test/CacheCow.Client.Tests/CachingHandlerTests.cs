@@ -8,8 +8,10 @@ using System.Text;
 using CacheCow.Client;
 using CacheCow.Client.Headers;
 using CacheCow.Common;
+using Moq;
 using NUnit.Framework;
 using Rhino.Mocks;
+using MockRepository = Rhino.Mocks.MockRepository;
 
 namespace CacheCow.Client.Tests
 {
@@ -467,7 +469,28 @@ namespace CacheCow.Client.Tests
 
         }
 
-		private HttpResponseMessage GetOkMessage(bool mustRevalidate = false)
+        [Test]
+	    public void DoesNotDisposeCacheStoreIfPassedToIt()
+        {
+            var mock = new Moq.Mock<ICacheStore>(MockBehavior.Strict);
+            var handler = new CachingHandler(mock.Object);
+            handler.Dispose();
+            mock.Verify();
+        }
+
+        [Test]
+        public void DoesNotDisposeVaryHeaderStoreIfPassedToIt()
+        {
+            var mockcs = new Moq.Mock<ICacheStore>();
+            var mockvh = new Moq.Mock<IVaryHeaderStore>(MockBehavior.Strict);
+            var handler = new CachingHandler(mockcs.Object, mockvh.Object);
+            handler.Dispose();
+            mockvh.Verify();
+        }
+
+
+
+	    private HttpResponseMessage GetOkMessage(bool mustRevalidate = false)
 		{
 			var response = new HttpResponseMessage(HttpStatusCode.OK);
 			response.Headers.CacheControl = new CacheControlHeaderValue()
