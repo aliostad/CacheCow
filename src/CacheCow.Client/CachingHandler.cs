@@ -19,6 +19,8 @@ namespace CacheCow.Client
 
         private readonly ICacheStore _cacheStore;
         private Func<HttpRequestMessage, bool> _ignoreRequestRules;
+        private bool _disposeCacheStore = false;
+        private bool _disposeVaryStore = false;
 
 
         // 13.4: A response received with a status code of 200, 203, 206, 300, 301 or 410 MAY be stored 
@@ -33,14 +35,21 @@ namespace CacheCow.Client
         public CachingHandler()
             : this(new InMemoryCacheStore())
         {
+            _disposeCacheStore = true;
         }
 
         public CachingHandler(ICacheStore cacheStore)
+            : this(cacheStore, new InMemoryVaryHeaderStore())
+        {
+            _disposeVaryStore = true;
+        }
+
+        public CachingHandler(ICacheStore cacheStore, IVaryHeaderStore varyHeaderStore)
         {
             _cacheStore = cacheStore;
             UseConditionalPut = true;
             MustRevalidateByDefault = true;
-            VaryHeaderStore = new InMemoryVaryHeaderStore();
+            VaryHeaderStore = varyHeaderStore;
             DefaultVaryHeaders = new string[] { "Accept" };
             ResponseValidator = (response) =>
             {
@@ -132,6 +141,7 @@ namespace CacheCow.Client
                     response.Content.Headers.Expires = null;
                 }
             };
+            
         }
 
         static CachingHandler()
@@ -505,10 +515,11 @@ namespace CacheCow.Client
             base.Dispose(disposing);
             if (disposing)
             {
-                VaryHeaderStore.Dispose();
-                var disposable = _cacheStore as IDisposable;
-                if (disposable != null)
-                    disposable.Dispose();
+                if(VaryHeaderStore != null && _disposeVaryStore)
+                    VaryHeaderStore.Dispose();
+                
+                if (_cacheStore != null && _disposeCacheStore)
+                    _cacheStore.Dispose();
             }
         }
 
