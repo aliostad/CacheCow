@@ -13,6 +13,7 @@
     <PackageOutputDir Include=".\artifacts\packages" />
     <Solutionfile Include=".\CacheCow.sln" />
     <AppProjFiles Include=".\src\**\*.csproj" />
+    <SnProjFiles Include=".\src\**\CacheCow.Common.csproj;.\src\**\CacheCow.Server.csproj;.\src\**\CacheCow.Client.csproj;.\src\**\CacheCow.Server.EntityTagStore.AzureCaching.csproj;.\src\**\CacheCow.Client.AzureCaching.csproj;.\src\**\CacheCow.Server.EntityTagStore.MongoDb.csproj" />	
     <TestProjFiles Include=".\test\**\*.csproj" />
     <ScriptsDir Include=".\scripts\" />
     <NugetExeDir Include=".\" />
@@ -20,7 +21,8 @@
 
   <Target Name="Default" DependsOnTargets="Restore; Compile; Package" />
   <Target Name="DefaultCI" DependsOnTargets="Restore; Compile; Package; Publish" />
-  
+  <Target Name="sn" DependsOnTargets="Restore;CompileSN" />
+ 
   <Target Name="Clean">
     <RemoveDir Directories="@(BuildArtifactsDir)" />
   </Target>
@@ -32,6 +34,9 @@
   </Target>
   <Target Name="Compile" DependsOnTargets="Init">
     <MSBuild Projects="@(AppProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
+  </Target>
+  <Target Name="CompileSN" DependsOnTargets="Init">
+    <MSBuild Projects="@(SnProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
   </Target>
   <Target Name="Package">
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server\CacheCow.Server.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B1901128-F84A-46CE-B8FD-E863465F94C2}"
 EndProject
@@ -19,6 +19,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client", "src\CacheCow.Client\CacheCow.Client.csproj", "{943325CB-7189-42FE-9DA4-E513DB3E0E87}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.SqlServer", "src\CacheCow.Server.EntityTagStore.SqlServer\CacheCow.Server.EntityTagStore.SqlServer.csproj", "{535A9638-9C46-4B32-822C-4AB6D442FD0D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B67727F4-5B65-41D0-8D26-8D1C32CEA63D} = {B67727F4-5B65-41D0-8D26-8D1C32CEA63D}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Tests", "test\CacheCow.Tests\CacheCow.Tests.csproj", "{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3}"
 EndProject
@@ -67,6 +70,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Testing.Common", "test\CacheCow.Testing.Common\CacheCow.Testing.Common.csproj", "{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.AzureCaching", "src\CacheCow.Server.EntityTagStore.AzureCaching\CacheCow.Server.EntityTagStore.AzureCaching.csproj", "{112BC648-DA8F-451D-8A4C-1831CC285008}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B67727F4-5B65-41D0-8D26-8D1C32CEA63D} = {B67727F4-5B65-41D0-8D26-8D1C32CEA63D}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.AzureCaching.Tests", "test\CacheCow.Server.EntityTagStore.AzureCaching.Tests\CacheCow.Server.EntityTagStore.AzureCaching.Tests.csproj", "{37650B35-41E3-49A6-889C-2D21AE0E69E4}"
 EndProject
