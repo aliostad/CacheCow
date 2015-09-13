@@ -16,4 +16,8 @@
       <dependency id="Microsoft.WindowsAzure.Caching" version="2.2.0"  />
     </dependencies>	
   </metadata>
+	<files>
+		<file src="..\..\artifacts\CacheCow.Client.AzureCachingCacheStore.dll" target="lib" />
+		<file src="..\..\artifacts\CacheCow.Client.AzureCachingCacheStore.pdb" target="lib" />
+	</files>	
 </package>

@@ -20,5 +20,5 @@ $packages = dir "$solutionDir\artifacts\packages\CacheCow.*.nupkg"
 
 foreach($package in $packages) { 
     #$package is type of System.IO.FileInfo
-    & ".\Nuget.exe" push $package.FullName $nugetApiKey
+    & ".\..\Nuget.exe" push $package.FullName $nugetApiKey
 }

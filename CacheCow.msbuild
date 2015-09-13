@@ -13,7 +13,7 @@
     <PackageOutputDir Include=".\artifacts\packages" />
     <Solutionfile Include=".\CacheCow.sln" />
     <AppProjFiles Include=".\src\**\*.csproj" />
-    <SnProjFiles Include=".\src\**\CacheCow.Common.csproj;.\src\**\CacheCow.Server.csproj;.\src\**\CacheCow.Client.csproj;.\src\**\CacheCow.Server.EntityTagStore.AzureCaching.csproj;.\src\**\CacheCow.Client.AzureCaching.csproj;.\src\**\CacheCow.Server.EntityTagStore.MongoDb.csproj" />	
+    <SnProjFiles Include=".\src\**\CacheCow.Common.csproj;.\src\**\CacheCow.Server.csproj;.\src\**\CacheCow.Client.csproj;.\src\**\CacheCow.Server.EntityTagStore.AzureCaching.csproj;.\src\**\CacheCow.Client.AzureCachingCacheStore.csproj;.\src\**\CacheCow.Server.EntityTagStore.MongoDb.csproj" />	
     <TestProjFiles Include=".\test\**\*.csproj" />
     <ScriptsDir Include=".\scripts\" />
     <NugetExeDir Include=".\" />
@@ -22,6 +22,7 @@
   <Target Name="Default" DependsOnTargets="Restore; Compile; Package" />
   <Target Name="DefaultCI" DependsOnTargets="Restore; Compile; Package; Publish" />
   <Target Name="sn" DependsOnTargets="Restore;CompileSN;PackageSN" />
+  <Target Name="sn-publish" DependsOnTargets="Restore;CompileSN;PackageSN;Publish" />
  
   <Target Name="Clean">
     <RemoveDir Directories="@(BuildArtifactsDir)" />

@@ -3,7 +3,7 @@
   <metadata>
     <id>CacheCow.Server.sn</id>
     <version>1.1.0</version>
-    <title>CacheCow.Server</title>
+    <title>CacheCow.Server (Strongly Named)</title>
     <authors>Ali Kheyrollahi</authors>
     <owners>Ali Kheyrollahi</owners>
     <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
@@ -15,4 +15,9 @@
       <dependency id="CacheCow.Common.sn" version="1.1.0" />
     </dependencies>
   </metadata>
+	<files>
+		<file src="..\..\artifacts\CacheCow.Server.dll" target="lib" />
+		<file src="..\..\artifacts\CacheCow.Server.pdb" target="lib" />
+		<file src="..\..\artifacts\CacheCow.Server.xml" target="lib" />
+	</files>	
 </package>
