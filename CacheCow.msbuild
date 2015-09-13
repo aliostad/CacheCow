@@ -21,7 +21,7 @@
 
   <Target Name="Default" DependsOnTargets="Restore; Compile; Package" />
   <Target Name="DefaultCI" DependsOnTargets="Restore; Compile; Package; Publish" />
-  <Target Name="sn" DependsOnTargets="Restore;CompileSN" />
+  <Target Name="sn" DependsOnTargets="Restore;CompileSN;PackageSN" />
  
   <Target Name="Clean">
     <RemoveDir Directories="@(BuildArtifactsDir)" />
@@ -57,6 +57,14 @@
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.RedisCacheStore\CacheCow.Client.RedisCacheStore.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.SqlCacheStore\CacheCow.Client.SqlCacheStore.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
   </Target>
+  <Target Name="PackageSN">
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client\CacheCow.Client.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server\CacheCow.Server.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Common\CacheCow.Common.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.AzureCaching\CacheCow.Server.EntityTagStore.AzureCaching.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.AzureCachingCacheStore\CacheCow.Client.AzureCachingCacheStore.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
+  </Target>
+
   <Target Name="Publish">
     <Exec WorkingDirectory="%(ScriptsDir.FullPath)" Command="powershell -file .\publish.ps1" />
   </Target>

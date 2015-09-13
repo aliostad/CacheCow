@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <copyright>Copyright 2012</copyright>
+    <copyright>Copyright 2012-2015</copyright>
     <tags>aspnetwebapi http caching webapi cachecow etag redisstore redis stackexchange.redis</tags>
 	<dependencies>
       <dependency id="CacheCow.Client" version="$version$"  />

@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <copyright>Copyright 2012</copyright>
+    <copyright>Copyright 2012-2015</copyright>
     <tags>aspnetwebapi http caching webapi cachecow memcached enyim etag</tags>
 	<dependencies>
       <dependency id="CacheCow.Server" version="$version$" />
