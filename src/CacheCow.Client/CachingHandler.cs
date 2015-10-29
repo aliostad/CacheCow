@@ -82,7 +82,7 @@ namespace CacheCow.Client
                 var dateTimeOffset = response.Headers.Date;
 
                 TraceWriter.WriteLine(
-                    String.Format("CachedResponse date was => {0} - compraed to UTC.Now => {1}", dateTimeOffset, DateTimeOffset.UtcNow), TraceLevel.Verbose);
+                    String.Format("CachedResponse date was => {0} - compared to UTC.Now => {1}", dateTimeOffset, DateTimeOffset.UtcNow), TraceLevel.Verbose);
 
                 if (response.Content == null)
                     return ResponseValidationResult.NotCacheable;
@@ -262,7 +262,7 @@ namespace CacheCow.Client
             var cacheCowHeader = new CacheCowHeader();
             string uri = request.RequestUri.ToString();
 
-            TraceWriter.WriteLine("{0} - Starting", TraceLevel.Verbose, request.RequestUri.ToString());
+            TraceWriter.WriteLine("{0} - Starting SendAsync", TraceLevel.Verbose, request.RequestUri.ToString());
 
 
             // check if needs to be ignored
@@ -289,7 +289,7 @@ namespace CacheCow.Client
                 TraceWriter.WriteLine("{0} - Before TryGetValue", TraceLevel.Verbose, request.RequestUri.ToString());
 
                 cacheCowHeader.DidNotExist = !_cacheStore.TryGetValue(cacheKey, out cachedResponse);
-                TraceWriter.WriteLine("{0} - After TryGetValue", TraceLevel.Verbose, request.RequestUri.ToString());
+                TraceWriter.WriteLine("{0} - After TryGetValue: DidNotExist => {1}", TraceLevel.Verbose, request.RequestUri.ToString(), cacheCowHeader.DidNotExist);
 
                 if (!cacheCowHeader.DidNotExist.Value) // so if it EXISTS in cache
                 {
@@ -348,7 +348,7 @@ namespace CacheCow.Client
                 else
                 {
                     ExceptionHandler(ex);
-                    Trace.TraceWarning("Exception was swalloed in CacheCow: " + ex.ToString());
+                    Trace.TraceWarning("Exception was swallowed in CacheCow: " + ex.ToString());
                     return base.SendAsync(request, cancellationToken);
                 }
             }
@@ -424,7 +424,7 @@ namespace CacheCow.Client
                             // store the cache
                             _cacheStore.AddOrUpdate(cacheKey, serverResponse);
 
-                            TraceWriter.WriteLine("{0} - Before AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
+                            TraceWriter.WriteLine("{0} - After AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
 
 
                             break;
