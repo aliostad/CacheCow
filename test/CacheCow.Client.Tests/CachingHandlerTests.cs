@@ -174,8 +174,8 @@ namespace CacheCow.Client.Tests
 			responseFromCache.Content.Headers.Expires = DateTime.Now.Subtract(TimeSpan.FromSeconds(10));
 			var responseFromServer = new HttpResponseMessage(HttpStatusCode.NotModified);
 			_messageHandler.Response = responseFromServer;
-			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
-				  out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
+			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything, out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
+			_cacheStore.Expect(x => x.AddOrUpdate(Arg<CacheKey>.Is.Anything, Arg<HttpResponseMessage>.Is.Anything));
 			
 			_mockRepository.ReplayAll();
 
@@ -208,8 +208,8 @@ namespace CacheCow.Client.Tests
 
 			var responseFromServer = new HttpResponseMessage(HttpStatusCode.NotModified);
 			_messageHandler.Response = responseFromServer;
-			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
-				  out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
+			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything, out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
+			_cacheStore.Expect(x => x.AddOrUpdate(Arg<CacheKey>.Is.Anything, Arg<HttpResponseMessage>.Is.Anything));
 
 			_mockRepository.ReplayAll();
 
@@ -334,7 +334,6 @@ namespace CacheCow.Client.Tests
             Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
 
         }
-
 
         [Test]
         public void Get_NoMustRevalidate_NoMustRevalidateByDefault_Expires_GetFromCache()
