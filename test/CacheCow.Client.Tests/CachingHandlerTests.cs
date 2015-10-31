@@ -174,8 +174,8 @@ namespace CacheCow.Client.Tests
 			responseFromCache.Content.Headers.Expires = DateTime.Now.Subtract(TimeSpan.FromSeconds(10));
 			var responseFromServer = new HttpResponseMessage(HttpStatusCode.NotModified);
 			_messageHandler.Response = responseFromServer;
-			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
-				  out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
+			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything, out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
+			_cacheStore.Expect(x => x.AddOrUpdate(Arg<CacheKey>.Is.Anything, Arg<HttpResponseMessage>.Is.Anything));
 			
 			_mockRepository.ReplayAll();
 
@@ -208,8 +208,8 @@ namespace CacheCow.Client.Tests
 
 			var responseFromServer = new HttpResponseMessage(HttpStatusCode.NotModified);
 			_messageHandler.Response = responseFromServer;
-			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything,
-				  out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
+			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything, out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
+			_cacheStore.Expect(x => x.AddOrUpdate(Arg<CacheKey>.Is.Anything, Arg<HttpResponseMessage>.Is.Anything));
 
 			_mockRepository.ReplayAll();
 
@@ -335,7 +335,6 @@ namespace CacheCow.Client.Tests
 
         }
 
-
         [Test]
         public void Get_NoMustRevalidate_NoMustRevalidateByDefault_Expires_GetFromCache()
         {
@@ -370,6 +369,39 @@ namespace CacheCow.Client.Tests
 
         }
 
+		[Test]
+		public void Get_NotModified_With_Stale_Client_Cache_Shall_Update_Date_Header()
+		{
+			// setup 
+			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
+			
+			var responseFromCache = GetOkMessage(false);
+			responseFromCache.Headers.Date = DateTimeOffset.UtcNow.AddHours(-1);
+			responseFromCache.Headers.CacheControl.MaxAge = TimeSpan.FromSeconds(10);
+
+			var responseFromServer = new HttpResponseMessage(HttpStatusCode.NotModified) {Content = new ByteArrayContent(new byte[256])};
+
+			_messageHandler.Response = responseFromServer;
+			_cacheStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Is.Anything, out Arg<HttpResponseMessage>.Out(responseFromCache).Dummy)).Return(true);
+			_cacheStore.Expect(x => x.AddOrUpdate(Arg<CacheKey>.Is.Anything, Arg<HttpResponseMessage>.Matches(r => DateTimeOffset.UtcNow - r.Headers.Date.Value <= TimeSpan.FromSeconds(1))));
+
+			_mockRepository.ReplayAll();
+
+
+			// run
+			var task = _client.SendAsync(request);
+			var responseReturned = task.Result;
+			var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
+			CacheCowHeader cacheCowHeader;
+			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
+
+
+			// verify
+			_mockRepository.VerifyAll();
+			Assert.IsNotNull(cacheCowHeader);
+			Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
+			Assert.AreEqual(true, cacheCowHeader.WasStale);
+		}
 
 		[Test]
 		public void Put_Validate_Etag()
