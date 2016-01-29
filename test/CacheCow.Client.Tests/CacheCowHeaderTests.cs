@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using CacheCow.Client.Headers;
@@ -14,6 +15,13 @@ namespace CacheCow.Client.Tests
 		private string _version = Assembly.GetAssembly(typeof(CacheCowHeader))
 				.GetName().Version.ToString();
 
+
+        [Test]
+	    public void DoesNotThrow_IfHeadersNull()
+        {
+            HttpResponseHeaders headers = null;
+            Assert.IsNull(headers.GetCacheCowHeader());
+        }
 
 		[Test]
 		public void ParseTest_Successful()
