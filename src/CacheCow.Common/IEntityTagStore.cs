@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 using CacheCow.Common;
 
 namespace CacheCow.Common
@@ -16,11 +17,11 @@ namespace CacheCow.Common
 	/// </summary>
 	public interface IEntityTagStore : IDisposable
 	{
-		bool TryGetValue(CacheKey key, out TimedEntityTagHeaderValue eTag);
-		void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag);
-        int RemoveResource(string resourceUri);
-        bool TryRemove(CacheKey key);
-		int RemoveAllByRoutePattern(string routePattern);
-		void Clear();
+		Task<TimedEntityTagHeaderValue> GetValueAsync(CacheKey key);
+		Task AddOrUpdateAsync(CacheKey key, TimedEntityTagHeaderValue eTag);
+        Task<int> RemoveResourceAsync(string resourceUri);
+        Task<bool> TryRemoveAsync(CacheKey key);
+		Task<int> RemoveAllByRoutePatternAsync(string routePattern);
+		Task ClearAsync();
 	}
 }

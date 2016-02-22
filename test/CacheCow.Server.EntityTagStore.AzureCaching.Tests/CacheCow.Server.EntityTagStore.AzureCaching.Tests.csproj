@@ -99,10 +99,6 @@
       <Project>{88E170E4-B857-42FE-963C-0505502B548C}</Project>
       <Name>CacheCow.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\CacheCow.Server.EntityTagStore.AzureCaching\CacheCow.Server.EntityTagStore.AzureCaching.csproj">
-      <Project>{112BC648-DA8F-451D-8A4C-1831CC285008}</Project>
-      <Name>CacheCow.Server.EntityTagStore.AzureCaching</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

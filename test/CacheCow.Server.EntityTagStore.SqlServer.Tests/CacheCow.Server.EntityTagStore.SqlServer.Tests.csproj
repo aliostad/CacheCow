@@ -84,10 +84,6 @@
       <Project>{88e170e4-b857-42fe-963c-0505502b548c}</Project>
       <Name>CacheCow.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\CacheCow.Server.EntityTagStore.SqlServer\CacheCow.Server.EntityTagStore.SqlServer.csproj">
-      <Project>{535a9638-9c46-4b32-822c-4ab6d442fd0d}</Project>
-      <Name>CacheCow.Server.EntityTagStore.SqlServer</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

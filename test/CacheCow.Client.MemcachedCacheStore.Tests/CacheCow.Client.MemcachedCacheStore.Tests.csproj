@@ -76,10 +76,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CacheCow.Client.MemcachedCacheStore\CacheCow.Client.MemcachedCacheStore.csproj">
-      <Project>{f95bb1bb-721f-49e8-a821-f3b19adfb867}</Project>
-      <Name>CacheCow.Client.MemcachedCacheStore</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\CacheCow.Client\CacheCow.Client.csproj">
       <Project>{943325cb-7189-42fe-9da4-e513db3e0e87}</Project>
       <Name>CacheCow.Client</Name>

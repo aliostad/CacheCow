@@ -1,4 +1,5 @@
-﻿using CacheCow.Common;
+﻿using System.Threading.Tasks;
+using CacheCow.Common;
 
 namespace CacheCow.Server
 {
@@ -14,7 +15,7 @@ namespace CacheCow.Server
         /// Invalidates the request. 
         /// </summary>
         /// <param name="request"></param>
-        void InvalidateResource(HttpRequestMessage request);
+        Task InvalidateResourceAsync(HttpRequestMessage request);
 
         /// <summary>
         /// Generates cacheKey. Sometimes can be useful

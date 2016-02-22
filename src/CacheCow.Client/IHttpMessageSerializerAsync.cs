@@ -10,7 +10,7 @@ namespace CacheCow.Client
 {
 	public interface IHttpMessageSerializerAsync
 	{
-		Task SerializeAsync(Task<HttpResponseMessage> response, Stream stream);
+		Task SerializeAsync(HttpResponseMessage response, Stream stream);
 		Task SerializeAsync(HttpRequestMessage request, Stream stream);
 		Task<HttpResponseMessage> DeserializeToResponseAsync(Stream stream);
 		Task<HttpRequestMessage> DeserializeToRequestAsync(Stream stream);

@@ -47,60 +47,44 @@ namespace CacheCow.Client.RedisCacheStore
             _connection = connection;
             _database = _connection.GetDatabase(databaseId);
         }
-		
-
-		/// <summary>
-		/// Gets the value if exists
-		/// ------------------------------------------
-		/// 
-		/// Steps:
-		/// 
-		/// 1) Get the value
-		/// 2) Update domain-based earliest access
-		/// 3) Update global earliest access
-		/// </summary>
-		/// <param name="key"></param>
-		/// <param name="response"></param>
-		/// <returns></returns>
-		public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
-		{
-			HttpResponseMessage result = null;
-			response = null;
-			string entryKey = key.Hash.ToBase64();
-            
-			if (!_database.KeyExists(entryKey))
-				return false;
-
-			byte[] value = _database.StringGet(entryKey);
-			
-			var memoryStream = new MemoryStream(value);
-            response = Task.Factory.StartNew(() => _serializer.DeserializeToResponseAsync(memoryStream).Result).Result; // offloading
-		    return true;
-		}
-
-		public void AddOrUpdate(CacheKey key, HttpResponseMessage response)
-		{
-			var memoryStream = new MemoryStream();
-		    Task.Factory.StartNew(() => _serializer.SerializeAsync(response.ToTask(), memoryStream).Wait()).Wait(); // offloading
-		    memoryStream.Position = 0;
-		    var data = memoryStream.ToArray();
-		    _database.StringSet(key.HashBase64, data);
-		}
-
-        public bool TryRemove(CacheKey key)
-        {
-            return _database.KeyDelete(key.HashBase64);
-        }
-
-        public void Clear()
-		{
-			throw new NotSupportedException("Currently not supported by StackExchange.Redis. Use redis-cli.exe"); 
-		}
 
 		public void Dispose()
 		{
 			if (_connection != null && _dispose)
 				_connection.Dispose();
 		}
+
+        public async Task<HttpResponseMessage> GetValueAsync(CacheKey key)
+        {
+            HttpResponseMessage result = null;
+            string entryKey = key.Hash.ToBase64();
+
+            if (! await _database.KeyExistsAsync(entryKey))
+                return null;
+
+            byte[] value = await _database.StringGetAsync(entryKey);
+
+            var memoryStream = new MemoryStream(value);
+            return await _serializer.DeserializeToResponseAsync(memoryStream);
+        }
+
+        public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
+        {
+            var memoryStream = new MemoryStream();
+            await _serializer.SerializeAsync(response, memoryStream);
+            memoryStream.Position = 0;
+            var data = memoryStream.ToArray();
+            await _database.StringSetAsync(key.HashBase64, data);
+        }
+
+        public Task<bool> TryRemoveAsync(CacheKey key)
+        {
+            return _database.KeyDeleteAsync(key.HashBase64);
+        }
+
+        public Task ClearAsync()
+        {
+            throw new NotSupportedException("Currently not supported by StackExchange.Redis. Use redis-cli.exe"); 
+        }
 	}
 }

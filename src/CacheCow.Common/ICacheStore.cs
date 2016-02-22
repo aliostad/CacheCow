@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CacheCow.Common
 {
 	public interface ICacheStore : IDisposable
 	{
 
-		bool TryGetValue(CacheKey key, out HttpResponseMessage response);
-		void AddOrUpdate(CacheKey key, HttpResponseMessage response);
-		bool TryRemove(CacheKey key);
-		void Clear();
+		Task<HttpResponseMessage> GetValueAsync(CacheKey key);
+		Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response);
+		Task<bool> TryRemoveAsync(CacheKey key);
+		Task ClearAsync();
 
 	}
 }

@@ -92,10 +92,6 @@
     <Compile Include="RandomResponseBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CacheCow.Client.FileCacheStore\CacheCow.Client.FileCacheStore.csproj">
-      <Project>{2F0D9026-336B-4677-B34E-CB8595CB98E4}</Project>
-      <Name>CacheCow.Client.FileCacheStore</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\CacheCow.Client\CacheCow.Client.csproj">
       <Project>{943325CB-7189-42FE-9DA4-E513DB3E0E87}</Project>
       <Name>CacheCow.Client</Name>

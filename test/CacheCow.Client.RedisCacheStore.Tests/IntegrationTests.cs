@@ -29,7 +29,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 		{
             var redisStore = new RedisStore(ConnectionString);
 			HttpResponseMessage responseMessage = null;
-			Console.WriteLine(redisStore.TryGetValue(new CacheKey("http://google.com", new string[0]), out responseMessage));
+			Console.WriteLine(redisStore.GetValueAsync(new CacheKey("http://google.com", new string[0])).Result);
 		}
 
 		[Ignore]
@@ -57,9 +57,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 			});
 
 			var httpResponseMessage = client.GetAsync(CacheableResource1).Result;
-			HttpResponseMessage response = null;
-			var tryGetValue = redisStore.TryGetValue(new CacheKey(CacheableResource1, new string[0]), out response);
-			Assert.That(tryGetValue);
+			var response = redisStore.GetValueAsync(new CacheKey(CacheableResource1, new string[0])).Result;
 			Assert.IsNotNull(response);
 
 		}

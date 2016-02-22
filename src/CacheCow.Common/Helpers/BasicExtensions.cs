@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.Threading.Tasks;
 
 namespace CacheCow.Common.Helpers
 {
@@ -23,6 +24,15 @@ namespace CacheCow.Common.Helpers
 					action();
 			};
 		}
+
+        public static Func<Task> Chain(this IEnumerable<Func<Task>> actions)
+        {
+            return async () =>
+            {
+                foreach (var action in actions)
+                    await action();
+            };
+        }
 
 		public static string ToHex(this byte[] data)
 		{

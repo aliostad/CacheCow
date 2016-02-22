@@ -9,11 +9,9 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using CacheCow.Common;
 using CacheCow.Server;
+using Moq;
 using NUnit.Framework;
-using Rhino.Mocks;
-using Rhino.Mocks.Constraints;
-using Rhino.Mocks.Expectations;
-using Rhino.Mocks.Impl;
+
 
 namespace CacheCow.Tests.Server
 {
@@ -33,30 +31,26 @@ namespace CacheCow.Tests.Server
 			HttpStatusCode expectedStatus = HttpStatusCode.Unused)
 		{
 			// setup 
-			var mocks = new MockRepository();
-			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore);
+			var entityTagStore = new Mock<IEntityTagStore>();
+			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore.Object);
 			var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
 			request.Headers.Add(headerName, values);
 			TimedEntityTagHeaderValue entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"");
 
-			if(values.Length>0) // if 
-				entityTagStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Matches(etg => etg.ResourceUri == entityTagHandler.UriTrimmer(new Uri(TestUrl))),
-					out Arg<TimedEntityTagHeaderValue>.Out(entityTagHeaderValue).Dummy)).Return(existsInStore);
-
-			mocks.ReplayAll();
-
+            if(values.Length>0) // if 
+                entityTagStore.Setup(x => x.GetValueAsync(It.Is<CacheKey>(etg => etg.ResourceUri == entityTagHandler.UriTrimmer(new Uri(TestUrl)))))
+                    .Returns(Task.FromResult(existsInStore ? entityTagHeaderValue : null));
 
 			// run 
 			var matchNoneMatch = entityTagHandler.GetIfMatchNoneMatch();
 			// verify 
 			Task<HttpResponseMessage> resultTask = matchNoneMatch(request);
-			Assert.That(expectReturnNull ^ resultTask != null, "result was not as expected");
-			if(resultTask!=null && expectedStatus != HttpStatusCode.Unused)
+			Assert.That(expectReturnNull ^ resultTask.Result != null, "result was not as expected");
+			if(resultTask.Result!=null && expectedStatus != HttpStatusCode.Unused)
 			{
 				Assert.AreEqual(expectedStatus, resultTask.Result.StatusCode, "Status code");				
 			}
-			mocks.VerifyAll();
+
 		}
 
 		[TestCase]
@@ -71,7 +65,7 @@ namespace CacheCow.Tests.Server
 			var task = getRule(request);
 
 			// verify
-			Assert.IsNull(task);
+			Assert.IsNull(task.Result);
 		}
 
 		[TestCase]
@@ -101,9 +95,8 @@ namespace CacheCow.Tests.Server
 				HttpStatusCode expectedStatus = HttpStatusCode.Unused)
 		{
 			// setup 
-			var mocks = new MockRepository();
-			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore);
+			var entityTagStore = new Mock<IEntityTagStore>();
+			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore.Object);
 			var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
 			DateTimeOffset lastChanged = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7));
 			DateTimeOffset lastModifiedInQuestion = resourceHasChanged
@@ -114,24 +107,21 @@ namespace CacheCow.Tests.Server
 			var entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"")
 				{LastModified = lastChanged};
 
-			entityTagStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Matches(etg => etg.ResourceUri == entityTagHandler.UriTrimmer(new Uri(TestUrl))),
-				out Arg<TimedEntityTagHeaderValue>.Out(entityTagHeaderValue).Dummy)).Return(true);
-
-			mocks.ReplayAll();
-
-
+		    entityTagStore.Setup(
+		        x => x.GetValueAsync(It.Is<CacheKey>(etg => etg.ResourceUri == entityTagHandler.UriTrimmer(new Uri(TestUrl)))))
+		        .Returns(Task.FromResult(entityTagHeaderValue));
+               
 			// run 
 			var modifiedUnmodifiedSince = entityTagHandler.GetIfModifiedUnmodifiedSince();
 			var task = modifiedUnmodifiedSince(request);
-			HttpResponseMessage response = task == null ? null : task.Result;
+			HttpResponseMessage response = task.Result;
 
 			// verify 
-			Assert.That(expectReturnNull ^ task != null, "result was not as expected");
-			if (task != null && expectedStatus != HttpStatusCode.Unused)
+			Assert.That(expectReturnNull ^ response != null, "result was not as expected");
+			if (task.Result != null && expectedStatus != HttpStatusCode.Unused)
 			{
 				Assert.AreEqual(expectedStatus, response.StatusCode, "Status code");
 			}
-			mocks.VerifyAll();
 
 		}
 
@@ -146,7 +136,7 @@ namespace CacheCow.Tests.Server
 			var task = getRule(request);
 
 			// verify
-			Assert.IsNull(task);
+			Assert.IsNull(task.Result);
 		}
 
 		[TestCase]
@@ -160,7 +150,7 @@ namespace CacheCow.Tests.Server
 			var task = getRule(request);
 
 			// verify
-			Assert.IsNull(task);
+			Assert.IsNull(task.Result);
 		}
 
 		[TestCase]
@@ -189,9 +179,8 @@ namespace CacheCow.Tests.Server
 				HttpStatusCode expectedStatus = HttpStatusCode.Unused)
 		{
 			// setup 
-			var mocks = new MockRepository();
-			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore);
+			var entityTagStore = new Mock<IEntityTagStore>();
+			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore.Object);
 			var request = new HttpRequestMessage(HttpMethod.Put, TestUrl);
 			DateTimeOffset lastChanged = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7));
 			DateTimeOffset lastModifiedInQuestion = resourceHasChanged
@@ -201,24 +190,21 @@ namespace CacheCow.Tests.Server
 			request.Headers.Add(HttpHeaderNames.IfUnmodifiedSince, lastModifiedInQuestion.ToString("r"));
 			TimedEntityTagHeaderValue entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"") { LastModified = lastChanged };
 
-			entityTagStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Matches(etg => etg.ResourceUri == entityTagHandler.UriTrimmer(new Uri(TestUrl))),
-				out Arg<TimedEntityTagHeaderValue>.Out(entityTagHeaderValue).Dummy)).Return(true);
-
-			mocks.ReplayAll();
+			entityTagStore.Setup(x => x.GetValueAsync(It.Is<CacheKey>(etg => etg.ResourceUri == entityTagHandler.UriTrimmer(new Uri(TestUrl)))))
+                .Returns(Task.FromResult(entityTagHeaderValue));
 
 
 			// run 
 			var modifiedUnmodifiedSince = entityTagHandler.PutIfUnmodifiedSince();
 			var task = modifiedUnmodifiedSince(request);
-			HttpResponseMessage response = task == null ? null : task.Result;
+			HttpResponseMessage response = task.Result;
 
 			// verify 
-			Assert.That(expectReturnNull ^ task != null, "result was not as expected");
-			if (task != null && expectedStatus != HttpStatusCode.Unused)
+            Assert.That(expectReturnNull ^ response != null, "result was not as expected");
+			if (response !=null && expectedStatus != HttpStatusCode.Unused)
 			{
 				Assert.AreEqual(expectedStatus, response.StatusCode, "Status code");
 			}
-			mocks.VerifyAll();
 
 		}
 
@@ -231,31 +217,28 @@ namespace CacheCow.Tests.Server
 			HttpStatusCode expectedStatus = HttpStatusCode.Unused)
 		{
 			// setup 
-			var mocks = new MockRepository();
-			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore);
+			var entityTagStore = new Mock<IEntityTagStore>();
+			var entityTagHandler = new CachingHandler(new HttpConfiguration(), entityTagStore.Object);
 			var request = new HttpRequestMessage(HttpMethod.Put, TestUrl);
 			request.Headers.Add(HttpHeaderNames.IfMatch, values);
 			TimedEntityTagHeaderValue entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"");
 
 			if (values.Length > 0) // if 
-				entityTagStore.Expect(x => x.TryGetValue(Arg<CacheKey>.Matches(etg => etg.ResourceUri == entityTagHandler.UriTrimmer(new Uri(TestUrl))),
-					out Arg<TimedEntityTagHeaderValue>.Out(entityTagHeaderValue).Dummy)).Return(existsInStore);
-
-			mocks.ReplayAll();
-
+                entityTagStore.Setup(x => x.GetValueAsync(It.Is<CacheKey>(etg => etg.ResourceUri == entityTagHandler.UriTrimmer(new Uri(TestUrl)))))
+                    .Returns(Task.FromResult(existsInStore ? entityTagHeaderValue : null));
 
 			// run 
 			var matchNoneMatch = entityTagHandler.PutIfMatch();
 			// verify 
 			Task<HttpResponseMessage> resultTask = matchNoneMatch(request);
-			Assert.That(expectReturnNull ^ resultTask != null, "result was not as expected");
-			if (resultTask != null && expectedStatus != HttpStatusCode.Unused)
+			Assert.That(expectReturnNull ^ resultTask.Result != null, "result was not as expected");
+			if (resultTask.Result != null && expectedStatus != HttpStatusCode.Unused)
 			{
 				Assert.AreEqual(expectedStatus, resultTask.Result.StatusCode, "Status code");
 			}
-			mocks.VerifyAll();
+
 		}
+
 		[TestCase]
 		public static void TestPutIfUnmodifiedReturnsNullIfVerbNotPut()
 		{
@@ -267,7 +250,7 @@ namespace CacheCow.Tests.Server
 			var task = getRule(request);
 
 			// verify
-			Assert.IsNull(task);
+			Assert.IsNull(task.Result);
 		}
 
 		[TestCase]
@@ -282,7 +265,7 @@ namespace CacheCow.Tests.Server
 			var task = getRule(request);
 
 			// verify
-			Assert.IsNull(task);
+			Assert.IsNull(task.Result);
 		}
 	
 	}

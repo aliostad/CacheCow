@@ -31,30 +31,6 @@ namespace CacheCow.Client
             _defaultExpiry = defaultExpiry;
         }
 
-	    public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
-		{
-			response = null;
-			var result = _responseCache.Get(key.HashBase64);
-			if (result!=null)
-			{
-			    Func<HttpResponseMessage> funky =
-			        () => _messageSerializer.DeserializeToResponseAsync(new MemoryStream((byte[]) result)).Result;
-                response = Task.Factory.StartNew(funky).Result;
-			}
-			return result!=null;
-		}
-
-		public void AddOrUpdate(CacheKey key, HttpResponseMessage response)
-		{
-			// removing reference to request so that the request can get GCed
-			var req = response.RequestMessage;
-			response.RequestMessage = null;
-			var memoryStream = new MemoryStream();
-			Task.Factory.StartNew(() => _messageSerializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream).Wait()).Wait();
-			response.RequestMessage = req;
-            _responseCache.Set(key.HashBase64, memoryStream.ToArray(), GetExpiry(response));
-		}
-
         private DateTimeOffset GetExpiry(HttpResponseMessage response)
         {
             if (response.Content == null)
@@ -72,21 +48,41 @@ namespace CacheCow.Client
             }
         }
 
-		public bool TryRemove(CacheKey key)
-		{
-			byte[] response;
-			return _responseCache.Remove(key.HashBase64) != null;
-		}
-
-		public void Clear()
-		{
-			_responseCache.Dispose();
-            _responseCache = new MemoryCache(CacheStoreEntryName);
-		}
-
 	    public void Dispose()
 	    {
 	        _responseCache.Dispose();
+	    }
+
+	    public async Task<HttpResponseMessage> GetValueAsync(CacheKey key)
+	    {
+            var result = _responseCache.Get(key.HashBase64);
+	        if (result == null)
+	            return null;
+
+	        return (await _messageSerializer.DeserializeToResponseAsync(new MemoryStream((byte[]) result)));
+	    }
+
+	    public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
+	    {
+            // removing reference to request so that the request can get GCed
+            var req = response.RequestMessage;
+            response.RequestMessage = null;
+            var memoryStream = new MemoryStream();
+	        await _messageSerializer.SerializeAsync(response, memoryStream);
+            response.RequestMessage = req;
+            _responseCache.Set(key.HashBase64, memoryStream.ToArray(), GetExpiry(response));
+	    }
+
+	    public Task<bool> TryRemoveAsync(CacheKey key)
+	    {
+            return Task.FromResult(_responseCache.Remove(key.HashBase64) != null);
+	    }
+
+	    public Task ClearAsync()
+	    {
+            _responseCache.Dispose();
+            _responseCache = new MemoryCache(CacheStoreEntryName);
+	        return Task.FromResult(0);
 	    }
 	}
 }

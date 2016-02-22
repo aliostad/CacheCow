@@ -20,8 +20,8 @@ namespace CacheCow.Server.EntityTagStore.Redis.Tests
         [TearDown]
         public void TearDown()
         {
-            _entityTagStore.RemoveResource(GetCacheKey().ResourceUri);
-            _entityTagStore.RemoveAllByRoutePattern(GetCacheKey().RoutePattern);
+            _entityTagStore.RemoveResourceAsync(GetCacheKey().ResourceUri).Wait();
+            _entityTagStore.RemoveAllByRoutePatternAsync(GetCacheKey().RoutePattern).Wait();
         }
 
         [SetUp]
@@ -36,13 +36,12 @@ namespace CacheCow.Server.EntityTagStore.Redis.Tests
         {
             var cacheKey = GetCacheKey();
             var original = GetETag();
-            _entityTagStore.AddOrUpdate(cacheKey, original);
+            _entityTagStore.AddOrUpdateAsync(cacheKey, original).Wait();
 
             TimedEntityTagHeaderValue etag = null;
-            Assert.IsTrue(_entityTagStore.TryGetValue(cacheKey, out etag), "retrieving failed!!");
+            Assert.IsTrue( (etag = _entityTagStore.GetValueAsync(cacheKey).Result) != null, "retrieving failed!!");
 
             Assert.AreEqual(original.Tag, etag.Tag);
-
         }
 
         [Ignore]
@@ -51,12 +50,11 @@ namespace CacheCow.Server.EntityTagStore.Redis.Tests
         {
             var cacheKey = GetCacheKey();
             var original = GetETag();
-            _entityTagStore.AddOrUpdate(cacheKey, original);
+            _entityTagStore.AddOrUpdateAsync(cacheKey, original).Wait();
 
-
-            var removeAllByRoutePattern = _entityTagStore.RemoveAllByRoutePattern(cacheKey.RoutePattern);
+            var removeAllByRoutePattern = _entityTagStore.RemoveAllByRoutePatternAsync(cacheKey.RoutePattern).Result;
             TimedEntityTagHeaderValue etag = null;
-            Assert.IsFalse(_entityTagStore.TryGetValue(cacheKey, out etag), "retrieving failed!!");
+            Assert.IsFalse( (etag = _entityTagStore.GetValueAsync(cacheKey).Result) != null, "retrieving failed!!");
 
             Assert.IsNull(etag);
 
@@ -69,10 +67,10 @@ namespace CacheCow.Server.EntityTagStore.Redis.Tests
             var cacheKey = GetCacheKey(true);
             var cacheKey2 = GetCacheKey(true);
             var original = GetETag();
-            _entityTagStore.AddOrUpdate(cacheKey, original);
-            _entityTagStore.AddOrUpdate(cacheKey2, original);
+            _entityTagStore.AddOrUpdateAsync(cacheKey, original).Wait();
+            _entityTagStore.AddOrUpdateAsync(cacheKey2, original).Wait();
 
-            var result = _entityTagStore.RemoveResource(cacheKey.ResourceUri);
+            var result = _entityTagStore.RemoveResourceAsync(cacheKey.ResourceUri).Result;
             Assert.AreEqual(2, result);
 
         }
