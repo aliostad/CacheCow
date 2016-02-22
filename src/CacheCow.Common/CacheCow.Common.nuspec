@@ -1,19 +1,18 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
-    <title>$title$</title>
+    <id>$id$45</id>
+    <version>$version$-alpha</version>
+    <title>$title$ (for .NET 4.5)</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
     <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <copyright>Copyright 2012</copyright>
+    <copyright>Copyright 2016</copyright>
     <tags>aspnetwebapi http caching webapi cachecow</tags>
 	<dependencies>
       <dependency id="Microsoft.AspNet.WebApi.Client" version="4.0.30506" />	  
     </dependencies>
-	
   </metadata>
 </package>

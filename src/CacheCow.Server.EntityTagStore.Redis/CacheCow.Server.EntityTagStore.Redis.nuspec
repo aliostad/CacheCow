@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
-    <title>$title$</title>
+    <id>$id$45</id>
+    <version>$version$-alpha</version>
+    <title>$title$ (for .NET 4.5)</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
     <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <copyright>Copyright 2014</copyright>
+    <copyright>Copyright 2016</copyright>
     <tags>aspnetwebapi http caching webapi cachecow etag redis</tags>
     <dependencies>
-      <dependency id="CacheCow.Server" version="$version$" />
+      <dependency id="CacheCow.Server45" version="$version$-alpha" />
       <dependency id="StackExchange.Redis" version="1.0.333" />
     </dependencies>
   </metadata>
