@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +18,7 @@ namespace CacheCow.Server.EntityTagStore.Redis.Tests
     public class IntegrationTests
     {
         private RedisEntityTagStore _entityTagStore;
+        private const string CacheChowClientRedisConnectionStringEnvVar = "CacheChowClientRedisConnectionStringEnvVar";
 
         [TearDown]
         public void TearDown()
@@ -27,7 +30,15 @@ namespace CacheCow.Server.EntityTagStore.Redis.Tests
         [SetUp]
         public void Setup()
         {
-            _entityTagStore = new RedisEntityTagStore("localhost");
+            string cn = "localhost";
+            var variables = Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Machine);
+            if (variables.Contains(CacheChowClientRedisConnectionStringEnvVar))
+            {
+                cn = (string) variables[CacheChowClientRedisConnectionStringEnvVar];
+                Trace.WriteLine("Using en var redis: => " + cn);
+            }
+
+            _entityTagStore = new RedisEntityTagStore(cn);
         }
 
         [Ignore]
