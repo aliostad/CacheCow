@@ -17,7 +17,6 @@ namespace CacheCow.Client.Tests
 	public class SerialisationTests
 	{
 
-
 		[Test]
 		public void Response_Deserialize_Serialize()
 		{
@@ -26,7 +25,7 @@ namespace CacheCow.Client.Tests
 			var response = serializer.DeserializeToResponseAsync(stream).Result;
 
 			var memoryStream = new MemoryStream();
-			serializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream).Wait();
+			serializer.SerializeAsync(response, memoryStream).Wait();
 
 			memoryStream.Position = 0;
 			var response2 = serializer.DeserializeToResponseAsync(memoryStream).Result;
@@ -63,7 +62,7 @@ namespace CacheCow.Client.Tests
 
 			using(var fileStream = new FileStream("response.tmp", FileMode.Create))
 			{
-				serializer.SerializeAsync(TaskHelpers.FromResult(response), fileStream).Wait();
+				serializer.SerializeAsync(response, fileStream).Wait();
 
 				fileStream.Position = 0;
 				var response2 = serializer.DeserializeToResponseAsync(fileStream).Result;

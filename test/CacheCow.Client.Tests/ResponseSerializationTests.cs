@@ -23,7 +23,7 @@ namespace CacheCow.Client.Tests
 			Console.WriteLine(httpResponseMessage.Headers.ToString());
 			var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
 			var fileStream = new FileStream("msg.bin", FileMode.Create);
-			defaultHttpResponseMessageSerializer.SerializeAsync(TaskHelpers.FromResult(httpResponseMessage), fileStream).Wait();
+			defaultHttpResponseMessageSerializer.SerializeAsync(httpResponseMessage, fileStream).Wait();
 			fileStream.Close();
 		}
 
@@ -46,7 +46,7 @@ namespace CacheCow.Client.Tests
 			var contentLength = httpResponseMessage.Content.Headers.ContentLength; // access to make sure is populated http://aspnetwebstack.codeplex.com/discussions/388196
 			var memoryStream = new MemoryStream();
 			var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
-			defaultHttpResponseMessageSerializer.SerializeAsync(TaskHelpers.FromResult(httpResponseMessage), memoryStream).Wait();
+			defaultHttpResponseMessageSerializer.SerializeAsync(httpResponseMessage, memoryStream).Wait();
 			memoryStream.Position = 0;
 			var httpResponseMessage2 = defaultHttpResponseMessageSerializer.DeserializeToResponseAsync(memoryStream).Result;
 			Assert.AreEqual(httpResponseMessage.StatusCode, httpResponseMessage2.StatusCode, "StatusCode");

@@ -16,9 +16,9 @@ namespace CacheCow.Client.Headers
 		    if (headers == null)
 		        return null;
 
-			var cacheCowHeader = headers.Where(x => x.Key == CacheCowHeader.Name).FirstOrDefault();
+            var cacheCowHeader = headers.FirstOrDefault(x => x.Key == CacheCowHeader.Name);
 
-			if(cacheCowHeader.Value.Count() > 0)
+			if(cacheCowHeader.Value != null && cacheCowHeader.Value.Count() > 0)
 			{
 				var last = cacheCowHeader.Value.Last();
 				CacheCowHeader.TryParse(last, out header);
