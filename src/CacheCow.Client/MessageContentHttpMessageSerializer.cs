@@ -23,7 +23,7 @@ namespace CacheCow.Client
         private bool _bufferContent;
 
         public MessageContentHttpMessageSerializer()
-            : this(false)
+            : this(true)
         {
 
         }
@@ -39,8 +39,8 @@ namespace CacheCow.Client
             {
                 TraceWriter.WriteLine("SerializeAsync - before load",
                     TraceLevel.Verbose);
-
-                await response.Content.LoadIntoBufferAsync();
+                if(_bufferContent)
+                    await response.Content.LoadIntoBufferAsync();
                 TraceWriter.WriteLine("SerializeAsync - after load", TraceLevel.Verbose);               
             }
             else
@@ -58,7 +58,7 @@ namespace CacheCow.Client
 
         public async Task SerializeAsync(HttpRequestMessage request, Stream stream)
         {
-            if (request.Content != null)
+            if (request.Content != null && _bufferContent)
             {
                 await request.Content.LoadIntoBufferAsync();
             }
@@ -70,22 +70,28 @@ namespace CacheCow.Client
                 buffer, 0, buffer.Length, null, TaskCreationOptions.AttachedToParent);
         }
 
-        public Task<HttpResponseMessage> DeserializeToResponseAsync(Stream stream)
+        public async Task<HttpResponseMessage> DeserializeToResponseAsync(Stream stream)
         {
             var response = new HttpResponseMessage();
             response.Content = new StreamContent(stream);
             response.Content.Headers.Add("Content-Type", "application/http;msgtype=response");
             TraceWriter.WriteLine("before ReadAsHttpResponseMessageAsync",
                     TraceLevel.Verbose);
-            return response.Content.ReadAsHttpResponseMessageAsync();
+            var responseMessage = await response.Content.ReadAsHttpResponseMessageAsync();
+            if (responseMessage.Content != null && _bufferContent)
+                await responseMessage.Content.LoadIntoBufferAsync();
+            return responseMessage;
         }
 
-        public Task<HttpRequestMessage> DeserializeToRequestAsync(Stream stream)
+        public async Task<HttpRequestMessage> DeserializeToRequestAsync(Stream stream)
         {
             var request = new HttpRequestMessage();
             request.Content = new StreamContent(stream);
             request.Content.Headers.Add("Content-Type", "application/http;msgtype=request");
-            return request.Content.ReadAsHttpRequestMessageAsync();
+            var requestMessage = await request.Content.ReadAsHttpRequestMessageAsync();
+            if (requestMessage.Content != null && _bufferContent)
+                await requestMessage.Content.LoadIntoBufferAsync();
+            return requestMessage;
         }
     }
 }

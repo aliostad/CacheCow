@@ -358,7 +358,7 @@ namespace CacheCow.Client
                 TraceWriter.WriteLine("{0} - NotModified",
                     TraceLevel.Verbose, request.RequestUri.ToString());
 
-                UpdateCachedResponse(cacheKey, cachedResponse, serverResponse, _cacheStore);
+                UpdateCachedResponseAsync(cacheKey, cachedResponse, serverResponse, _cacheStore);
                 ConsumeAndDisposeResponse(serverResponse);
                 return cachedResponse.AddCacheCowHeader(cacheCowHeader); // EXIT !! _______________
             }
@@ -445,23 +445,23 @@ namespace CacheCow.Client
             }
         }
 
-        internal async static void UpdateCachedResponse(CacheKey cacheKey,
+        internal async static Task UpdateCachedResponseAsync(CacheKey cacheKey,
             HttpResponseMessage cachedResponse,
             HttpResponseMessage serverResponse,
             ICacheStore store)
         {
-            TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - response: " + serverResponse.Headers.ToString(), TraceLevel.Verbose);
+            TraceWriter.WriteLine("CachingHandler.UpdateCachedResponseAsync - response: " + serverResponse.Headers.ToString(), TraceLevel.Verbose);
 
             // update only if server had a cachecontrol.
             // TODO: merge CacheControl headers instead of replace
             if (serverResponse.Headers.CacheControl != null && (!serverResponse.Headers.CacheControl.NoCache)) // added to cover issue #139
             {
-                TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - CacheControl: " + serverResponse.Headers.CacheControl.ToString(), TraceLevel.Verbose);
+                TraceWriter.WriteLine("CachingHandler.UpdateCachedResponseAsync - CacheControl: " + serverResponse.Headers.CacheControl.ToString(), TraceLevel.Verbose);
                 cachedResponse.Headers.CacheControl = serverResponse.Headers.CacheControl;
             }
             else
             {
-                TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - CacheControl missing from server. Applying sliding expiration. Date => " + DateTimeOffset.UtcNow, TraceLevel.Verbose);
+                TraceWriter.WriteLine("CachingHandler.UpdateCachedResponseAsync - CacheControl missing from server. Applying sliding expiration. Date => " + DateTimeOffset.UtcNow, TraceLevel.Verbose);
             }
 
             cachedResponse.Headers.Date = DateTimeOffset.UtcNow; // very important
