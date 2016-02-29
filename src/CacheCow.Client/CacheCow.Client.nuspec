@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$45</id>
-    <version>$version$-alpha4</version>
+    <version>$version$-alpha5</version>
     <title>$title$ (for .NET 4.5)</title>
     <authors>$author$</authors>
     <owners>$author$</owners>

@@ -79,7 +79,7 @@ namespace CacheCow.Client
                     TraceLevel.Verbose);
             var responseMessage = await response.Content.ReadAsHttpResponseMessageAsync();
             if (responseMessage.Content != null && _bufferContent)
-                await responseMessage.Content.LoadIntoBufferAsync();
+                await responseMessage.Content.LoadIntoBufferAsync(); 
             return responseMessage;
         }
 

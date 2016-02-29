@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -358,7 +359,7 @@ namespace CacheCow.Client
                 TraceWriter.WriteLine("{0} - NotModified",
                     TraceLevel.Verbose, request.RequestUri.ToString());
 
-                UpdateCachedResponseAsync(cacheKey, cachedResponse, serverResponse, _cacheStore);
+                await UpdateCachedResponseAsync(cacheKey, cachedResponse, serverResponse, _cacheStore);
                 ConsumeAndDisposeResponse(serverResponse);
                 return cachedResponse.AddCacheCowHeader(cacheCowHeader); // EXIT !! _______________
             }
@@ -375,8 +376,6 @@ namespace CacheCow.Client
 
                     // prepare
                     ResponseStoragePreparationRules(serverResponse);
-
-                    TraceWriter.WriteLine("{0} - Before AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
 
                     // re-create cacheKey with real server accept
 
@@ -399,6 +398,7 @@ namespace CacheCow.Client
                         );
 
                     // store the cache
+                    CheckForCacheCowHeader(serverResponse);
                     await _cacheStore.AddOrUpdateAsync(cacheKey, serverResponse);
 
                     TraceWriter.WriteLine("{0} - After AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
@@ -411,10 +411,9 @@ namespace CacheCow.Client
 
                     TraceWriter.WriteLine("{0} - Before TryRemove", TraceLevel.Verbose, request.RequestUri.ToString());
                     await _cacheStore.TryRemoveAsync(cacheKey);
-                    TraceWriter.WriteLine("{0} - After AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
+                    TraceWriter.WriteLine("{0} - After TryRemoveAsync", TraceLevel.Verbose, request.RequestUri.ToString());
 
                     cacheCowHeader.NotCacheable = true;
-
 
                     break;
             }
@@ -465,7 +464,17 @@ namespace CacheCow.Client
             }
 
             cachedResponse.Headers.Date = DateTimeOffset.UtcNow; // very important
+            CheckForCacheCowHeader(cachedResponse);
             await store.AddOrUpdateAsync(cacheKey, cachedResponse);
+        }
+
+        private static void CheckForCacheCowHeader(HttpResponseMessage responseMessage)
+        {
+            var header = responseMessage.Headers.GetCacheCowHeader();
+            if (header!=null)
+            {
+                TraceWriter.WriteLine("!!WARNING!! response stored with CacheCowHeader!!", TraceLevel.Warning);
+            }
         }
 
         private static void DoCacheValidationForGet(HttpRequestMessage request, CacheCowHeader cacheCowHeader,
