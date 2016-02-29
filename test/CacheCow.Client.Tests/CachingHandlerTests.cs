@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -67,6 +68,21 @@ namespace CacheCow.Client.Tests
 
 		}
 
+        [Test]
+        public void TestMemoryLeak()
+        {
+            var memorySize64 = Process.GetCurrentProcess().PrivateMemorySize64;
+            for (int i = 0; i < 200; i++)
+            {
+                var store = new CachingHandler();
+                //Thread.Sleep(1);
+                store.Dispose();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                if (Process.GetCurrentProcess().PrivateMemorySize64 - memorySize64 > 2 * 1024 * 1024)
+                    Assert.Fail("Memory leak");
+            }
+        }
 
 		[Test]
 		public void Get_OK_But_Not_In_Cache_To_Insert_In_Cache()
@@ -134,7 +150,8 @@ namespace CacheCow.Client.Tests
 		    
 			_messageHandler.Response = responseFromServer;
             _cacheStore.Setup(x => x.GetValueAsync(It.IsAny<CacheKey>())).ReturnsAsync(responseFromCache);
-            _cacheStore.Setup(x => x.AddOrUpdateAsync(It.IsAny<CacheKey>(), It.Is<HttpResponseMessage>(r => r == responseFromCache)));
+            _cacheStore.Setup(x => x.AddOrUpdateAsync(It.IsAny<CacheKey>(), It.Is<HttpResponseMessage>(r => r == responseFromCache)))
+                .Returns(Task.FromResult(false));
 
 			
 
@@ -197,7 +214,8 @@ namespace CacheCow.Client.Tests
 			var responseFromServer = new HttpResponseMessage(HttpStatusCode.NotModified);
 			_messageHandler.Response = responseFromServer;
             _cacheStore.Setup(x => x.GetValueAsync(It.IsAny<CacheKey>())).ReturnsAsync(responseFromCache);
-			_cacheStore.Setup(x => x.AddOrUpdateAsync(It.IsAny<CacheKey>(), It.IsAny<HttpResponseMessage>()));
+			_cacheStore.Setup(x => x.AddOrUpdateAsync(It.IsAny<CacheKey>(), It.IsAny<HttpResponseMessage>()))
+                .Returns(Task.FromResult(false));
 
 			
 
@@ -356,12 +374,12 @@ namespace CacheCow.Client.Tests
 
 			_messageHandler.Response = responseFromServer;
             _cacheStore.Setup(x => x.GetValueAsync(It.IsAny<CacheKey>())).ReturnsAsync(responseFromCache);
-			_cacheStore.Setup(x => x.AddOrUpdateAsync(It.IsAny<CacheKey>(), It.Is<HttpResponseMessage>(r => DateTimeOffset.UtcNow - r.Headers.Date.Value <= TimeSpan.FromSeconds(1))));
+			_cacheStore.Setup(x => x.AddOrUpdateAsync(It.IsAny<CacheKey>(), It.Is<HttpResponseMessage>(r => DateTimeOffset.UtcNow - r.Headers.Date.Value <= TimeSpan.FromSeconds(1))))
+                .Returns(Task.FromResult(0));
 
 
 			// run
-			var task = _client.SendAsync(request);
-			var responseReturned = task.Result;
+            var responseReturned = _client.SendAsync(request).Result;
 			var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
 			CacheCowHeader cacheCowHeader;
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);

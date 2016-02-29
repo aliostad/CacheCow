@@ -91,10 +91,10 @@ namespace CacheCow.IntegrationTesting
 	            Assert.LessOrEqual(DateTime.UtcNow - response.Headers.Date, TimeSpan.FromSeconds(1), "The cached item had expired and was refreshed, but the new retrieval date was not updated.");
 			}
         }
-
+        
         [Test]
         [Explicit("This takes a long time to run.")]
-        public void ExpiredClientCacheShallLoadFromServerAndUpdateExpiryThenLoadFromCache()
+        public void ExpiredClientCacheShallCallFromServerAndIf304UpdateExpiryThenLoadFromCache()
         {
 			using (var server = new InMemoryServer())
 			using (var client = new HttpClient(new CachingHandler { InnerHandler = new HttpClientHandler() }))
@@ -109,10 +109,11 @@ namespace CacheCow.IntegrationTesting
 				Assert.IsTrue(response.Headers.GetCacheCowHeader().RetrievedFromCache.GetValueOrDefault());
 
 				//TODO: Find a better way to make time pass. (:
-				Thread.Sleep(TimeSpan.FromSeconds(5 + 1));
+				Thread.Sleep(TimeSpan.FromSeconds(5 + 3));
+                Console.WriteLine("After SLEEP ---------------------------------------------");
 
-				response = client.GetAsync(id).Result;
-				response = client.GetAsync(id).Result;
+                response = client.GetAsync(id).Result;
+                response = client.GetAsync(id).Result;
 				Assert.IsTrue(response.Headers.GetCacheCowHeader().RetrievedFromCache.GetValueOrDefault());
 				Assert.IsFalse(response.Headers.GetCacheCowHeader().WasStale.GetValueOrDefault(), "The cached item should have been refreshed but was instead considered stale.");
 			}

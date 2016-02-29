@@ -84,6 +84,7 @@
     <Compile Include="CachingHandlerTests.cs" />
     <EmbeddedResource Include="Data\Request.cs" />
     <EmbeddedResource Include="Data\Response.cs" />
+    <Compile Include="FauxServerTests.cs" />
     <Compile Include="Helper\DeepComparer.cs" />
     <Compile Include="Helper\ResponseHelper.cs" />
     <Compile Include="InMemoryVaryHeaderStoreTests.cs" />
