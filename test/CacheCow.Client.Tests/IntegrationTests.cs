@@ -20,7 +20,7 @@ namespace CacheCow.Client.Tests
 		public void Test_GoogleImage_WorksOnFirstSecondRequestNotThird()
 		{
 			const string Url = "https://ssl.gstatic.com/gb/images/j_e6a6aca6.png";
-			var httpClient = new HttpClient(new CachingHandler()
+			var httpClient = new HttpClient(new CachingHandler("test", "1.0.0")
 												{
 													InnerHandler = new HttpClientHandler()
 												});
@@ -39,7 +39,7 @@ namespace CacheCow.Client.Tests
 		{
 			
 			const string Url = "http://carmanager.azurewebsites.net/api/Car";
-			var httpClient = new HttpClient(new CachingHandler()
+			var httpClient = new HttpClient(new CachingHandler("test", "1.0.0")
 			{
 				InnerHandler = new HttpClientHandler()
 			});
@@ -59,7 +59,7 @@ namespace CacheCow.Client.Tests
             var memorySize64 = Process.GetCurrentProcess().PrivateMemorySize64;
             for (int i = 0; i < 200; i++)
             {
-                var store = new CachingHandler();
+                var store = new CachingHandler("test", "1.0.0");
                 //Thread.Sleep(1);
                 store.Dispose();
                 GC.Collect();

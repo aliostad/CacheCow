@@ -36,7 +36,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 		[Test]
 		public void AddItemTest()
 		{
-            var client = new HttpClient(new CachingHandler(new RedisStore(ConnectionString))
+            var client = new HttpClient(new CachingHandler("test", "1.0.0", new RedisStore(ConnectionString))
 			               	{
 			               		InnerHandler = new HttpClientHandler()
 			               	});
@@ -51,7 +51,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 		public void GetValue()
 		{
             var redisStore = new RedisStore(ConnectionString);
-			var client = new HttpClient(new CachingHandler(redisStore)
+            var client = new HttpClient(new CachingHandler("test", "1.0.0", redisStore)
 			{
 				InnerHandler = new HttpClientHandler()
 			});

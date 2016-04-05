@@ -55,7 +55,7 @@ namespace CacheCow.Tests.Server.Integration
             );
 
             var inMemoryServer = new InMemoryServer(configuration);
-            var cachingHandler = new CachingHandler(configuration, store, "Accept")
+            var cachingHandler = new CachingHandler("test", "1.0.0", configuration, store, "Accept")
             {
                 InnerHandler = inMemoryServer
             };
