@@ -220,6 +220,9 @@ namespace CacheCow.Server
                 return; // infinity
 
             var cacheKey = GenerateCacheKey(request);
+            if (cacheKey.RoutePattern == null)
+                return;
+
             TimedEntityTagHeaderValue value = null;
             if(!_entityTagStore.TryGetValue(cacheKey, out value))
                 return;
@@ -416,8 +419,11 @@ namespace CacheCow.Server
 			    try
 			    {
                     var cacheKey = GenerateCacheKey(request);
-                    ExecuteCacheInvalidationRules(cacheKey, request, response);
-                    ExecuteCacheAdditionRules(cacheKey, request, response);
+                    if (cacheKey.RoutePattern != null)
+                    {
+                        ExecuteCacheInvalidationRules(cacheKey, request, response);
+                        ExecuteCacheAdditionRules(cacheKey, request, response);
+                    }
                     return response;
 			    }
 			    catch (Exception ex)
