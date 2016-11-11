@@ -238,6 +238,9 @@ namespace CacheCow.Server
 
 	        try
 	        {
+	            if (!CheckCacheable(request))
+	                return base.SendAsync(request, cancellationToken);
+
                 // do the expiry
                 CheckExpiry(request);
 
@@ -272,7 +275,12 @@ namespace CacheCow.Server
 			
 		}
 
-		/// <summary>
+	    private bool CheckCacheable(HttpRequestMessage request)
+	    {
+	        return _routePatternProvider.GetRoutePattern(request) != null;
+	    }
+
+	    /// <summary>
 		/// This is a scenario where we have a POST to a resource
 		/// and it needs to invalidate the cache to that resource
 		/// and all its linked URLs
