@@ -294,7 +294,7 @@ namespace CacheCow.Client
                 if (!cacheCowHeader.DidNotExist.Value) // so if it EXISTS in cache
                 {
                     TraceWriter.WriteLine("{0} - Existed in the cache. CacheControl Headers => {1}", TraceLevel.Verbose, request.RequestUri.ToString(),
-                        cachedResponse.Headers.CacheControl.ToString());
+                        cachedResponse.Headers.CacheControl.ToSafeString());
                     cachedResponse.RequestMessage = request;
                     validationResultForCachedResponse = ResponseValidator(cachedResponse);
                 }
@@ -479,7 +479,7 @@ namespace CacheCow.Client
             // TODO: merge CacheControl headers instead of replace
 	        if (serverResponse.Headers.CacheControl != null && (!serverResponse.Headers.CacheControl.NoCache)) // added to cover issue #139
 	        {
-		        TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - CacheControl: " + serverResponse.Headers.CacheControl.ToString(), TraceLevel.Verbose);
+		        TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - CacheControl: " + serverResponse.Headers.CacheControl.ToSafeString(), TraceLevel.Verbose);
 		        cachedResponse.Headers.CacheControl = serverResponse.Headers.CacheControl;
 	        }
 	        else

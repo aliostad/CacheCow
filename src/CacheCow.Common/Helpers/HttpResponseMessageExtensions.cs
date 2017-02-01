@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,5 +16,10 @@ namespace CacheCow.Common.Helpers
 			taskCompletionSource.SetResult(responseMessage);
 			return taskCompletionSource.Task;
 		}
+
+	    public static string ToSafeString(this CacheControlHeaderValue cacheControl)
+	    {
+	        return cacheControl == null ? "(null)" : cacheControl.ToString();
+	    }
 	}
 }
