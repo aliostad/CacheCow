@@ -14,7 +14,7 @@ namespace CacheCow.Server.EntityTagStore.Elasticsearch
         public NestEntityTagStore(string elasticsearchUrl)
         {
             var uri = new Uri(elasticsearchUrl);
-            var settings = new ConnectionSettings(uri).SetDefaultIndex(ElasticsearchIndex);
+            var settings = new ConnectionSettings(uri).DefaultIndex(ElasticsearchIndex);
             _elasticsearchClient = new ElasticClient(settings);
         }
 
@@ -24,7 +24,7 @@ namespace CacheCow.Server.EntityTagStore.Elasticsearch
             var result = _elasticsearchClient.Search<PersistentCacheKey>(s => s
                 .Index(ElasticsearchIndex)
                 .AllTypes()
-                .Query(p => p.Ids(idsList)));
+                .Query(p => p.Ids(d => d.Values(idsList))));
 
             if (result.Documents.Any())
             {
@@ -72,7 +72,7 @@ namespace CacheCow.Server.EntityTagStore.Elasticsearch
                     ResourceUri = key.ResourceUri
                 };
             }
-            _elasticsearchClient.Index(cacheKey, PersistentCacheKey.SearchIndex, ElasticsearchIndex);
+            _elasticsearchClient.Index(cacheKey, d => d.Index(ElasticsearchIndex));
         }
 
         public int RemoveResource(string resourceUri)
@@ -81,10 +81,9 @@ namespace CacheCow.Server.EntityTagStore.Elasticsearch
 
             var result = _elasticsearchClient.Search<PersistentCacheKey>(s => s.Index(ElasticsearchIndex)
                 .AllTypes()
-                .Query(q => q.TermsDescriptor(tq => tq
-                    .OnField(f => f.ResourceUri)
+                .Query(q => q.Terms(tq => tq
+                    .Field(f => f.ResourceUri)
                     .Terms(items)
-                    .MinimumMatch(items.Length)
                     )
                 ));
 
@@ -92,7 +91,7 @@ namespace CacheCow.Server.EntityTagStore.Elasticsearch
 
             foreach (var item in result.Documents)
             {
-                _elasticsearchClient.DeleteById(ElasticsearchIndex, ElasticsearchIndex, item.Id);
+                _elasticsearchClient.Delete(new DeleteRequest(ElasticsearchIndex, ElasticsearchIndex, item.Id));
             }
 
             return count;
@@ -104,13 +103,13 @@ namespace CacheCow.Server.EntityTagStore.Elasticsearch
             var result = _elasticsearchClient.Search<PersistentCacheKey>(s => s
                 .Index(ElasticsearchIndex)
                 .AllTypes()
-                .Query(p => p.Ids(idsList)));
+                .Query(p => p.Ids(d => d.Values(idsList))));
 
             int count = result.Documents.Count();
 
             foreach (var item in result.Documents)
             {
-                _elasticsearchClient.DeleteById(ElasticsearchIndex, ElasticsearchIndex, item.Id);
+                _elasticsearchClient.Delete(new DeleteRequest(ElasticsearchIndex, ElasticsearchIndex, item.Id));
             }
 
             return count > 0;
@@ -122,10 +121,9 @@ namespace CacheCow.Server.EntityTagStore.Elasticsearch
 
             var result = _elasticsearchClient.Search<PersistentCacheKey>(s => s.Index(ElasticsearchIndex)
                 .AllTypes()
-                .Query(q => q.TermsDescriptor(tq => tq
-                    .OnField(f => f.ResourceUri)
+                .Query(q => q.Terms(tq => tq
+                    .Field(f => f.ResourceUri)
                     .Terms(items)
-                    .MinimumMatch(items.Length)
                     )
                 ));
 
@@ -133,7 +131,7 @@ namespace CacheCow.Server.EntityTagStore.Elasticsearch
 
             foreach (var item in result.Documents)
             {
-                _elasticsearchClient.DeleteById(ElasticsearchIndex, ElasticsearchIndex, item.Id);
+                _elasticsearchClient.Delete(new DeleteRequest(ElasticsearchIndex, ElasticsearchIndex, item.Id));
             }
 
             return count;
