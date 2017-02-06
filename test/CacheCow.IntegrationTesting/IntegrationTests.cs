@@ -26,7 +26,7 @@ namespace CacheCow.IntegrationTesting
         {
             // arrange
             using (var server = new InMemoryServer())
-            using (var client = new HttpClient(new CachingHandler()
+            using (var client = new HttpClient(new CachingHandler("test", "1.0.0")
                                                    {
                                                        InnerHandler = new HttpClientHandler()
                                                    }))
@@ -50,7 +50,7 @@ namespace CacheCow.IntegrationTesting
         {
             // arrange
             using (var server = new InMemoryServer())
-            using (var client = new HttpClient(new CachingHandler()
+            using (var client = new HttpClient(new CachingHandler("test", "1.0.0")
             {
                 InnerHandler = new HttpClientHandler()
             }))
@@ -71,7 +71,7 @@ namespace CacheCow.IntegrationTesting
 		public void ExpiredClientCacheShallLoadFromServerAndUpdateExpiry()
         {
             using (var server = new InMemoryServer())
-            using (var client = new HttpClient(new CachingHandler {InnerHandler = new HttpClientHandler()}))
+            using (var client = new HttpClient(new CachingHandler("test", "1.0.0") {InnerHandler = new HttpClientHandler()}))
             {
                 string id = Guid.NewGuid().ToString();
 				client.BaseAddress = new Uri(new Uri(TestConstants.BaseUrl), "/api/NoMustRevalidate/");
@@ -97,7 +97,7 @@ namespace CacheCow.IntegrationTesting
         public void ExpiredClientCacheShallLoadFromServerAndUpdateExpiryThenLoadFromCache()
         {
 			using (var server = new InMemoryServer())
-			using (var client = new HttpClient(new CachingHandler { InnerHandler = new HttpClientHandler() }))
+			using (var client = new HttpClient(new CachingHandler("test", "1.0.0") { InnerHandler = new HttpClientHandler() }))
 			{
 				string id = Guid.NewGuid().ToString();
 				client.BaseAddress = new Uri(new Uri(TestConstants.BaseUrl), "/api/NoMustRevalidate/");
@@ -124,7 +124,7 @@ namespace CacheCow.IntegrationTesting
         {
             // arrange
             using (var server = new InMemoryServer())
-            using (var client = new HttpClient(new CachingHandler()
+            using (var client = new HttpClient(new CachingHandler("test", "1.0.0")
             {
                 InnerHandler = new HttpClientHandler()
             }))

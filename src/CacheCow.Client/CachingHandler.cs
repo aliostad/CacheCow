@@ -16,7 +16,8 @@ namespace CacheCow.Client
 {
     public class CachingHandler : DelegatingHandler
     {
-
+        private readonly string _serviceIdentifier;
+        private readonly string _versionNumber;
         private readonly ICacheStore _cacheStore;
         private Func<HttpRequestMessage, bool> _ignoreRequestRules;
         private bool _disposeCacheStore = false;
@@ -32,20 +33,22 @@ namespace CacheCow.Client
 				HttpStatusCode.MovedPermanently, HttpStatusCode.Gone
 			};
 
-        public CachingHandler()
-            : this(new InMemoryCacheStore())
+        public CachingHandler(string serviceIdentifier, string versionNumber)
+            : this(serviceIdentifier, versionNumber, new InMemoryCacheStore())
         {
             _disposeCacheStore = true;
         }
 
-        public CachingHandler(ICacheStore cacheStore)
-            : this(cacheStore, new InMemoryVaryHeaderStore())
+        public CachingHandler(string serviceIdentifier, string versionNumber, ICacheStore cacheStore)
+            : this(serviceIdentifier, versionNumber, cacheStore, new InMemoryVaryHeaderStore())
         {
             _disposeVaryStore = true;
         }
 
-        public CachingHandler(ICacheStore cacheStore, IVaryHeaderStore varyHeaderStore)
+        public CachingHandler(string serviceIdentifier, string versionNumber, ICacheStore cacheStore, IVaryHeaderStore varyHeaderStore)
         {
+            _serviceIdentifier = serviceIdentifier;
+            _versionNumber = versionNumber;
             _cacheStore = cacheStore;
             UseConditionalPut = true;
             MustRevalidateByDefault = true;
@@ -277,7 +280,9 @@ namespace CacheCow.Client
             var cacheKey = new CacheKey(uri,
                 request.Headers.Where(x => varyHeaders.Any(y => y.Equals(x.Key,
                     StringComparison.CurrentCultureIgnoreCase)))
-                    .SelectMany(z => z.Value)
+                    .SelectMany(z => z.Value),
+                    _serviceIdentifier,
+                    _versionNumber
                 );
 
             // get from cache and verify response
@@ -418,7 +423,9 @@ namespace CacheCow.Client
                             cacheKey = new CacheKey(uri,
                                 request.Headers.Where(x => varyHeaders.Any(y => y.Equals(x.Key,
                                     StringComparison.CurrentCultureIgnoreCase)))
-                                    .SelectMany(z => z.Value)
+                                    .SelectMany(z => z.Value),
+                                    _serviceIdentifier,
+                                    _versionNumber
                                 );
 
                             // store the cache

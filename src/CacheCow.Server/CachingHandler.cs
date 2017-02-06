@@ -37,6 +37,8 @@ namespace CacheCow.Server
         // This class is heavily functional. The reason is ease of unit testing each 
         // individual function/ 
 
+        private readonly string _serviceIdentifier;
+        private readonly string _versionNumber;
 		protected readonly IEntityTagStore _entityTagStore;
 		private readonly string[] _varyByHeaders;
 		private object _padLock = new object();
@@ -59,14 +61,13 @@ namespace CacheCow.Server
             IgnoreExceptionPolicy = (e) => { };
         }
 
-        public CachingHandler(HttpConfiguration configuration, params string[] varyByHeader)
-			: this(configuration, new InMemoryEntityTagStore(), varyByHeader)
-		{
+        public CachingHandler(string serviceIdentifier, string versionNumber, HttpConfiguration configuration, params string[] varyByHeader)
+            : this(serviceIdentifier, versionNumber, configuration, new InMemoryEntityTagStore(), varyByHeader) { }
 
-		}
-
-	    public CachingHandler(HttpConfiguration configuration, IEntityTagStore entityTagStore, params string[] varyByHeaders)
-		{
+        public CachingHandler(string serviceIdentifier, string versionNumber, HttpConfiguration configuration, IEntityTagStore entityTagStore, params string[] varyByHeaders)
+        {
+            _serviceIdentifier = serviceIdentifier;
+            _versionNumber = versionNumber;
 	        _configuration = configuration;
 	        AddLastModifiedHeader = true;
 			AddVaryHeader = true;
@@ -166,7 +167,9 @@ namespace CacheCow.Server
             return new CacheKey(UriTrimmer(request.RequestUri), 
                 request.Headers.ExtractHeadersValues(_varyByHeaders)
                 .SelectMany(h => h.Value),
-                _routePatternProvider.GetRoutePattern(request));
+                _routePatternProvider.GetRoutePattern(request),
+                _serviceIdentifier,
+                _versionNumber);
         }
 
 	    public void InvalidateResource(HttpRequestMessage request)

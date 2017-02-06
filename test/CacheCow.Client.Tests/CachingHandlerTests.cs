@@ -32,7 +32,7 @@ namespace CacheCow.Client.Tests
 			_mockRepository = new MockRepository();
 			_cacheStore = _mockRepository.StrictMock<ICacheStore>();
 			_messageHandler = new DummyMessageHandler();
-            _cachingHandler = new CachingHandler(_cacheStore)
+            _cachingHandler = new CachingHandler("test", "1.0.0", _cacheStore)
 		                             {
 		                                 InnerHandler = _messageHandler
 		                             };
@@ -463,7 +463,7 @@ namespace CacheCow.Client.Tests
             var responseFromServer = GetOkMessage();
             _messageHandler.Response = responseFromServer;
            _cacheStore = new FaultyCacheStore();
-           _cachingHandler = new CachingHandler(_cacheStore)
+           _cachingHandler = new CachingHandler("test", "1.0.0", _cacheStore)
            {
                InnerHandler = _messageHandler
            };
@@ -488,7 +488,7 @@ namespace CacheCow.Client.Tests
             var responseFromServer = GetOkMessage();
             _messageHandler.Response = responseFromServer;
             _cacheStore = new FaultyCacheStore();
-            _cachingHandler = new CachingHandler(_cacheStore)
+            _cachingHandler = new CachingHandler("test", "1.0.0", _cacheStore)
             {
                 InnerHandler = _messageHandler
             };
@@ -505,7 +505,7 @@ namespace CacheCow.Client.Tests
 	    public void DoesNotDisposeCacheStoreIfPassedToIt()
         {
             var mock = new Moq.Mock<ICacheStore>(MockBehavior.Strict);
-            var handler = new CachingHandler(mock.Object);
+            var handler = new CachingHandler("test", "1.0.0", mock.Object);
             handler.Dispose();
             mock.Verify();
         }
@@ -515,7 +515,7 @@ namespace CacheCow.Client.Tests
         {
             var mockcs = new Moq.Mock<ICacheStore>();
             var mockvh = new Moq.Mock<IVaryHeaderStore>(MockBehavior.Strict);
-            var handler = new CachingHandler(mockcs.Object, mockvh.Object);
+            var handler = new CachingHandler("test", "1.0.0", mockcs.Object, mockvh.Object);
             handler.Dispose();
             mockvh.Verify();
         }

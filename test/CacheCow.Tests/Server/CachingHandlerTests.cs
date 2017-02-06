@@ -34,16 +34,14 @@ namespace CacheCow.Tests.Server
 			// setup
 			var mocks = new MockRepository();
 			var request = new HttpRequestMessage(new HttpMethod(method), TestUrl);
-			string routePattern = "http://myserver/api/stuffs/*";
+			string routePattern = "http://myserver/api/stuff/*";
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-			var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
-									{
-										
-									};
-			var entityTagKey = new CacheKey(TestUrl, new string[0], routePattern);
+		    var cachingHandler = new CachingHandler("test", "1.0.0", new HttpConfiguration(), entityTagStore);
+			var entityTagKey = new CacheKey(TestUrl, new string[0], routePattern, "test", "1.0.0");
 			var response = new HttpResponseMessage();
 			var invalidateCache = cachingHandler.InvalidateCache(entityTagKey, request, response);
             entityTagStore.Expect(x => x.RemoveResource("/api/stuff/")).Return(1);
+		    entityTagStore.Expect(x => x.RemoveAllByRoutePattern("/api/stuff/")).Return(1);
 
 			mocks.ReplayAll();
 
@@ -70,17 +68,15 @@ namespace CacheCow.Tests.Server
 			string routePattern = "http://myserver/api/stuffs/*";
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
 
-			var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
-			{
-				
-			};
-			var entityTagKey = new CacheKey(TestUrl, new string[0], routePattern);
+		    var cachingHandler = new CachingHandler("test", "1.0.0", new HttpConfiguration(), entityTagStore);
+			var entityTagKey = new CacheKey(TestUrl, new string[0], routePattern, "test", "1.0.0");
 			var response = new HttpResponseMessage();
 			response.Headers.Location = locationUrl;
 			var invalidateCacheForPost = cachingHandler.PostInvalidationRule(entityTagKey, request, response);
 			if(method == "POST")
 			{
-                entityTagStore.Expect(x => x.RemoveAllByRoutePattern("/SomeLocationUrl/")).Return(1);				
+			    entityTagStore.Expect(x => x.RemoveAllByRoutePattern("/SomeLocationUrl/")).Return(1);
+			    entityTagStore.Expect(x => x.RemoveResource("/SomeLocationUrl/")).Return(1);
 			}
 			mocks.ReplayAll();
 
@@ -99,7 +95,7 @@ namespace CacheCow.Tests.Server
             var request = new HttpRequestMessage(HttpMethod.Get, TestUrl);
             request.Headers.Add(HttpHeaderNames.Accept, "text/xml");
             var entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"");
-            var cachingHandler = new CachingHandler(new HttpConfiguration())
+            var cachingHandler = new CachingHandler("test", "1.0.0", new HttpConfiguration())
             {              
                 ETagValueGenerator = (x, y) => entityTagHeaderValue,
                 CacheControlHeaderProvider = (r, c) =>
@@ -136,7 +132,7 @@ namespace CacheCow.Tests.Server
 			request.Headers.Add(HttpHeaderNames.AcceptLanguage, "en-GB");
 			var entityTagStore = mocks.StrictMock<IEntityTagStore>();
 			var entityTagHeaderValue = new TimedEntityTagHeaderValue("\"12345678\"");
-			var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore, varyByHeader)
+            var cachingHandler = new CachingHandler("test", "1.0.0", new HttpConfiguration(), entityTagStore, varyByHeader)
 			{
 				AddLastModifiedHeader = addLastModifiedHeader,
 				AddVaryHeader = addVaryHeader,
@@ -194,13 +190,12 @@ namespace CacheCow.Tests.Server
             var mocks = new MockRepository();
             
             var entityTagStore = mocks.StrictMock<IEntityTagStore>();
-            var cachingHandler = new CachingHandler(new HttpConfiguration(), entityTagStore)
-            {
-               
-            };
+            var cachingHandler = new CachingHandler("test", "1.0.0", new HttpConfiguration(), entityTagStore);
 
             entityTagStore.Expect(x => x.RemoveResource("/api/stuff/")).Return(1);
+            entityTagStore.Expect(x => x.RemoveAllByRoutePattern("/api/stuff/")).Return(1);
             entityTagStore.Expect(x => x.RemoveResource("/api/more/")).Return(1);
+            entityTagStore.Expect(x => x.RemoveAllByRoutePattern("/api/more/")).Return(1);
 
 
             mocks.ReplayAll();

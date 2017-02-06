@@ -15,13 +15,16 @@ namespace CacheCow.Common
 		private readonly string _hashBase64;
 		private string _domain = null;
 
-		private const string CacheKeyFormat = "{0}-{1}";
+		private const string CacheKeyFormat = "{0}-{1}-{2}-{3}";
 
 		public CacheKey(string resourceUri, IEnumerable<string> headerValues)
-			: this(resourceUri, headerValues, resourceUri)
-		{
+			: this(resourceUri, headerValues, resourceUri) { }
 
-		}
+        public CacheKey(string resourceUri, IEnumerable<string> headerValues, string routePattern)
+            : this(resourceUri, headerValues, routePattern, "", "") { }
+
+        public CacheKey(string resourceUri, IEnumerable<string> headerValue, string serviceIdentifier, string versionNumber)
+            : this(resourceUri, headerValue, resourceUri, serviceIdentifier, versionNumber) { }
 
 		/// <summary>
 		/// constructor for CacheKey
@@ -35,11 +38,11 @@ namespace CacheCow.Common
 		/// For example /api/cars/fastest and /api/cars/mostExpensive can share tha pattern /api/cars/*
 		/// This will be used at the time of cache invalidation. 
 		/// </param>
-		public CacheKey(string resourceUri, IEnumerable<string> headerValues, string routePattern)
+        public CacheKey(string resourceUri, IEnumerable<string> headerValues, string routePattern, string serviceIdentifier, string versionNumber)
 		{
 			_routePattern = routePattern;
 
-			_toString = string.Format(CacheKeyFormat, resourceUri, string.Join("-", headerValues));
+            _toString = string.Format(CacheKeyFormat, resourceUri, string.Join("-", headerValues), serviceIdentifier, versionNumber);
 			using (var sha1 = new SHA1CryptoServiceProvider())
 			{
 				_hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(_toString));
@@ -54,7 +57,6 @@ namespace CacheCow.Common
 		    {
 		        _resourceUri = _resourceUri.Substring(0, indexOfQuestionMark);
 		    }
-
 		}
 
 
