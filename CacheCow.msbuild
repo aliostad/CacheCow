@@ -48,8 +48,6 @@
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.MongoDb\CacheCow.Server.EntityTagStore.MongoDb.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.Memcached\CacheCow.Server.EntityTagStore.Memcached.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.Redis\CacheCow.Server.EntityTagStore.Redis.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.AzureCaching\CacheCow.Server.EntityTagStore.AzureCaching.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.AzureCachingCacheStore\CacheCow.Client.AzureCachingCacheStore.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
 	<Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.Memcached12\CacheCow.Server.EntityTagStore.Memcached12.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.Elasticsearch\CacheCow.Server.EntityTagStore.Elasticsearch.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />	
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.FileCacheStore\CacheCow.Client.FileCacheStore.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
@@ -62,8 +60,6 @@
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client\CacheCow.Client.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server\CacheCow.Server.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Common\CacheCow.Common.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
-    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.AzureCaching\CacheCow.Server.EntityTagStore.AzureCaching.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
-    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.AzureCachingCacheStore\CacheCow.Client.AzureCachingCacheStore.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
   </Target>
 
   <Target Name="Publish">
