@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B1901128-F84A-46CE-B8FD-E863465F94C2}"
 EndProject
@@ -68,15 +68,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.IntegrationTesting", "test\CacheCow.IntegrationTesting\CacheCow.IntegrationTesting.csproj", "{F65D37F5-2F97-4CD2-BC90-E67670108FC5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Testing.Common", "test\CacheCow.Testing.Common\CacheCow.Testing.Common.csproj", "{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.AzureCaching", "src\CacheCow.Server.EntityTagStore.AzureCaching\CacheCow.Server.EntityTagStore.AzureCaching.csproj", "{112BC648-DA8F-451D-8A4C-1831CC285008}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B67727F4-5B65-41D0-8D26-8D1C32CEA63D} = {B67727F4-5B65-41D0-8D26-8D1C32CEA63D}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.AzureCaching.Tests", "test\CacheCow.Server.EntityTagStore.AzureCaching.Tests\CacheCow.Server.EntityTagStore.AzureCaching.Tests.csproj", "{37650B35-41E3-49A6-889C-2D21AE0E69E4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.AzureCachingCacheStore", "src\CacheCow.Client.AzureCachingCacheStore\CacheCow.Client.AzureCachingCacheStore.csproj", "{8E707D5F-0FB0-40FD-B154-D0F96550672B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.Elasticsearch", "src\CacheCow.Server.EntityTagStore.Elasticsearch\CacheCow.Server.EntityTagStore.Elasticsearch.csproj", "{2AB731D9-7FE2-4E37-9846-73546AAC933F}"
 EndProject
@@ -194,18 +185,6 @@ Global
 		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}.Release|Any CPU.Build.0 = Release|Any CPU
-		{112BC648-DA8F-451D-8A4C-1831CC285008}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{112BC648-DA8F-451D-8A4C-1831CC285008}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{112BC648-DA8F-451D-8A4C-1831CC285008}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{112BC648-DA8F-451D-8A4C-1831CC285008}.Release|Any CPU.Build.0 = Release|Any CPU
-		{37650B35-41E3-49A6-889C-2D21AE0E69E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{37650B35-41E3-49A6-889C-2D21AE0E69E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{37650B35-41E3-49A6-889C-2D21AE0E69E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{37650B35-41E3-49A6-889C-2D21AE0E69E4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8E707D5F-0FB0-40FD-B154-D0F96550672B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E707D5F-0FB0-40FD-B154-D0F96550672B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8E707D5F-0FB0-40FD-B154-D0F96550672B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8E707D5F-0FB0-40FD-B154-D0F96550672B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2AB731D9-7FE2-4E37-9846-73546AAC933F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2AB731D9-7FE2-4E37-9846-73546AAC933F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AB731D9-7FE2-4E37-9846-73546AAC933F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -249,9 +228,6 @@ Global
 		{F8652DD6-6031-4BFC-8387-2175ABA211A0} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{F65D37F5-2F97-4CD2-BC90-E67670108FC5} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
-		{112BC648-DA8F-451D-8A4C-1831CC285008} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
-		{37650B35-41E3-49A6-889C-2D21AE0E69E4} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
-		{8E707D5F-0FB0-40FD-B154-D0F96550672B} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 		{2AB731D9-7FE2-4E37-9846-73546AAC933F} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 		{096C9308-DD7A-4EE0-87A0-BF76BF278873} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 		{54E6669E-C714-40EE-863E-A579A2A99078} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
