@@ -156,6 +156,16 @@ namespace CacheCow.Client
         public string[] StarVaryHeaders { get; set; } // TODO: populate and use
 
         /// <summary>
+        /// Rules by which requests get ignored for caching
+        /// If you ever change this, make sure you wrap the original logic in your own rather than replacing.
+        /// </summary>
+        public Func<HttpRequestMessage, bool> IgnoreRequestRules
+        {
+            get { return _ignoreRequestRules; }
+            set { _ignoreRequestRules = value; }
+        }
+
+        /// <summary>
         /// Whether to use cache's ETag or Last-Modified
         /// to make conditional PUT according to RFC2616 13.3
         /// If no cache available on the resource, no conditional is used
