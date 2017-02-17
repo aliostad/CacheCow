@@ -27,11 +27,13 @@ namespace CacheCow.IntegrationTesting.Server
             config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
             config.Formatters.XmlFormatter.UseXmlSerializer = true;
-            var cachingHandler = new CachingHandler(config, new InMemoryEntityTagStore(),"Accept", "Accept-Encoding");
+            var cachingHandler = new CachingHandler(config, new InMemoryEntityTagStore(), "Accept", "Accept-Encoding");
             cachingHandler.CacheControlHeaderProvider = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue()
-                {
-                    NoCache = true, Private = true, NoStore = true
-                }).GetCacheControl; // turn caching off unless an attribute is used
+            {
+                NoCache = true,
+                Private = true,
+                NoStore = true
+            }).GetCacheControl; // turn caching off unless an attribute is used
 
             cachingHandler.CacheRefreshPolicyProvider = new AttributeBasedCacheRefreshPolicy(TimeSpan.FromMinutes(15)).GetCacheRefreshPolicy;
             config.MessageHandlers.Add(cachingHandler);

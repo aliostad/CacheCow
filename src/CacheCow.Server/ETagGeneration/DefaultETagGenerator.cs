@@ -15,7 +15,7 @@ namespace CacheCow.Server.ETagGeneration
         {
             return new EntityTagHeaderValue(
                 string.Format("\"{0}\"", Guid.NewGuid().ToString("N").ToLower()),
-                false); 
+                false);
 
         }
     }

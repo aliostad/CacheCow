@@ -22,7 +22,7 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
             var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://aliostad/api/CachePolicy/1"));
             var routeData = configuration.Routes.GetRouteData(request);
             request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
-            
+
 
             var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue());
             var cchv = attributeBasedCachePolicy.GetCacheControl(request, configuration);
@@ -32,13 +32,13 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
 
         }
 
-        
+
 
         [Test]
         public void TestRefreshPolicyFor404()
         {
             var configuration = new HttpConfiguration(new HttpRouteCollection("/"));
-            configuration.Services.Replace(typeof (IHttpControllerSelector), new NotFoundControllerSelector());
+            configuration.Services.Replace(typeof(IHttpControllerSelector), new NotFoundControllerSelector());
             configuration.Routes.MapHttpRoute("main", "api/{controller}/{id}");
             var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://aliostad/api/CachePolicyAction/1"));
             var routeData = configuration.Routes.GetRouteData(request);
@@ -83,7 +83,7 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
             var routeData = configuration.Routes.GetRouteData(request);
             request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
             var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue()
-                {NoStore = true, NoCache = true});
+            { NoStore = true, NoCache = true });
 
             // action
             var cchv = attributeBasedCachePolicy.GetCacheControl(request, configuration);
@@ -124,7 +124,7 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
     }
 
 
-   
+
 }
 
 namespace CacheCow.Tests.Server.CachePolicy.Controllers
@@ -154,5 +154,5 @@ namespace CacheCow.Tests.Server.CachePolicy.Controllers
         {
             return "CacheCow";
         }
-    }    
+    }
 }

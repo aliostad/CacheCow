@@ -17,7 +17,7 @@ namespace CacheCow.Server.EntityTagStore.Redis
         private const string ResourceFormat = "ResourceUri:{0}";
         private const string RoutePatternFormat = "RoutePattern:{0}";
 
-        public RedisEntityTagStore(string connectionString, 
+        public RedisEntityTagStore(string connectionString,
             int databaseId = 0,
             TimeSpan? expiry = null)
         {
@@ -25,7 +25,7 @@ namespace CacheCow.Server.EntityTagStore.Redis
             Init(ConnectionMultiplexer.Connect(connectionString), databaseId);
         }
 
-        public RedisEntityTagStore(ConnectionMultiplexer connection, 
+        public RedisEntityTagStore(ConnectionMultiplexer connection,
             int databaseId = 0,
             TimeSpan? expiry = null)
         {
@@ -47,7 +47,7 @@ namespace CacheCow.Server.EntityTagStore.Redis
 
         public void Dispose()
         {
-            if(_connection!=null)
+            if (_connection != null)
                 _connection.Dispose();
         }
 
@@ -66,7 +66,7 @@ namespace CacheCow.Server.EntityTagStore.Redis
         public void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag)
         {
             _database.StringSet(key.HashBase64, eTag.ToString(), _expiry);
-            
+
             // resource
             var resourceKey = string.Format(ResourceFormat, key.ResourceUri);
             _database.SetAdd(resourceKey, key.HashBase64);
@@ -82,7 +82,7 @@ namespace CacheCow.Server.EntityTagStore.Redis
         }
 
         public int RemoveResource(string resourceUri)
-        {         
+        {
             string key = string.Format(ResourceFormat, resourceUri);
             var count = 0;
             foreach (var member in _database.SetMembers(key))

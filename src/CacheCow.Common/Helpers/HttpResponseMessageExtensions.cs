@@ -8,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace CacheCow.Common.Helpers
 {
-	public static class HttpResponseMessageExtensions
-	{
-		public static Task<HttpResponseMessage> ToTask(this HttpResponseMessage responseMessage)
-		{
-			var taskCompletionSource = new TaskCompletionSource<HttpResponseMessage>();
-			taskCompletionSource.SetResult(responseMessage);
-			return taskCompletionSource.Task;
-		}
+    public static class HttpResponseMessageExtensions
+    {
+        public static Task<HttpResponseMessage> ToTask(this HttpResponseMessage responseMessage)
+        {
+            var taskCompletionSource = new TaskCompletionSource<HttpResponseMessage>();
+            taskCompletionSource.SetResult(responseMessage);
+            return taskCompletionSource.Task;
+        }
 
-	    public static string ToSafeString(this CacheControlHeaderValue cacheControl)
-	    {
-	        return cacheControl == null ? "(null)" : cacheControl.ToString();
-	    }
-	}
+        public static string ToSafeString(this CacheControlHeaderValue cacheControl)
+        {
+            return cacheControl == null ? "(null)" : cacheControl.ToString();
+        }
+    }
 }

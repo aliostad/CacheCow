@@ -12,11 +12,11 @@ namespace CacheCow.Server.ETagGeneration
     /// </summary>
     public class ContentHashETagAttribute : ActionFilterAttribute
     {
-        internal const string ContentHashHeaderName = "x-cachecow-content-hash-md5"; 
+        internal const string ContentHashHeaderName = "x-cachecow-content-hash-md5";
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
             base.OnActionExecuted(actionExecutedContext);
-            if(actionExecutedContext.Response.Content == null)
+            if (actionExecutedContext.Response.Content == null)
                 return;
 
             var bytes = actionExecutedContext.Response.Content
@@ -29,6 +29,6 @@ namespace CacheCow.Server.ETagGeneration
                 hex = hex.Replace("-", "");
                 actionExecutedContext.Request.Headers.TryAddWithoutValidation(ContentHashHeaderName, hex);
             }
-        }       
+        }
     }
 }

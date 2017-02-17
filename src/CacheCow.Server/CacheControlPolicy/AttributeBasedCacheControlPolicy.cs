@@ -7,7 +7,7 @@ using System.Web.Http.Controllers;
 
 namespace CacheCow.Server.CacheControlPolicy
 {
-    
+
     public class AttributeBasedCacheControlPolicy : CacheControlPolicyBase
     {
         public AttributeBasedCacheControlPolicy(CacheControlHeaderValue defaultValue) : base(defaultValue)
@@ -59,7 +59,7 @@ namespace CacheCow.Server.CacheControlPolicy
             name += "Controller";
             var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes());
             return allTypes.FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)
-                                                && x.IsAssignableFrom(typeof (ApiController)));
+                                                && x.IsAssignableFrom(typeof(ApiController)));
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Web.Http;
 
 namespace CacheCow.Tests.Server.Integration.MiniServer
 {
-    public class InMemoryServer: HttpMessageHandler
+    public class InMemoryServer : HttpMessageHandler
     {
         private HttpServer _httpServer;
         private HttpMessageInvoker _invoker;

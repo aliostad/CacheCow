@@ -15,7 +15,7 @@ namespace CacheCow.Client.Tests
             // arrange
             var store = new InMemoryVaryHeaderStore();
             IEnumerable<String> headers = null;
-            var hdrs = new string[] {"a", "b"};
+            var hdrs = new string[] { "a", "b" };
 
             // act
             store.AddOrUpdate(TestUrl, hdrs);
@@ -44,7 +44,7 @@ namespace CacheCow.Client.Tests
             Assert.IsFalse(result);
             Assert.IsNull(headers);
             Assert.IsTrue(tryRemove);
-            
+
         }
 
         [Test]

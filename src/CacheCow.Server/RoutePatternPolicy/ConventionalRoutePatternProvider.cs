@@ -41,27 +41,27 @@ namespace CacheCow.Server.RoutePatternPolicy
             if (routeData == null)
                 routeData = _configuration.Routes.GetRouteData(request);
 
-            if(routeData == null)
+            if (routeData == null)
                 return GetDefaultRoutePattern(request);
 
             var routeInfo = new RouteInfo(routeData.Route);
 
             // deal with no parameters
             if (routeInfo.Parameters.Count == 0)
-                    return GetDefaultRoutePattern(request);
+                return GetDefaultRoutePattern(request);
 
 
             // deal with catchall
             if (routeInfo.Parameters.Any(x => x.IsCatchAll))
                 return GetDefaultRoutePattern(request);
-         
+
             if (routeInfo.IsCollection(routeData))
             {
-                return routeInfo.BuildCollectionPattern( routeData);
+                return routeInfo.BuildCollectionPattern(routeData);
             }
             else
             {
-                return routeInfo.BuildInstancePattern(request.RequestUri, routeData);                
+                return routeInfo.BuildInstancePattern(request.RequestUri, routeData);
             }
         }
 
@@ -138,7 +138,7 @@ namespace CacheCow.Server.RoutePatternPolicy
         public string GetRoot(IHttpRouteData routeData)
         {
             var collectionPattern = BuildCollectionPattern(routeData);
-            var uptoController = collectionPattern.Replace("/*","");
+            var uptoController = collectionPattern.Replace("/*", "");
             var lastIndexOf = uptoController.LastIndexOf('/');
             return uptoController.Substring(0, lastIndexOf).TrimEnd('/');
         }
@@ -173,9 +173,9 @@ namespace CacheCow.Server.RoutePatternPolicy
                 if (parameter == last)
                 {
                     routePattern = routePattern.Replace("{" + parameter.Name + "}",
-                        isCollection ? 
-                            ConventionalRoutePatternProvider.CollectionPatternSign : 
-                            ConventionalRoutePatternProvider.InstancePatternSign );
+                        isCollection ?
+                            ConventionalRoutePatternProvider.CollectionPatternSign :
+                            ConventionalRoutePatternProvider.InstancePatternSign);
                 }
                 else
                 {

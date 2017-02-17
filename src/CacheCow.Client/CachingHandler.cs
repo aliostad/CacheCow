@@ -26,11 +26,11 @@ namespace CacheCow.Client
         // 13.4: A response received with a status code of 200, 203, 206, 300, 301 or 410 MAY be stored 
         // TODO: Implement caching statuses other than 2xx
         private static HttpStatusCode[] _cacheableStatuses = new HttpStatusCode[]
-		    {
-				HttpStatusCode.OK, HttpStatusCode.NonAuthoritativeInformation,
-       			HttpStatusCode.PartialContent, HttpStatusCode.MultipleChoices,
-				HttpStatusCode.MovedPermanently, HttpStatusCode.Gone
-			};
+            {
+                HttpStatusCode.OK, HttpStatusCode.NonAuthoritativeInformation,
+                   HttpStatusCode.PartialContent, HttpStatusCode.MultipleChoices,
+                HttpStatusCode.MovedPermanently, HttpStatusCode.Gone
+            };
 
         public CachingHandler()
             : this(new InMemoryCacheStore())
@@ -141,7 +141,7 @@ namespace CacheCow.Client
                     response.Content.Headers.Expires = null;
                 }
             };
-            
+
         }
 
         static CachingHandler()
@@ -474,22 +474,22 @@ namespace CacheCow.Client
             ICacheStore store)
         {
             TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - response: " + serverResponse.Headers.ToString(), TraceLevel.Verbose);
-            
+
             // update only if server had a cachecontrol.
             // TODO: merge CacheControl headers instead of replace
-	        if (serverResponse.Headers.CacheControl != null && (!serverResponse.Headers.CacheControl.NoCache)) // added to cover issue #139
-	        {
-		        TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - CacheControl: " + serverResponse.Headers.CacheControl.ToSafeString(), TraceLevel.Verbose);
-		        cachedResponse.Headers.CacheControl = serverResponse.Headers.CacheControl;
-	        }
-	        else
-	        {
-				TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - CacheControl missing from server. Applying sliding expiration. Date => " + DateTimeOffset.UtcNow, TraceLevel.Verbose);
-			}
-		
-			cachedResponse.Headers.Date = DateTimeOffset.UtcNow; // very important
-			store.AddOrUpdate(cacheKey, cachedResponse);
-		}
+            if (serverResponse.Headers.CacheControl != null && (!serverResponse.Headers.CacheControl.NoCache)) // added to cover issue #139
+            {
+                TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - CacheControl: " + serverResponse.Headers.CacheControl.ToSafeString(), TraceLevel.Verbose);
+                cachedResponse.Headers.CacheControl = serverResponse.Headers.CacheControl;
+            }
+            else
+            {
+                TraceWriter.WriteLine("CachingHandler.UpdateCachedResponse - CacheControl missing from server. Applying sliding expiration. Date => " + DateTimeOffset.UtcNow, TraceLevel.Verbose);
+            }
+
+            cachedResponse.Headers.Date = DateTimeOffset.UtcNow; // very important
+            store.AddOrUpdate(cacheKey, cachedResponse);
+        }
 
         private static void DoCacheValidationForGet(HttpRequestMessage request, CacheCowHeader cacheCowHeader,
             HttpResponseMessage cachedResponse)
@@ -520,9 +520,9 @@ namespace CacheCow.Client
             base.Dispose(disposing);
             if (disposing)
             {
-                if(VaryHeaderStore != null && _disposeVaryStore)
+                if (VaryHeaderStore != null && _disposeVaryStore)
                     VaryHeaderStore.Dispose();
-                
+
                 if (_cacheStore != null && _disposeCacheStore)
                     _cacheStore.Dispose();
             }

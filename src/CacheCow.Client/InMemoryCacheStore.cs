@@ -11,19 +11,19 @@ using System.Threading.Tasks;
 
 namespace CacheCow.Client
 {
-	public class InMemoryCacheStore : ICacheStore
-	{
+    public class InMemoryCacheStore : ICacheStore
+    {
         private const string CacheStoreEntryName = "###InMemoryCacheStore_###";
-	    private static TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(6);
+        private static TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(6);
 
         private MemoryCache _responseCache = new MemoryCache(CacheStoreEntryName);
-		private MessageContentHttpMessageSerializer _messageSerializer = new MessageContentHttpMessageSerializer(true);
-	    private readonly TimeSpan _defaultExpiry;
+        private MessageContentHttpMessageSerializer _messageSerializer = new MessageContentHttpMessageSerializer(true);
+        private readonly TimeSpan _defaultExpiry;
 
-	    public InMemoryCacheStore()
+        public InMemoryCacheStore()
             : this(DefaultCacheExpiry)
         {
-            
+
         }
 
         public InMemoryCacheStore(TimeSpan defaultExpiry)
@@ -31,38 +31,38 @@ namespace CacheCow.Client
             _defaultExpiry = defaultExpiry;
         }
 
-	    public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
-		{
-			response = null;
-			var result = _responseCache.Get(key.HashBase64);
-			if (result!=null)
-			{
-			    Func<HttpResponseMessage> funky =
-			        () => _messageSerializer.DeserializeToResponseAsync(new MemoryStream((byte[]) result)).Result;
+        public bool TryGetValue(CacheKey key, out HttpResponseMessage response)
+        {
+            response = null;
+            var result = _responseCache.Get(key.HashBase64);
+            if (result != null)
+            {
+                Func<HttpResponseMessage> funky =
+                    () => _messageSerializer.DeserializeToResponseAsync(new MemoryStream((byte[])result)).Result;
                 response = Task.Factory.StartNew(funky).Result;
-			}
-			return result!=null;
-		}
+            }
+            return result != null;
+        }
 
-		public void AddOrUpdate(CacheKey key, HttpResponseMessage response)
-		{
-			// removing reference to request so that the request can get GCed
-			var req = response.RequestMessage;
-			response.RequestMessage = null;
-			var memoryStream = new MemoryStream();
-			Task.Factory.StartNew(() => _messageSerializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream).Wait()).Wait();
-			response.RequestMessage = req;
+        public void AddOrUpdate(CacheKey key, HttpResponseMessage response)
+        {
+            // removing reference to request so that the request can get GCed
+            var req = response.RequestMessage;
+            response.RequestMessage = null;
+            var memoryStream = new MemoryStream();
+            Task.Factory.StartNew(() => _messageSerializer.SerializeAsync(TaskHelpers.FromResult(response), memoryStream).Wait()).Wait();
+            response.RequestMessage = req;
             _responseCache.Set(key.HashBase64, memoryStream.ToArray(), GetExpiry(response));
-		}
+        }
 
         private DateTimeOffset GetExpiry(HttpResponseMessage response)
         {
             if (response.Content == null)
             {
-                return response.Headers.CacheControl !=null && response.Headers.CacheControl.MaxAge.HasValue
+                return response.Headers.CacheControl != null && response.Headers.CacheControl.MaxAge.HasValue
                            ? DateTimeOffset.UtcNow.Add(response.Headers.CacheControl.MaxAge.Value)
                            : DateTimeOffset.UtcNow.Add(_defaultExpiry);
-                
+
             }
             else
             {
@@ -72,21 +72,21 @@ namespace CacheCow.Client
             }
         }
 
-		public bool TryRemove(CacheKey key)
-		{
-			byte[] response;
-			return _responseCache.Remove(key.HashBase64) != null;
-		}
+        public bool TryRemove(CacheKey key)
+        {
+            byte[] response;
+            return _responseCache.Remove(key.HashBase64) != null;
+        }
 
-		public void Clear()
-		{
-			_responseCache.Dispose();
+        public void Clear()
+        {
+            _responseCache.Dispose();
             _responseCache = new MemoryCache(CacheStoreEntryName);
-		}
+        }
 
-	    public void Dispose()
-	    {
-	        _responseCache.Dispose();
-	    }
-	}
+        public void Dispose()
+        {
+            _responseCache.Dispose();
+        }
+    }
 }

@@ -25,7 +25,7 @@ namespace CacheCow.Tests.Server
                 store.AddOrUpdate(cacheKey, headerValue);
                 TimedEntityTagHeaderValue storedHeader;
                 Assert.True(store.TryGetValue(cacheKey, out storedHeader));
-                Assert.AreEqual(headerValue.ToString(), storedHeader.ToString());                
+                Assert.AreEqual(headerValue.ToString(), storedHeader.ToString());
             }
         }
 

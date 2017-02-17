@@ -6,13 +6,13 @@ using System.Text;
 
 namespace CacheCow.Common
 {
-	public interface ICacheStore : IDisposable
-	{
+    public interface ICacheStore : IDisposable
+    {
 
-		bool TryGetValue(CacheKey key, out HttpResponseMessage response);
-		void AddOrUpdate(CacheKey key, HttpResponseMessage response);
-		bool TryRemove(CacheKey key);
-		void Clear();
+        bool TryGetValue(CacheKey key, out HttpResponseMessage response);
+        void AddOrUpdate(CacheKey key, HttpResponseMessage response);
+        bool TryRemove(CacheKey key);
+        void Clear();
 
-	}
+    }
 }

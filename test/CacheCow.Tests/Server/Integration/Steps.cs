@@ -77,9 +77,9 @@ namespace CacheCow.Tests.Server.Integration
             }
             catch (Exception e)
             {
-                ScenarioContext.Current[Keys.Exception] = e;               
+                ScenarioContext.Current[Keys.Exception] = e;
             }
-            
+
         }
 
         [Given(@"Get the collection ETag as (.*)")]
@@ -118,11 +118,11 @@ namespace CacheCow.Tests.Server.Integration
         [Given(@"in my custom RoutePatternProvider I return all the same pattern")]
         public void GivenInMyCustomRoutePatternProviderIReturnAllTheSamePattern()
         {
-            var handler = (CachingHandler) ScenarioContext.Current[Keys.CacheHandler];
+            var handler = (CachingHandler)ScenarioContext.Current[Keys.CacheHandler];
             handler.RoutePatternProvider = new CustomRoutePatternProvider();
         }
 
-       
+
         [When(@"I Create another new item in a different path")]
         public void WhenICreateAnotherNewItemInADifferentPath()
         {
@@ -137,7 +137,7 @@ namespace CacheCow.Tests.Server.Integration
         public void WhenIUpdateTheItem()
         {
             var client = (HttpClient)ScenarioContext.Current[Keys.Client];
-            var result = client.PutAsync(ServerUrl + "Item/" + 
+            var result = client.PutAsync(ServerUrl + "Item/" +
                 ScenarioContext.Current[Keys.ItemId] + "?name=newName", null).Result;
             ScenarioContext.Current[Keys.Response] = result;
 
@@ -199,7 +199,7 @@ namespace CacheCow.Tests.Server.Integration
     {
         public void Dispose()
         {
-            
+
         }
 
         public bool TryGetValue(CacheKey key, out TimedEntityTagHeaderValue eTag)
@@ -229,7 +229,7 @@ namespace CacheCow.Tests.Server.Integration
 
         public void Clear()
         {
-            
+
         }
     }
 }
