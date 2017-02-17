@@ -220,6 +220,9 @@ namespace CacheCow.Server
                 return; // infinity
 
             var cacheKey = GenerateCacheKey(request);
+            if (cacheKey.RoutePattern == null)
+                return;
+
             TimedEntityTagHeaderValue value = null;
             if(!_entityTagStore.TryGetValue(cacheKey, out value))
                 return;
@@ -235,6 +238,9 @@ namespace CacheCow.Server
 
 	        try
 	        {
+	            if (!CheckCacheable(request))
+	                return base.SendAsync(request, cancellationToken);
+
                 // do the expiry
                 CheckExpiry(request);
 
@@ -269,7 +275,12 @@ namespace CacheCow.Server
 			
 		}
 
-		/// <summary>
+	    private bool CheckCacheable(HttpRequestMessage request)
+	    {
+	        return _routePatternProvider.GetRoutePattern(request) != null;
+	    }
+
+	    /// <summary>
 		/// This is a scenario where we have a POST to a resource
 		/// and it needs to invalidate the cache to that resource
 		/// and all its linked URLs
@@ -416,8 +427,11 @@ namespace CacheCow.Server
 			    try
 			    {
                     var cacheKey = GenerateCacheKey(request);
-                    ExecuteCacheInvalidationRules(cacheKey, request, response);
-                    ExecuteCacheAdditionRules(cacheKey, request, response);
+                    if (cacheKey.RoutePattern != null)
+                    {
+                        ExecuteCacheInvalidationRules(cacheKey, request, response);
+                        ExecuteCacheAdditionRules(cacheKey, request, response);
+                    }
                     return response;
 			    }
 			    catch (Exception ex)
