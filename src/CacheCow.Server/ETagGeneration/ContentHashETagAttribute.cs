@@ -16,7 +16,7 @@ namespace CacheCow.Server.ETagGeneration
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
             base.OnActionExecuted(actionExecutedContext);
-            if (actionExecutedContext.Response.Content == null)
+            if (actionExecutedContext.Response?.Content == null)
                 return;
 
             var bytes = actionExecutedContext.Response.Content
