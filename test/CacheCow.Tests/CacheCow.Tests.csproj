@@ -110,6 +110,7 @@
     <Compile Include="Server\CachingHandlerRulesTests.cs" />
     <Compile Include="Server\CachingHandlerTests.cs" />
     <Compile Include="Server\InMemoryEntityTagStoreTests.cs" />
+    <Compile Include="Server\RoutePatternPolicy\RestfulRoutePatternProviderTests.cs" />
     <Compile Include="TimedEntityTagHeaderValueTests.cs" />
   </ItemGroup>
   <ItemGroup>
