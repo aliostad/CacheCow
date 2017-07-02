@@ -32,20 +32,15 @@ namespace CacheCow.Client
         }
 
         private DateTimeOffset GetExpiry(HttpResponseMessage response)
-        {
-            if (response.Content == null)
+        {      
+            if (response.Headers.CacheControl != null && response.Headers.CacheControl.MaxAge.HasValue)
             {
-                return response.Headers.CacheControl !=null && response.Headers.CacheControl.MaxAge.HasValue
-                           ? DateTimeOffset.UtcNow.Add(response.Headers.CacheControl.MaxAge.Value)
-                           : DateTimeOffset.UtcNow.Add(_defaultExpiry);
-                
+                return DateTimeOffset.UtcNow.Add(response.Headers.CacheControl.MaxAge.Value);
             }
-            else
-            {
-                return response.Content.Headers.Expires.HasValue
-                           ? response.Content.Headers.Expires.Value
-                           : DateTimeOffset.UtcNow.Add(_defaultExpiry);
-            }
+           
+            return response.Content != null && response.Content.Headers.Expires.HasValue
+                        ? response.Content.Headers.Expires.Value
+                        : DateTimeOffset.UtcNow.Add(_defaultExpiry);
         }
 
 	    public void Dispose()
