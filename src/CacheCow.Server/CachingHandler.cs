@@ -244,7 +244,7 @@ namespace CacheCow.Server
 	            if (response == null)
 	            {
 	                var resp = await base.SendAsync(request, cancellationToken);
-	                return GetCachingContinuation(request)(resp);
+	                return await GetCachingContinuation(request)(resp);
 	            }
 	            else
 	            {
@@ -400,9 +400,9 @@ namespace CacheCow.Server
 
 		}
 
-	    internal Func<HttpResponseMessage, HttpResponseMessage> GetCachingContinuation(HttpRequestMessage request)
+	    internal Func<HttpResponseMessage, Task<HttpResponseMessage>> GetCachingContinuation(HttpRequestMessage request)
 		{
-			return response =>
+			return async response => 
 			{
 				if (!response.IsSuccessStatusCode) // only if successful carry on processing
 					return response;
@@ -410,8 +410,8 @@ namespace CacheCow.Server
 			    try
 			    {
                     var cacheKey = GenerateCacheKey(request);
-                    ExecuteCacheInvalidationRules(cacheKey, request, response);
-                    ExecuteCacheAdditionRules(cacheKey, request, response);
+                    await ExecuteCacheInvalidationRules(cacheKey, request, response);
+                    await ExecuteCacheAdditionRules(cacheKey, request, response);
                     return response;
 			    }
 			    catch (Exception ex)

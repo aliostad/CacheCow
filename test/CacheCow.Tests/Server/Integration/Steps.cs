@@ -176,6 +176,12 @@ namespace CacheCow.Tests.Server.Integration
         [Then(@"Get an unsuccessful response")]
         public void ThenGetAnUnsuccessfulResponse()
         {
+            var response = (HttpResponseMessage) ScenarioContext.Current[Keys.Response];
+            if (response != null)
+            {
+                Assert.False(response.IsSuccessStatusCode, "Succeeded but supposed to fail");
+            }
+
             var ex = ScenarioContext.Current[Keys.Exception];
             Assert.NotNull(ex);
         }
@@ -265,7 +271,7 @@ namespace CacheCow.Tests.Server.Integration
 
         public void Clear()
         {
-            
+            throw new NotImplementedException();
         }
     }
 }
