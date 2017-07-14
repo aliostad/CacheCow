@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$45</id>
+    <version>$version$-alpha1</version>
+    <title>$title$ for .NET 4.4</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <projectUrl>https://github.com/aliostad/CacheCow</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright 2012-2017</copyright>
+    <tags>aspnetwebapi http caching webapi cachecow sqlserver etag</tags>
+	<dependencies>
+      <dependency id="CacheCow.Server" version="$version$" />
+    </dependencies>
+  </metadata>
+	<files>
+		<file src="Scripts\script.sql" target="scripts" /> 
+	</files>
+</package>

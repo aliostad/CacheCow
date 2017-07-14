@@ -45,7 +45,9 @@
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client\CacheCow.Client.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.Redis\CacheCow.Server.EntityTagStore.Redis.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.RedisCacheStore\CacheCow.Client.RedisCacheStore.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-  </Target>
+    <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.SqlServer\CacheCow.Server.EntityTagStore.SqlServer.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
+
+	</Target>
   <Target Name="PackageSN">
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client\CacheCow.Client.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server\CacheCow.Server.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />

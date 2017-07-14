@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B1901128-F84A-46CE-B8FD-E863465F94C2}"
 EndProject
@@ -37,6 +37,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.Redis", "src\CacheCow.Server.EntityTagStore.Redis\CacheCow.Server.EntityTagStore.Redis.csproj", "{096C9308-DD7A-4EE0-87A0-BF76BF278873}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.Redis.Tests", "test\CacheCow.Server.EntityTagStore.Redis.Tests\CacheCow.Server.EntityTagStore.Redis.Tests.csproj", "{54E6669E-C714-40EE-863E-A579A2A99078}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.SqlServer", "src\CacheCow.Server.EntityTagStore.SqlServer\CacheCow.Server.EntityTagStore.SqlServer.csproj", "{F603783D-4974-4F1E-B3CF-91F32CC05C75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,6 +94,10 @@ Global
 		{54E6669E-C714-40EE-863E-A579A2A99078}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54E6669E-C714-40EE-863E-A579A2A99078}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54E6669E-C714-40EE-863E-A579A2A99078}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F603783D-4974-4F1E-B3CF-91F32CC05C75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F603783D-4974-4F1E-B3CF-91F32CC05C75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F603783D-4974-4F1E-B3CF-91F32CC05C75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F603783D-4974-4F1E-B3CF-91F32CC05C75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,5 +115,6 @@ Global
 		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{096C9308-DD7A-4EE0-87A0-BF76BF278873} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 		{54E6669E-C714-40EE-863E-A579A2A99078} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
+		{F603783D-4974-4F1E-B3CF-91F32CC05C75} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 	EndGlobalSection
 EndGlobal
