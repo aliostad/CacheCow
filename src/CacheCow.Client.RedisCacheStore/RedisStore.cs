@@ -74,7 +74,8 @@ namespace CacheCow.Client.RedisCacheStore
             await _serializer.SerializeAsync(response, memoryStream);
             memoryStream.Position = 0;
             var data = memoryStream.ToArray();
-            await _database.StringSetAsync(key.HashBase64, data);
+            var expiry = response.GetExpiry() ?? DateTimeOffset.UtcNow.AddDays(1);
+            await _database.StringSetAsync(key.HashBase64, data, expiry.Subtract(DateTimeOffset.UtcNow));
         }
 
         public Task<bool> TryRemoveAsync(CacheKey key)

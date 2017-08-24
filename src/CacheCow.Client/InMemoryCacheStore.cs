@@ -8,6 +8,7 @@ using System.Runtime.Caching;
 using System.Text;
 using CacheCow.Common;
 using System.Threading.Tasks;
+using CacheCow.Common.Helpers;
 
 namespace CacheCow.Client
 {
@@ -29,18 +30,6 @@ namespace CacheCow.Client
         public InMemoryCacheStore(TimeSpan defaultExpiry)
         {
             _defaultExpiry = defaultExpiry;
-        }
-
-        private DateTimeOffset GetExpiry(HttpResponseMessage response)
-        {      
-            if (response.Headers.CacheControl != null && response.Headers.CacheControl.MaxAge.HasValue)
-            {
-                return DateTimeOffset.UtcNow.Add(response.Headers.CacheControl.MaxAge.Value);
-            }
-           
-            return response.Content != null && response.Content.Headers.Expires.HasValue
-                        ? response.Content.Headers.Expires.Value
-                        : DateTimeOffset.UtcNow.Add(_defaultExpiry);
         }
 
 	    public void Dispose()
@@ -65,7 +54,7 @@ namespace CacheCow.Client
             var memoryStream = new MemoryStream();
 	        await _messageSerializer.SerializeAsync(response, memoryStream);
             response.RequestMessage = req;
-            _responseCache.Set(key.HashBase64, memoryStream.ToArray(), GetExpiry(response));
+            _responseCache.Set(key.HashBase64, memoryStream.ToArray(), response.GetExpiry() ?? DateTimeOffset.UtcNow.Add(_defaultExpiry));
 	    }
 
 	    public Task<bool> TryRemoveAsync(CacheKey key)
