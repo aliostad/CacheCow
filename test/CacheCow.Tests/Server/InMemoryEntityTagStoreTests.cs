@@ -60,7 +60,6 @@ namespace CacheCow.Tests.Server
                 store.AddOrUpdate(cacheKey, headerValue);
                 store.AddOrUpdate(cacheKey2, headerValue);
                 store.RemoveAllByRoutePattern(RoutePattern);
-                store.TryRemove(cacheKey);
                 TimedEntityTagHeaderValue storedHeader;
                 Assert.False(store.TryGetValue(cacheKey, out storedHeader));
                 Assert.False(store.TryGetValue(cacheKey2, out storedHeader));
