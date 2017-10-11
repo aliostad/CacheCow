@@ -3,6 +3,8 @@
 CacheCow
 ========
 
+[![Join the chat at https://gitter.im/aliostad/CacheCow](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/aliostad/CacheCow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 An implementation of HTTP Caching in ASP.NET Web API for both client-side and server-side.
 
 Please see [Wiki](https://github.com/aliostad/CacheCow/wiki)
