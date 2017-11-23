@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -24,12 +25,29 @@ namespace CacheCow.Client.RedisCacheStore
         private IDatabase _database;
 		private bool _dispose;
 		private MessageContentHttpMessageSerializer _serializer = new MessageContentHttpMessageSerializer();
+	    private int _timeoutMilli;
+	    private bool _throwExceptions;
 
-         public RedisStore(string connectionString, 
-            int databaseId = 0)
-        {
-            Init(ConnectionMultiplexer.Connect(connectionString), databaseId);
-        }
+	    public RedisStore(string connectionString, 
+            int databaseId = 0,
+            int timeoutMilli = 2000,
+            bool throwExceptions = true)
+	    {
+	        _throwExceptions = throwExceptions;
+	        _timeoutMilli = timeoutMilli;
+	        try
+	        {
+                Init(ConnectionMultiplexer.Connect(connectionString), databaseId);
+            }
+	        catch (Exception e)
+	        {
+                if(_throwExceptions)
+	                throw;
+                else
+                    Trace.WriteLine(e.ToString());
+	        }
+	        
+	    }
 
         public RedisStore(ConnectionMultiplexer connection, 
             int databaseId = 0)
@@ -56,10 +74,15 @@ namespace CacheCow.Client.RedisCacheStore
 
         public async Task<HttpResponseMessage> GetValueAsync(CacheKey key)
         {
+            return await FinishInTimeOrDie(DoGetValueAsync(key));
+        }
+
+	    private async Task<HttpResponseMessage> DoGetValueAsync(CacheKey key)
+	    {
             HttpResponseMessage result = null;
             string entryKey = key.Hash.ToBase64();
 
-            if (! await _database.KeyExistsAsync(entryKey))
+            if (!await _database.KeyExistsAsync(entryKey))
                 return null;
 
             byte[] value = await _database.StringGetAsync(entryKey);
@@ -70,15 +93,51 @@ namespace CacheCow.Client.RedisCacheStore
 
         public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
         {
+            await FinishInTimeOrDie(DoAddOrUpdateAsync(key, response));
+        }
+
+	    public async Task<T> FinishInTimeOrDie<T>(Task<T> t1)
+	    {
+            var t2 = Task.Delay(_timeoutMilli);
+            var index = Task.WaitAny(new[] { t1, t2 });
+            try
+            {
+                if (index == 1)
+                    return default(T);
+
+                if (t1.IsFaulted)
+                    throw t1.Exception;
+
+                return t1.Result;
+            }
+            catch (Exception e)
+            {
+                if (_throwExceptions)
+                    throw;
+                else
+                    Trace.WriteLine(e.ToString());
+
+                return default(T);
+            }
+        }
+
+	    private async Task<bool> DoAddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
+	    {
             var memoryStream = new MemoryStream();
             await _serializer.SerializeAsync(response, memoryStream);
             memoryStream.Position = 0;
             var data = memoryStream.ToArray();
             var expiry = response.GetExpiry() ?? DateTimeOffset.UtcNow.AddDays(1);
             await _database.StringSetAsync(key.HashBase64, data, expiry.Subtract(DateTimeOffset.UtcNow));
+            return true;
         }
 
         public Task<bool> TryRemoveAsync(CacheKey key)
+        {
+            return FinishInTimeOrDie(DoTryRemoveAsync(key));
+        }
+
+        private Task<bool> DoTryRemoveAsync(CacheKey key)
         {
             return _database.KeyDeleteAsync(key.HashBase64);
         }

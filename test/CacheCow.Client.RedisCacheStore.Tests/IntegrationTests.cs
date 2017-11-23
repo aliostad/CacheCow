@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using CacheCow.Common;
@@ -46,7 +47,21 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 			Assert.That(httpResponseMessage2.Headers.GetCacheCowHeader().RetrievedFromCache.Value);
 		}
 
-		[Ignore]
+        [Ignore("This should work even with no Redis")]
+        [Test]
+        public void ExceptionTest()
+        {
+            var client = new HttpClient(new CachingHandler(new RedisStore(ConnectionString, throwExceptions: false))
+            {
+                InnerHandler = new HttpClientHandler()
+            });
+
+            var httpResponseMessage = client.GetAsync(CacheableResource1).Result;
+            var httpResponseMessage2 = client.GetAsync(CacheableResource1).Result;
+            Assert.AreEqual(HttpStatusCode.OK, httpResponseMessage.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, httpResponseMessage2.StatusCode);
+        }
+        [Ignore]
 		[Test]
 		public void GetValue()
 		{
