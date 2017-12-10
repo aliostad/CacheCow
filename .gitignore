@@ -36,3 +36,4 @@ packages/
 artifacts/
 script.sql
 .idea/
+.vs/

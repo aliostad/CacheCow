@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Scripts\AddUpdateCache.sp" />
     <None Include="Scripts\CacheState.tbl" />
     <None Include="Scripts\ClearCache.sp" />
