@@ -74,7 +74,7 @@ namespace CacheCow.Client.RedisCacheStore
 
         public Task<HttpResponseMessage> GetValueAsync(CacheKey key)
         {
-            return FinishInTimeOrDie(DoGetValueAsync(key));
+            return DoGetValueAsync(key);
         }
 
 	    private async Task<HttpResponseMessage> DoGetValueAsync(CacheKey key)
@@ -82,53 +82,19 @@ namespace CacheCow.Client.RedisCacheStore
             HttpResponseMessage result = null;
             string entryKey = key.Hash.ToBase64();
 
-            Trace.WriteLine("After hash");
-
             if (!await _database.KeyExistsAsync(entryKey))
                 return null;
 
-            Trace.WriteLine("After exists");
-
             byte[] value = await _database.StringGetAsync(entryKey);
-
-            Trace.WriteLine("After get");
-
             var memoryStream = new MemoryStream(value);
             var r = await _serializer.DeserializeToResponseAsync(memoryStream);
-
-            Trace.WriteLine("After deser");
 
             return r;
         }
 
         public Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
         {
-            return FinishInTimeOrDie(DoAddOrUpdateAsync(key, response));
-        }
-
-	    public async Task<T> FinishInTimeOrDie<T>(Task<T> t1)
-	    {
-            var t2 = Task.Delay(_timeoutMilli);
-            var index = Task.WaitAny(new[] { t1, t2 });
-            try
-            {
-                if (index == 1)
-                    return default(T);
-
-                if (t1.IsFaulted)
-                    throw t1.Exception;
-
-                return t1.Result;
-            }
-            catch (Exception e)
-            {
-                if (_throwExceptions)
-                    throw;
-                else
-                    Trace.WriteLine(e.ToString());
-
-                return default(T);
-            }
+            return DoAddOrUpdateAsync(key, response);
         }
 
 	    private async Task<bool> DoAddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
@@ -144,7 +110,7 @@ namespace CacheCow.Client.RedisCacheStore
 
         public Task<bool> TryRemoveAsync(CacheKey key)
         {
-            return FinishInTimeOrDie(DoTryRemoveAsync(key));
+            return DoTryRemoveAsync(key);
         }
 
         private Task<bool> DoTryRemoveAsync(CacheKey key)
