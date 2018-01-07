@@ -12,7 +12,7 @@ namespace CacheCow.IntegrationTesting.Server
     public class TestController : ApiController
     {
         [HttpCacheRefreshPolicy(10)] 
-        [HttpCacheControlPolicy(false, 5)] 
+        [HttpCacheControlPolicy(false, 5, mustRevalidate: true)] 
         public string GetBigString()
         {
             var bytes = new byte[256*1024];
@@ -22,7 +22,7 @@ namespace CacheCow.IntegrationTesting.Server
         }
 
         [HttpCacheRefreshPolicy(10)]
-        [HttpCacheControlPolicy(false, 5)]
+        [HttpCacheControlPolicy(false, 5, mustRevalidate: true)]
         public string GetReverseString(string id)
         {
             return new string(id.Reverse().ToArray());
