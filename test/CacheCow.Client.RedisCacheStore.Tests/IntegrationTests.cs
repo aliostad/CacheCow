@@ -79,6 +79,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 		}
 
         [Test]
+        [Ignore]
         public void WorksWithMaxAgeZeroAndStillStoresIt()
         {
             var redisStore = new RedisStore(ConnectionString);
