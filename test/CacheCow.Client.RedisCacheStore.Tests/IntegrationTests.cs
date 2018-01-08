@@ -22,7 +22,8 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 
 		private const string CacheableResource1 = "https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js";
 		private const string CacheableResource2 = "http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js";
-	    private const string ConnectionString = "localhost";
+        private const string MaxAgeZeroResource = "https://google.com/";
+        private const string ConnectionString = "localhost";
 
 		[Ignore]
 		[Test]
@@ -76,5 +77,21 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 			Assert.IsNotNull(response);
 
 		}
-	}
+
+        [Test]
+        public void WorksWithMaxAgeZeroAndStillStoresIt()
+        {
+            var redisStore = new RedisStore(ConnectionString);
+            var client = new HttpClient(new CachingHandler(redisStore)
+            {
+                InnerHandler = new HttpClientHandler(),
+                DefaultVaryHeaders = new string[0]
+            });
+
+            var httpResponseMessage = client.GetAsync(MaxAgeZeroResource).Result;
+            var key = new CacheKey(MaxAgeZeroResource, new string[0]);
+            var response = redisStore.GetValueAsync(key).Result;
+            Assert.IsNotNull(response);
+        }
+    }
 }

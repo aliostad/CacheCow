@@ -80,7 +80,7 @@ namespace CacheCow.Client.RedisCacheStore
 	    private async Task<HttpResponseMessage> DoGetValueAsync(CacheKey key)
 	    {
             HttpResponseMessage result = null;
-            string entryKey = key.Hash.ToBase64();
+            string entryKey = key.HashBase64;
 
             if (!await _database.KeyExistsAsync(entryKey))
                 return null;
@@ -104,7 +104,15 @@ namespace CacheCow.Client.RedisCacheStore
             memoryStream.Position = 0;
             var data = memoryStream.ToArray();
             var expiry = response.GetExpiry() ?? DateTimeOffset.UtcNow.AddDays(1);
-            await _database.StringSetAsync(key.HashBase64, data, expiry.Subtract(DateTimeOffset.UtcNow));
+            var now = DateTimeOffset.UtcNow;
+            if (expiry <= now)
+            {
+                // NOTE: Eventhough the expiry might be now or maxage=0, there is still
+                // benefit in storing so you can do conditional get after expiry
+                expiry = DateTimeOffset.UtcNow.AddHours(6);
+            }
+
+            await _database.StringSetAsync(key.HashBase64, data, expiry.Subtract(now));
             return true;
         }
 
