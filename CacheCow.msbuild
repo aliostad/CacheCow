@@ -17,10 +17,12 @@
     <TestProjFiles Include=".\test\**\*.csproj" />
     <ScriptsDir Include=".\scripts\" />
     <NugetExeDir Include=".\" />
+	<TestRunnerFilePattern Include=".\packages\NUnit.Runners.2.6.4\tools\*.*" />
+	<TestRunnerLibsPattern Include=".\packages\NUnit.Runners.2.6.4\tools\lib\*.*" />
   </ItemGroup>
 
-  <Target Name="Default" DependsOnTargets="Restore; Compile; Package" />
-  <Target Name="DefaultCI" DependsOnTargets="Restore; Compile; Package; Publish" />
+  <Target Name="Default" DependsOnTargets="Restore; Compile; Test; Package" />
+  <Target Name="DefaultCI" DependsOnTargets="Restore; Compile; Test;Package; Publish" />
   <Target Name="sn" DependsOnTargets="Restore;CompileSN;PackageSN" />
   <Target Name="sn-publish" DependsOnTargets="Restore;CompileSN;PackageSN;Publish" />
  
@@ -35,18 +37,28 @@
   </Target>
   <Target Name="Compile" DependsOnTargets="Init">
     <MSBuild Projects="@(AppProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
+    <MSBuild Projects="@(TestProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
   </Target>
   <Target Name="CompileSN" DependsOnTargets="Init">
     <MSBuild Projects="@(SnProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
   </Target>
-  <Target Name="Package">
+  <Target Name="Test" DependsOnTargets="Compile">
+    <Copy  SourceFiles="@(TestRunnerFilePattern)" DestinationFolder="@(BuildArtifactsDir)" />  
+    <Copy  SourceFiles="@(TestRunnerLibsPattern)" DestinationFolder="@(BuildArtifactsDir)" />  
+    <Exec WorkingDirectory="%(BuildArtifactsDir.FullPath)" Command="nunit-console.exe CacheCow.Tests.dll" />
+    <Exec WorkingDirectory="%(BuildArtifactsDir.FullPath)" Command="nunit-console.exe CacheCow.Client.Tests.dll" />
+    <Exec WorkingDirectory="%(BuildArtifactsDir.FullPath)" Command="nunit-console.exe CacheCow.IntegrationTesting.dll" />
+    <Exec WorkingDirectory="%(BuildArtifactsDir.FullPath)" Command="nunit-console.exe CacheCow.LoadTesting.dll" />	
+    <Exec WorkingDirectory="%(BuildArtifactsDir.FullPath)" Command="nunit-console.exe CacheCow.Client.RedisCacheStore.Tests.dll" />
+    <Exec WorkingDirectory="%(BuildArtifactsDir.FullPath)" Command="nunit-console.exe CacheCow.Server.EntityTagStore.Redis.Tests.dll" />
+  </Target>
+  <Target Name="Package" DependsOnTargets="Test">
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server\CacheCow.Server.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Common\CacheCow.Common.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client\CacheCow.Client.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.Redis\CacheCow.Server.EntityTagStore.Redis.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.RedisCacheStore\CacheCow.Client.RedisCacheStore.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.SqlServer\CacheCow.Server.EntityTagStore.SqlServer.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-
 	</Target>
   <Target Name="PackageSN">
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client\CacheCow.Client.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
