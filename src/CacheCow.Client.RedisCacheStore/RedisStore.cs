@@ -25,20 +25,17 @@ namespace CacheCow.Client.RedisCacheStore
         private IDatabase _database;
 		private bool _dispose;
 		private MessageContentHttpMessageSerializer _serializer = new MessageContentHttpMessageSerializer();
-	    private int _timeoutMilli;
 	    private bool _throwExceptions;
 
 	    public RedisStore(string connectionString, 
             int databaseId = 0,
-            int timeoutMilli = 10000,
             bool throwExceptions = true)
 	    {
 	        _throwExceptions = throwExceptions;
-	        _timeoutMilli = timeoutMilli;
 	        try
 	        {
-                Init(ConnectionMultiplexer.Connect(connectionString), 
-                    databaseId, timeoutMilli, throwExceptions);
+                Init(ConnectionMultiplexer.Connect(connectionString),
+                    databaseId, throwExceptions);
             }
 	        catch (Exception e)
 	        {
@@ -51,30 +48,25 @@ namespace CacheCow.Client.RedisCacheStore
 
         public RedisStore(ConnectionMultiplexer connection, 
             int databaseId = 0,
-            int timeoutMilli = 10000,
             bool throwExceptions = true)
         {
-            Init(connection, databaseId, timeoutMilli, throwExceptions);
+            Init(connection, databaseId, throwExceptions);
         }
 
         public RedisStore(IDatabase database,
-            int timeoutMilli = 10000,
             bool throwExceptions = true)
         {
             _database = database;
             _throwExceptions = throwExceptions;
-            _timeoutMilli = timeoutMilli;
         }
 
         private void Init(ConnectionMultiplexer connection, 
             int databaseId = 0,
-            int timeoutMilli = 10000,
             bool throwExceptions = true)
         {
             _connection = connection;
             _database = _connection.GetDatabase(databaseId);
             _throwExceptions = throwExceptions;
-            _timeoutMilli = timeoutMilli;
         }
 
         public void Dispose()
