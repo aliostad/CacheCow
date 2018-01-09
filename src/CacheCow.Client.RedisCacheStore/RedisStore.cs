@@ -37,7 +37,8 @@ namespace CacheCow.Client.RedisCacheStore
 	        _timeoutMilli = timeoutMilli;
 	        try
 	        {
-                Init(ConnectionMultiplexer.Connect(connectionString), databaseId);
+                Init(ConnectionMultiplexer.Connect(connectionString), 
+                    databaseId, timeoutMilli, throwExceptions);
             }
 	        catch (Exception e)
 	        {
@@ -45,36 +46,58 @@ namespace CacheCow.Client.RedisCacheStore
 	                throw;
                 else
                     Trace.WriteLine(e.ToString());
-	        }
-	        
+	        }	        
 	    }
 
         public RedisStore(ConnectionMultiplexer connection, 
-            int databaseId = 0)
+            int databaseId = 0,
+            int timeoutMilli = 10000,
+            bool throwExceptions = true)
         {
-            Init(connection, databaseId);
+            Init(connection, databaseId, timeoutMilli, throwExceptions);
         }
 
-        public RedisStore(IDatabase database)
+        public RedisStore(IDatabase database,
+            int timeoutMilli = 10000,
+            bool throwExceptions = true)
         {
             _database = database;
+            _throwExceptions = throwExceptions;
+            _timeoutMilli = timeoutMilli;
         }
 
-        private void Init(ConnectionMultiplexer connection, int databaseId = 0)
+        private void Init(ConnectionMultiplexer connection, 
+            int databaseId = 0,
+            int timeoutMilli = 10000,
+            bool throwExceptions = true)
         {
             _connection = connection;
             _database = _connection.GetDatabase(databaseId);
+            _throwExceptions = throwExceptions;
+            _timeoutMilli = timeoutMilli;
         }
 
-		public void Dispose()
+        public void Dispose()
 		{
 			if (_connection != null && _dispose)
 				_connection.Dispose();
 		}
 
-        public Task<HttpResponseMessage> GetValueAsync(CacheKey key)
+        // has to have async for the purpose of exception handling
+        public async Task<HttpResponseMessage> GetValueAsync(CacheKey key)
         {
-            return DoGetValueAsync(key);
+            try
+            {
+                return await DoGetValueAsync(key);
+            }
+            catch (Exception e)
+            {
+                if (_throwExceptions)
+                    throw;
+                else
+                    Trace.WriteLine(e.ToString());
+                return null;
+            }
         }
 
 	    private async Task<HttpResponseMessage> DoGetValueAsync(CacheKey key)
@@ -92,9 +115,20 @@ namespace CacheCow.Client.RedisCacheStore
             return r;
         }
 
-        public Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
+        // has to have async for the purpose of exception handling
+        public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
         {
-            return DoAddOrUpdateAsync(key, response);
+            try
+            {
+                await DoAddOrUpdateAsync(key, response);
+            }
+            catch(Exception e)
+            {
+                if (_throwExceptions)
+                    throw;
+                else
+                    Trace.WriteLine(e.ToString());
+            }
         }
 
 	    private async Task<bool> DoAddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
@@ -116,9 +150,21 @@ namespace CacheCow.Client.RedisCacheStore
             return true;
         }
 
-        public Task<bool> TryRemoveAsync(CacheKey key)
+        // has to have async for the purpose of exception handling
+        public async Task<bool> TryRemoveAsync(CacheKey key)
         {
-            return DoTryRemoveAsync(key);
+            try
+            {
+                return await DoTryRemoveAsync(key);
+            }
+            catch (Exception e)
+            {
+                if (_throwExceptions)
+                    throw;
+                else
+                    Trace.WriteLine(e.ToString());
+                return false;
+            }
         }
 
         private Task<bool> DoTryRemoveAsync(CacheKey key)

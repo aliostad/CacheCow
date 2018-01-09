@@ -78,6 +78,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExceptionPolicyTests.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="PerfTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
