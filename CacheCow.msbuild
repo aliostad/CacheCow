@@ -3,10 +3,10 @@
          ToolsVersion="4.0"
          DefaultTargets="Default">
 
-    <PropertyGroup>
-        <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
-        <SolutionDir Condition=" '$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)</SolutionDir>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <SolutionDir Condition=" '$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)</SolutionDir>
+  </PropertyGroup>
 
   <ItemGroup>
     <BuildArtifactsDir Include=".\artifacts\" />
@@ -66,46 +66,8 @@
     <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Common\CacheCow.Common.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
   </Target>
 
-    <Target Name="Clean">
-        <RemoveDir Directories="@(BuildArtifactsDir)" />
-    </Target>
-    <Target Name="Init" DependsOnTargets="Clean">
-        <MakeDir Directories="@(BuildArtifactsDir);@(PackageOutputDir)" />
-    </Target>
-    <Target Name="Restore">
-        <Exec Command="nuget.exe restore" />
-    </Target>
-    <Target Name="Compile" DependsOnTargets="Init">
-        <MSBuild Projects="@(AppProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
-    </Target>
-    <Target Name="CompileSN" DependsOnTargets="Init">
-        <MSBuild Projects="@(SnProjFiles)" Targets="Rebuild" Properties="OutDir=%(BuildArtifactsDir.FullPath);Configuration=$(Configuration);SolutionDir=$(SolutionDir)" />
-    </Target>
-    <Target Name="Package">
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server\CacheCow.Server.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Common\CacheCow.Common.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client\CacheCow.Client.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.SqlServer\CacheCow.Server.EntityTagStore.SqlServer.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.RavenDb\CacheCow.Server.EntityTagStore.RavenDb.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.MongoDb\CacheCow.Server.EntityTagStore.MongoDb.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.Memcached\CacheCow.Server.EntityTagStore.Memcached.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.Redis\CacheCow.Server.EntityTagStore.Redis.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.Memcached12\CacheCow.Server.EntityTagStore.Memcached12.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server.EntityTagStore.Elasticsearch\CacheCow.Server.EntityTagStore.Elasticsearch.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.FileCacheStore\CacheCow.Client.FileCacheStore.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.MemcachedCacheStore\CacheCow.Client.MemcachedCacheStore.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.MemcachedCacheStore12\CacheCow.Client.MemcachedCacheStore12.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.RedisCacheStore\CacheCow.Client.RedisCacheStore.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client.SqlCacheStore\CacheCow.Client.SqlCacheStore.csproj -Build -Symbols -OutputDirectory .\artifacts\packages" />
-    </Target>
-    <Target Name="PackageSN">
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Client\CacheCow.Client.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Server\CacheCow.Server.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
-        <Exec WorkingDirectory="%(NugetExeDir.FullPath)" Command="nuget.exe pack .\src\CacheCow.Common\CacheCow.Common.sn.nuspec -Build -Symbols -OutputDirectory .\artifacts\packages" />
-    </Target>
-
-    <Target Name="Publish">
-        <Exec WorkingDirectory="%(ScriptsDir.FullPath)" Command="powershell -file .\publish.ps1" />
-    </Target>
+  <Target Name="Publish">
+    <Exec WorkingDirectory="%(ScriptsDir.FullPath)" Command="powershell -file .\publish.ps1" />
+  </Target>
 
 </Project>
