@@ -26,10 +26,10 @@ namespace CacheCow.Tests.Server.Integration.MiniServer
         {
             int id = Item.Items.Count + 1;
             Item.Items.Add(id, new Item()
-            {
-                Name = name,
-                Id = id
-            });
+                                   {
+                                       Name = name,
+                                       Id = id
+                                   });
 
             var response = Request.CreateResponse(HttpStatusCode.Created);
             response.Headers.Location = new Uri(Request.RequestUri,

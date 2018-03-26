@@ -10,7 +10,7 @@ namespace CacheCow.Server.CacheRefreshPolicy
 
         public CacheRefreshPolicyBase() : this(TimeSpan.MaxValue)
         {
-
+            
         }
 
         public CacheRefreshPolicyBase(TimeSpan defaultRefreshInterval)

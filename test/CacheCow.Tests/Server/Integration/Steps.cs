@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web.Http;
 using CacheCow.Common;
 using CacheCow.Server;
@@ -77,9 +78,9 @@ namespace CacheCow.Tests.Server.Integration
             }
             catch (Exception e)
             {
-                ScenarioContext.Current[Keys.Exception] = e;
+                ScenarioContext.Current[Keys.Exception] = e;               
             }
-
+            
         }
 
         [Given(@"Get the collection ETag as (.*)")]
@@ -118,11 +119,11 @@ namespace CacheCow.Tests.Server.Integration
         [Given(@"in my custom RoutePatternProvider I return all the same pattern")]
         public void GivenInMyCustomRoutePatternProviderIReturnAllTheSamePattern()
         {
-            var handler = (CachingHandler)ScenarioContext.Current[Keys.CacheHandler];
+            var handler = (CachingHandler) ScenarioContext.Current[Keys.CacheHandler];
             handler.RoutePatternProvider = new CustomRoutePatternProvider();
         }
 
-
+       
         [When(@"I Create another new item in a different path")]
         public void WhenICreateAnotherNewItemInADifferentPath()
         {
@@ -137,7 +138,7 @@ namespace CacheCow.Tests.Server.Integration
         public void WhenIUpdateTheItem()
         {
             var client = (HttpClient)ScenarioContext.Current[Keys.Client];
-            var result = client.PutAsync(ServerUrl + "Item/" +
+            var result = client.PutAsync(ServerUrl + "Item/" + 
                 ScenarioContext.Current[Keys.ItemId] + "?name=newName", null).Result;
             ScenarioContext.Current[Keys.Response] = result;
 
@@ -169,13 +170,18 @@ namespace CacheCow.Tests.Server.Integration
         [Given(@"my error policy is set to ignore")]
         public void GivenMyErrorPolicyIsSetToIgnore()
         {
-            var handler = (CachingHandler)ScenarioContext.Current[Keys.CacheHandler];
-            handler.ExceptionHandler = CachingHandler.IgnoreExceptionPolicy;
+            // TO DO
         }
 
         [Then(@"Get an unsuccessful response")]
         public void ThenGetAnUnsuccessfulResponse()
         {
+            var response = (HttpResponseMessage) ScenarioContext.Current[Keys.Response];
+            if (response != null)
+            {
+                Assert.False(response.IsSuccessStatusCode, "Succeeded but supposed to fail");
+            }
+
             var ex = ScenarioContext.Current[Keys.Exception];
             Assert.NotNull(ex);
         }
@@ -199,7 +205,7 @@ namespace CacheCow.Tests.Server.Integration
     {
         public void Dispose()
         {
-
+            
         }
 
         public bool TryGetValue(CacheKey key, out TimedEntityTagHeaderValue eTag)
@@ -208,6 +214,42 @@ namespace CacheCow.Tests.Server.Integration
         }
 
         public void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> TryGetValueAsync(CacheKey key, out TimedEntityTagHeaderValue eTag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TimedEntityTagHeaderValue> GetValueAsync(CacheKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddOrUpdateAsync(CacheKey key, TimedEntityTagHeaderValue eTag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> RemoveResourceAsync(string resourceUri)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public Task<bool> TryRemoveAsync(CacheKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> RemoveAllByRoutePatternAsync(string routePattern)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ClearAsync()
         {
             throw new NotImplementedException();
         }
@@ -229,7 +271,7 @@ namespace CacheCow.Tests.Server.Integration
 
         public void Clear()
         {
-
+            throw new NotImplementedException();
         }
     }
 }

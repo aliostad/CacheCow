@@ -6,6 +6,7 @@ using System.Web.Http.Dispatcher;
 using System.Web.Http.Hosting;
 using CacheCow.Server.CacheControlPolicy;
 using CacheCow.Tests.Common;
+using CacheCow.Tests.Server.CacheControlPolicy;
 using NUnit.Framework;
 
 namespace CacheCow.Tests.Server.CacheControlPolicy
@@ -13,6 +14,8 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
     [TestFixture]
     public class AttributeBasedCachePolicyTests
     {
+        public const int ControllerExpirySeconds = 110;
+        public const int ActionExpirySeconds = 120;
 
         [Test]
         public void TestControllerLevel()
@@ -22,23 +25,23 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
             var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://aliostad/api/CachePolicy/1"));
             var routeData = configuration.Routes.GetRouteData(request);
             request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
-
+            
 
             var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue());
             var cchv = attributeBasedCachePolicy.GetCacheControl(request, configuration);
 
-            Assert.AreEqual(TimeSpan.FromSeconds(110), cchv.MaxAge);
+            Assert.AreEqual(TimeSpan.FromSeconds(ControllerExpirySeconds), cchv.MaxAge);
             Assert.AreEqual(false, cchv.Private, "Private");
 
         }
 
-
+        
 
         [Test]
         public void TestRefreshPolicyFor404()
         {
             var configuration = new HttpConfiguration(new HttpRouteCollection("/"));
-            configuration.Services.Replace(typeof(IHttpControllerSelector), new NotFoundControllerSelector());
+            configuration.Services.Replace(typeof (IHttpControllerSelector), new NotFoundControllerSelector());
             configuration.Routes.MapHttpRoute("main", "api/{controller}/{id}");
             var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://aliostad/api/CachePolicyAction/1"));
             var routeData = configuration.Routes.GetRouteData(request);
@@ -62,13 +65,16 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
             var request = new HttpRequestMessage(HttpMethod.Get, new Uri("http://aliostad/api/CachePolicyAction/1"));
             var routeData = configuration.Routes.GetRouteData(request);
             request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
-            var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue());
+            var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue()
+            {
+                MaxAge = TimeSpan.FromSeconds(112),
+            });
 
             // act
             var cchv = attributeBasedCachePolicy.GetCacheControl(request, configuration);
 
             // assert
-            Assert.AreEqual(TimeSpan.FromSeconds(120), cchv.MaxAge);
+            Assert.AreEqual(TimeSpan.FromSeconds(ActionExpirySeconds), cchv.MaxAge);
             Assert.AreEqual(false, cchv.Private, "Private");
 
         }
@@ -83,7 +89,7 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
             var routeData = configuration.Routes.GetRouteData(request);
             request.Properties.Add(HttpPropertyKeys.HttpRouteDataKey, (object)routeData);
             var attributeBasedCachePolicy = new AttributeBasedCacheControlPolicy(new CacheControlHeaderValue()
-            { NoStore = true, NoCache = true });
+                {NoStore = true, NoCache = true});
 
             // action
             var cchv = attributeBasedCachePolicy.GetCacheControl(request, configuration);
@@ -124,12 +130,12 @@ namespace CacheCow.Tests.Server.CacheControlPolicy
     }
 
 
-
+   
 }
 
 namespace CacheCow.Tests.Server.CachePolicy.Controllers
 {
-    [HttpCacheControlPolicy(false, 110)]
+    [HttpCacheControlPolicy(false, AttributeBasedCachePolicyTests.ControllerExpirySeconds)]
     public class CachePolicyController : ApiController
     {
         public string Get(int id)
@@ -138,10 +144,10 @@ namespace CacheCow.Tests.Server.CachePolicy.Controllers
         }
     }
 
-    [HttpCacheControlPolicy(false, 110)]
+    [HttpCacheControlPolicy(false, AttributeBasedCachePolicyTests.ControllerExpirySeconds)]
     public class CachePolicyActionController : ApiController
     {
-        [HttpCacheControlPolicy(false, 120)]
+        [HttpCacheControlPolicy(false, AttributeBasedCachePolicyTests.ActionExpirySeconds)]
         public string Get(int id)
         {
             return "CacheCow";
@@ -154,5 +160,5 @@ namespace CacheCow.Tests.Server.CachePolicy.Controllers
         {
             return "CacheCow";
         }
-    }
+    }    
 }

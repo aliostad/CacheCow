@@ -9,24 +9,24 @@ using System.Text;
 
 namespace CacheCow.Common.Http
 {
-    public class NotModifiedResponse : HttpResponseMessage
-    {
+	public class NotModifiedResponse : HttpResponseMessage
+	{
         public NotModifiedResponse(HttpRequestMessage request, CacheControlHeaderValue cacheControlHeaderValue)
-            : this(request, cacheControlHeaderValue, null)
-        {
-        }
+			: this(request, cacheControlHeaderValue, null)
+		{
+		}
 
 
-        public NotModifiedResponse(HttpRequestMessage request, CacheControlHeaderValue cacheControlHeaderValue, EntityTagHeaderValue etag)
-            : base(HttpStatusCode.NotModified)
-        {
-            if (etag != null)
-                this.Headers.ETag = etag;
-            this.Headers.CacheControl = cacheControlHeaderValue;
-            this.RequestMessage = request;
-        }
+		public NotModifiedResponse(HttpRequestMessage request, CacheControlHeaderValue cacheControlHeaderValue, EntityTagHeaderValue etag)
+			: base(HttpStatusCode.NotModified)
+		{
+			if(etag!=null)
+				this.Headers.ETag = etag;
+		    this.Headers.CacheControl = cacheControlHeaderValue;
+			this.RequestMessage = request;
+		}
 
-    }
+	}
 
-
+	
 }

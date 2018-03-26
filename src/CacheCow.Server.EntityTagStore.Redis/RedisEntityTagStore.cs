@@ -17,7 +17,7 @@ namespace CacheCow.Server.EntityTagStore.Redis
         private const string ResourceFormat = "ResourceUri:{0}";
         private const string RoutePatternFormat = "RoutePattern:{0}";
 
-        public RedisEntityTagStore(string connectionString,
+        public RedisEntityTagStore(string connectionString, 
             int databaseId = 0,
             TimeSpan? expiry = null)
         {
@@ -25,7 +25,7 @@ namespace CacheCow.Server.EntityTagStore.Redis
             Init(ConnectionMultiplexer.Connect(connectionString), databaseId);
         }
 
-        public RedisEntityTagStore(ConnectionMultiplexer connection,
+        public RedisEntityTagStore(ConnectionMultiplexer connection, 
             int databaseId = 0,
             TimeSpan? expiry = null)
         {
@@ -47,77 +47,76 @@ namespace CacheCow.Server.EntityTagStore.Redis
 
         public void Dispose()
         {
-            if (_connection != null)
+            if(_connection!=null)
                 _connection.Dispose();
         }
 
-        public bool TryGetValue(CacheKey key, out TimedEntityTagHeaderValue eTag)
+        public async Task<TimedEntityTagHeaderValue> GetValueAsync(CacheKey key)
         {
-            eTag = null;
-            string value = _database.StringGet(key.HashBase64);
+            string value = await _database.StringGetAsync(key.HashBase64);
+            TimedEntityTagHeaderValue eTag = null;
             if (!string.IsNullOrEmpty(value))
             {
-                return TimedEntityTagHeaderValue.TryParse(value, out eTag);
+                TimedEntityTagHeaderValue.TryParse(value, out eTag);
             }
 
-            return false;
+            return eTag;
         }
 
-        public void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag)
+        public async Task AddOrUpdateAsync(CacheKey key, TimedEntityTagHeaderValue eTag)
         {
-            _database.StringSet(key.HashBase64, eTag.ToString(), _expiry);
+            await _database.StringSetAsync(key.HashBase64, eTag.ToString(), _expiry);
 
             // resource
             var resourceKey = string.Format(ResourceFormat, key.ResourceUri);
-            _database.SetAdd(resourceKey, key.HashBase64);
+            await _database.SetAddAsync(resourceKey, key.HashBase64);
             if (_expiry.HasValue)
-                _database.KeyExpire(resourceKey, _expiry);
+                await _database.KeyExpireAsync(resourceKey, _expiry);
 
             // routePattern
             var routePatternKey = string.Format(RoutePatternFormat, key.RoutePattern);
-            _database.SetAdd(routePatternKey, key.HashBase64);
+            await _database.SetAddAsync(routePatternKey, key.HashBase64);
             if (_expiry.HasValue)
-                _database.KeyExpire(routePatternKey, _expiry);
-
+                await _database.KeyExpireAsync(routePatternKey, _expiry);
         }
 
-        public int RemoveResource(string resourceUri)
+        public async Task<int> RemoveResourceAsync(string resourceUri)
         {
             string key = string.Format(ResourceFormat, resourceUri);
             var count = 0;
             foreach (var member in _database.SetMembers(key))
             {
-                if (TryRemove(member))
+                if (await TryRemoveAsync(member))
                     count++;
             }
 
             return count;
         }
 
-        public bool TryRemove(CacheKey key)
+        public Task<bool> TryRemoveAsync(CacheKey key)
         {
-            return TryRemove(key.HashBase64);
+            return TryRemoveAsync(key.HashBase64);
         }
 
-        private bool TryRemove(string key)
+        private Task<bool> TryRemoveAsync(string key)
         {
-            return _database.KeyDelete(key);
+            return _database.KeyDeleteAsync(key);
         }
 
-        public int RemoveAllByRoutePattern(string routePattern)
+        public async Task<int> RemoveAllByRoutePatternAsync(string routePattern)
         {
             int count = 0;
             string key = string.Format(RoutePatternFormat, routePattern);
             foreach (var member in _database.SetMembers(key))
             {
-                if (TryRemove(member))
+                if (await TryRemoveAsync(member))
                     count++;
             }
 
             return count;
         }
 
-        public void Clear()
+        public Task ClearAsync()
         {
             throw new NotSupportedException("StackExchange.Redis does not supprt Clear() but you can use FLUSH through redis-cli.");
         }

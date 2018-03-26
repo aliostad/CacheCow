@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using CacheCow.Common;
@@ -21,7 +22,8 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 
 		private const string CacheableResource1 = "https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js";
 		private const string CacheableResource2 = "http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js";
-	    private const string ConnectionString = "localhost";
+        private const string MaxAgeZeroResource = "https://google.com/";
+        private const string ConnectionString = "localhost";
 
 		[Ignore]
 		[Test]
@@ -29,7 +31,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 		{
             var redisStore = new RedisStore(ConnectionString);
 			HttpResponseMessage responseMessage = null;
-			Console.WriteLine(redisStore.TryGetValue(new CacheKey("http://google.com", new string[0]), out responseMessage));
+			Console.WriteLine(redisStore.GetValueAsync(new CacheKey("http://google.com", new string[0])).Result);
 		}
 
 		[Ignore]
@@ -46,7 +48,21 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 			Assert.That(httpResponseMessage2.Headers.GetCacheCowHeader().RetrievedFromCache.Value);
 		}
 
-		[Ignore]
+        [Ignore("This should work even with no Redis")]
+        [Test]
+        public void ExceptionTest()
+        {
+            var client = new HttpClient(new CachingHandler(new RedisStore(ConnectionString, throwExceptions: false))
+            {
+                InnerHandler = new HttpClientHandler()
+            });
+
+            var httpResponseMessage = client.GetAsync(CacheableResource1).Result;
+            var httpResponseMessage2 = client.GetAsync(CacheableResource1).Result;
+            Assert.AreEqual(HttpStatusCode.OK, httpResponseMessage.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, httpResponseMessage2.StatusCode);
+        }
+        [Ignore]
 		[Test]
 		public void GetValue()
 		{
@@ -57,11 +73,26 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 			});
 
 			var httpResponseMessage = client.GetAsync(CacheableResource1).Result;
-			HttpResponseMessage response = null;
-			var tryGetValue = redisStore.TryGetValue(new CacheKey(CacheableResource1, new string[0]), out response);
-			Assert.That(tryGetValue);
+			var response = redisStore.GetValueAsync(new CacheKey(CacheableResource1, new string[0])).Result;
 			Assert.IsNotNull(response);
 
 		}
-	}
+
+        [Test]
+        [Ignore]
+        public void WorksWithMaxAgeZeroAndStillStoresIt()
+        {
+            var redisStore = new RedisStore(ConnectionString);
+            var client = new HttpClient(new CachingHandler(redisStore)
+            {
+                InnerHandler = new HttpClientHandler(),
+                DefaultVaryHeaders = new string[0]
+            });
+
+            var httpResponseMessage = client.GetAsync(MaxAgeZeroResource).Result;
+            var key = new CacheKey(MaxAgeZeroResource, new string[0]);
+            var response = redisStore.GetValueAsync(key).Result;
+            Assert.IsNotNull(response);
+        }
+    }
 }

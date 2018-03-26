@@ -2,5 +2,5 @@
 using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("CacheCow.Server.EntityTagStore.SqlServer")]
-[assembly: AssemblyDescription("SqlServer integration library for CacheCow EntityTagStore")]
+[assembly: AssemblyDescription("SQL Server storage for CacheCow.Server")]
 

@@ -53,7 +53,7 @@ namespace CacheCow.Tests.Server.RoutePatternPolicy
         }
 
         [TestCase("api/{controller}/{id}", "http://x/api/y/123", new[] { "/api/y/*" })]
-        [TestCase("api/{controller}/{id}", "http://x/api/y/", new[] { "/api" })]
+        [TestCase("api/{controller}/{id}", "http://x/api/y/", new [] {"/api"} )]
         [TestCase("api/{controller}/{id}", "http://x/api/y", new[] { "/api" })]
         [TestCase("api/{controller}/{chichak}/{id}", "http://x/api/y", new[] { "/api/y" })]
         [TestCase("api/{parentController}/{parentId}/{controller}/{id}", "http://x/api/y/123/z/12", new[] { "/api/y/123" })]
@@ -81,10 +81,10 @@ namespace CacheCow.Tests.Server.RoutePatternPolicy
                 {
                     Console.WriteLine("These were returned:");
                     routePatterns.ToList().ForEach(x => Console.WriteLine("\t" + x));
-                    Assert.Fail("could not find " + exptectedPattern);
+                    Assert.Fail("could not find " + exptectedPattern);                           
                 }
             }
-
+            
         }
 
         private static HttpConfiguration GetDefaultConfig()

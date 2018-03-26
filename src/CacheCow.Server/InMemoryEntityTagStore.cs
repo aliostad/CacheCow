@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Text;
+using System.Threading.Tasks;
 using CacheCow.Common;
 
 namespace CacheCow.Server
 {
-    public class InMemoryEntityTagStore : IEntityTagStore
-    {
+	public class InMemoryEntityTagStore : IEntityTagStore
+	{
 
         private const string ETagCacheName = "###_InMemoryEntityTagStore_ETag_###";
         private const string RoutePatternCacheName = "###_InMemoryEntityTagStore_RoutePattern_###";
@@ -19,15 +20,13 @@ namespace CacheCow.Server
         private MemoryCache _routePatternCache = new MemoryCache(RoutePatternCacheName);
         private MemoryCache _resourceCache = new MemoryCache(ResourceCacheName);
 
+	    public Task<TimedEntityTagHeaderValue> GetValueAsync(CacheKey key)
+	    {
+	        return Task.FromResult((TimedEntityTagHeaderValue) _eTagCache.Get(key.HashBase64));
+	    }
 
-        public bool TryGetValue(CacheKey key, out TimedEntityTagHeaderValue eTag)
-        {
-            eTag = (TimedEntityTagHeaderValue)_eTagCache.Get(key.HashBase64);
-            return eTag != null;
-        }
-
-        public void AddOrUpdate(CacheKey key, TimedEntityTagHeaderValue eTag)
-        {
+	    public Task AddOrUpdateAsync(CacheKey key, TimedEntityTagHeaderValue eTag)
+	    {
             _eTagCache.Set(key.HashBase64, eTag, DateTimeOffset.MaxValue);
 
             // route pattern
@@ -42,15 +41,11 @@ namespace CacheCow.Server
                 , DateTimeOffset.MaxValue) ?? rbag;
             rbag.Add(key);
 
-        }
+	        return Task.FromResult(0);
+	    }
 
-        public bool TryRemove(CacheKey key)
-        {
-            return _eTagCache.Remove(key.HashBase64) != null;
-        }
-
-        public int RemoveResource(string resourceUri)
-        {
+	    public async Task<int> RemoveResourceAsync(string resourceUri)
+	    {
             int count = 0;
             var keys = (ConcurrentBag<CacheKey>)_resourceCache.Get(resourceUri);
 
@@ -58,16 +53,21 @@ namespace CacheCow.Server
             {
                 count = keys.Count;
                 foreach (var entityTagKey in keys)
-                    this.TryRemove(entityTagKey);
+                    await this.TryRemoveAsync(entityTagKey);
                 _resourceCache.Remove(resourceUri);
             }
 
             return count;
-        }
+	    }
 
 
-        public int RemoveAllByRoutePattern(string routePattern)
-        {
+	    public Task<bool> TryRemoveAsync(CacheKey key)
+	    {
+            return Task.FromResult(_eTagCache.Remove(key.HashBase64) != null);
+	    }
+
+	    public async Task<int> RemoveAllByRoutePatternAsync(string routePattern)
+	    {
             int count = 0;
             var keys = (ConcurrentBag<CacheKey>)_routePatternCache.Get(routePattern);
 
@@ -75,15 +75,15 @@ namespace CacheCow.Server
             {
                 count = keys.Count;
                 foreach (var entityTagKey in keys)
-                    this.TryRemove(entityTagKey);
+                    this.TryRemoveAsync(entityTagKey);
                 _routePatternCache.Remove(routePattern);
             }
 
             return count;
-        }
+	    }
 
-        public void Clear()
-        {
+	    public Task ClearAsync()
+	    {
             _eTagCache.Dispose();
             _eTagCache = new MemoryCache(ETagCacheName);
 
@@ -92,14 +92,15 @@ namespace CacheCow.Server
 
             _resourceCache.Dispose();
             _resourceCache = new MemoryCache(ResourceCacheName);
-        }
+	        return Task.FromResult(0);
+	    }
 
-        public void Dispose()
-        {
+	    public void Dispose()
+	    {
             _eTagCache.Dispose();
-            _routePatternCache.Dispose();
+	        _routePatternCache.Dispose();
             _resourceCache.Dispose();
-        }
-    }
+	    }
+	}
 
 }

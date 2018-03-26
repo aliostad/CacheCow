@@ -60,7 +60,7 @@ namespace CacheCow.Tests.Server.CacheRefreshPolicy
 
         }
 
-
+    
 
         [Test]
         public void TestRefreshPolicyFor404()

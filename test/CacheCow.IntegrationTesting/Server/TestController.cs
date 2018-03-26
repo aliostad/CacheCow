@@ -11,18 +11,18 @@ namespace CacheCow.IntegrationTesting.Server
 {
     public class TestController : ApiController
     {
-        [HttpCacheRefreshPolicy(10)]
-        [HttpCacheControlPolicy(false, 5)]
+        [HttpCacheRefreshPolicy(10)] 
+        [HttpCacheControlPolicy(false, 5, mustRevalidate: true)] 
         public string GetBigString()
         {
-            var bytes = new byte[256 * 1024];
+            var bytes = new byte[256*1024];
             var random = new Random();
             random.NextBytes(bytes);
             return Convert.ToBase64String(bytes);
         }
 
         [HttpCacheRefreshPolicy(10)]
-        [HttpCacheControlPolicy(false, 5)]
+        [HttpCacheControlPolicy(false, 5, mustRevalidate: true)]
         public string GetReverseString(string id)
         {
             return new string(id.Reverse().ToArray());
@@ -30,7 +30,7 @@ namespace CacheCow.IntegrationTesting.Server
 
         public void Post(string id)
         {
-
+            
         }
 
     }
@@ -38,7 +38,7 @@ namespace CacheCow.IntegrationTesting.Server
 
     public class ZeroMaxAgeController : ApiController
     {
-        [HttpCacheControlPolicy(true, 0, noCache: false, nostore: false)]
+        [HttpCacheControlPolicy(true, 0, noCache:false, nostore:false)]
         public string GetBigString()
         {
             var bytes = new byte[256 * 1024];
@@ -60,16 +60,16 @@ namespace CacheCow.IntegrationTesting.Server
     }
 
 
-    public class NoMustRevalidateController : ApiController
-    {
-        [HttpCacheRefreshPolicy(10)]
-        [HttpCacheControlPolicy(false, 5, false)]
-        public string GetBigString()
-        {
-            var bytes = new byte[256 * 1024];
-            var random = new Random();
-            random.NextBytes(bytes);
-            return Convert.ToBase64String(bytes);
-        }
-    }
+	public class NoMustRevalidateController : ApiController
+	{
+		[HttpCacheRefreshPolicy(10)]
+		[HttpCacheControlPolicy(false, 5, false)]
+		public string GetBigString()
+		{
+			var bytes = new byte[256 * 1024];
+			var random = new Random();
+			random.NextBytes(bytes);
+			return Convert.ToBase64String(bytes);
+		}
+	}
 }

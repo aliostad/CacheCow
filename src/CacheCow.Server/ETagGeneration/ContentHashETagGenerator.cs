@@ -11,13 +11,13 @@ namespace CacheCow.Server.ETagGeneration
     /// </summary>
     public class ContentHashETagGenerator : DefaultETagGenerator
     {
-        public override EntityTagHeaderValue Generate(string url,
+        public override EntityTagHeaderValue Generate(string url, 
             IEnumerable<KeyValuePair<string, IEnumerable<string>>> requestHeaders)
         {
-            var keyValuePair = requestHeaders.FirstOrDefault(x =>
+            var keyValuePair = requestHeaders.FirstOrDefault(x => 
                 x.Key == ContentHashETagAttribute.ContentHashHeaderName);
 
-
+            
             return keyValuePair.Key == null ? base.Generate(url, requestHeaders) :
                 new EntityTagHeaderValue("\"" + keyValuePair.Value.First() + "\"", false);
         }

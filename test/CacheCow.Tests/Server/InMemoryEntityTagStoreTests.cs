@@ -6,6 +6,7 @@ using CacheCow.Common;
 using CacheCow.Server;
 using NUnit.Framework;
 
+
 namespace CacheCow.Tests.Server
 {
     [TestFixture]
@@ -22,10 +23,10 @@ namespace CacheCow.Tests.Server
                 var cacheKey = new CacheKey(Url, new[] { "Accept" });
 
                 var headerValue = new TimedEntityTagHeaderValue("\"abcdefghijkl\"");
-                store.AddOrUpdate(cacheKey, headerValue);
+                store.AddOrUpdateAsync(cacheKey, headerValue).Wait();
                 TimedEntityTagHeaderValue storedHeader;
-                Assert.True(store.TryGetValue(cacheKey, out storedHeader));
-                Assert.AreEqual(headerValue.ToString(), storedHeader.ToString());
+                Assert.NotNull(storedHeader = store.GetValueAsync(cacheKey).Result);
+                Assert.AreEqual(headerValue.ToString(), storedHeader.ToString());                
             }
         }
 
@@ -38,10 +39,10 @@ namespace CacheCow.Tests.Server
             {
                 var cacheKey = new CacheKey(Url, new[] { "Accept" });
                 var headerValue = new TimedEntityTagHeaderValue("\"abcdefghijkl\"");
-                store.AddOrUpdate(cacheKey, headerValue);
-                store.TryRemove(cacheKey);
+                store.AddOrUpdateAsync(cacheKey, headerValue).Wait();
+                store.TryRemoveAsync(cacheKey).Wait();
                 TimedEntityTagHeaderValue storedHeader;
-                Assert.False(store.TryGetValue(cacheKey, out storedHeader));
+                storedHeader = store.GetValueAsync(cacheKey).Result;
                 Assert.IsNull(storedHeader);
             }
         }
@@ -49,22 +50,18 @@ namespace CacheCow.Tests.Server
         [Test]
         public void AddRemoveByPatternTest()
         {
-
             const string RoutePattern = "stuff";
-
             using (var store = new InMemoryEntityTagStore())
             {
                 var cacheKey = new CacheKey(Url, new[] { "Accept" }, RoutePattern);
                 var cacheKey2 = new CacheKey(Url + "/chaja", new[] { "Accept" }, RoutePattern);
                 var headerValue = new TimedEntityTagHeaderValue("\"abcdefghijkl\"");
-                store.AddOrUpdate(cacheKey, headerValue);
-                store.AddOrUpdate(cacheKey2, headerValue);
-                store.RemoveAllByRoutePattern(RoutePattern);
-                store.TryRemove(cacheKey);
-                TimedEntityTagHeaderValue storedHeader;
-                Assert.False(store.TryGetValue(cacheKey, out storedHeader));
-                Assert.False(store.TryGetValue(cacheKey2, out storedHeader));
-                Assert.IsNull(storedHeader);
+                store.AddOrUpdateAsync(cacheKey, headerValue).Wait();
+                store.AddOrUpdateAsync(cacheKey2, headerValue).Wait();
+                store.RemoveAllByRoutePatternAsync(RoutePattern).Wait();
+                store.TryRemoveAsync(cacheKey).Wait();
+                Assert.Null(store.GetValueAsync(cacheKey).Result);
+                Assert.Null(store.GetValueAsync(cacheKey2).Result);
             }
         }
 
