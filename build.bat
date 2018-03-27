@@ -1,1 +1,3 @@
-powershell.exe -file build.ps1
+
+dotnet restore
+dotnet test

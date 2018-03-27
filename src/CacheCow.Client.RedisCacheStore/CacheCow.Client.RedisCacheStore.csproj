@@ -2,8 +2,8 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
 		<Summary>Redis Storage for HTTP Client Caching</Summary>
-		<AssemblyName>CacheCow.Client.RedisCacgeStore</AssemblyName>
-		<PackageId>CacheCow.Client.RedisCacgeStore</PackageId>
+		<AssemblyName>CacheCow.Client.RedisCacheStore</AssemblyName>
+		<PackageId>CacheCow.Client.RedisCacheStore</PackageId>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
