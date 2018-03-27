@@ -6,15 +6,15 @@
 		<PackageId>CacheCow.Client.Tests</PackageId>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="Data\Request.bin" />
-	  <None Remove="Data\Response.bin" />
+	  <Compile Remove="Data\Request.cs" />
+	  <Compile Remove="Data\Response.cs" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Include="..\Common\DummyMessageHandler.cs" Link="DummyMessageHandler.cs" />
 	</ItemGroup>
 	<ItemGroup>
-	  <EmbeddedResource Include="Data\Request.bin" />
-	  <EmbeddedResource Include="Data\Response.bin" />
+	  <EmbeddedResource Include="Data\Request.cs" />
+	  <EmbeddedResource Include="Data\Response.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
