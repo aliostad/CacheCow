@@ -18,34 +18,34 @@ namespace CacheCow.Client.Tests
 	{
 
 		[Fact]
-		public void Response_Deserialize_Serialize()
+		public async Task Response_Deserialize_Serialize()
 		{
             var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Response.bin");
 			var serializer = new MessageContentHttpMessageSerializer();
-			var response = serializer.DeserializeToResponseAsync(stream).Result;
+			var response = await serializer.DeserializeToResponseAsync(stream);
 
 			var memoryStream = new MemoryStream();
-			serializer.SerializeAsync(response, memoryStream).Wait();
+			await serializer.SerializeAsync(response, memoryStream);
 
 			memoryStream.Position = 0;
-			var response2 = serializer.DeserializeToResponseAsync(memoryStream).Result;
+			var response2 = await serializer.DeserializeToResponseAsync(memoryStream);
 			var result = DeepComparer.Compare(response, response2);
 			if(result.Count()>0)
 				throw new Exception(string.Join("\r\n", result));
 		}
 
 		[Fact]
-		public void Request_Deserialize_Serialize()
+		public async Task Request_Deserialize_Serialize()
 		{
             var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Request.bin");
 			var serializer = new MessageContentHttpMessageSerializer();
-			var request = serializer.DeserializeToRequestAsync(stream).Result;
+			var request = await serializer.DeserializeToRequestAsync(stream);
 
 			var memoryStream = new MemoryStream();
-			serializer.SerializeAsync(request, memoryStream).Wait();
+			await serializer.SerializeAsync(request, memoryStream);
 
 			memoryStream.Position = 0;
-			var request2 = serializer.DeserializeToRequestAsync(memoryStream).Result;
+			var request2 = await serializer.DeserializeToRequestAsync(memoryStream);
 			var result = DeepComparer.Compare(request, request2);
 
 			// !! Ignore this until RTM since this is fixed. See http://aspnetwebstack.codeplex.com/workitem/303
@@ -54,18 +54,18 @@ namespace CacheCow.Client.Tests
 		}
 
 		[Fact]
-		public void Response_Deserialize_Serialize_File()
+		public async Task Response_Deserialize_Serialize_File()
 		{
             var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Response.bin");
 			var serializer = new MessageContentHttpMessageSerializer();
-			var response = serializer.DeserializeToResponseAsync(stream).Result;
+			var response = await serializer.DeserializeToResponseAsync(stream);
 
-			using(var fileStream = new FileStream("response.tmp", FileMode.Create))
+			using(var fileStream = new FileStream(Path.GetTempFileName(), FileMode.Create))
 			{
-				serializer.SerializeAsync(response, fileStream).Wait();
+				await serializer.SerializeAsync(response, fileStream);
 
 				fileStream.Position = 0;
-				var response2 = serializer.DeserializeToResponseAsync(fileStream).Result;
+				var response2 = await serializer.DeserializeToResponseAsync(fileStream);
 				var result = DeepComparer.Compare(response, response2);
 				if (result.Count() > 0)
 					throw new Exception(string.Join("\r\n", result));
@@ -73,18 +73,18 @@ namespace CacheCow.Client.Tests
 		}
 
 		[Fact]
-		public void Request_Deserialize_Serialize_File()
+		public async Task Request_Deserialize_Serialize_File()
 		{
             var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Request.bin");
 			var serializer = new MessageContentHttpMessageSerializer();
-			var request = serializer.DeserializeToRequestAsync(stream).Result;
+			var request = await serializer.DeserializeToRequestAsync(stream);
 
-			using(var fileStream = new FileStream("request.tmp", FileMode.Create))
+			using(var fileStream = new FileStream(Path.GetTempFileName(), FileMode.Create))
 			{
-				serializer.SerializeAsync(request, fileStream).Wait();
+				await serializer.SerializeAsync(request, fileStream);
 
 				fileStream.Position = 0;
-				var request2 = serializer.DeserializeToRequestAsync(fileStream).Result;
+				var request2 = await serializer.DeserializeToRequestAsync(fileStream);
 				var result = DeepComparer.Compare(request, request2);
 
 				if (result.Count() > 0)

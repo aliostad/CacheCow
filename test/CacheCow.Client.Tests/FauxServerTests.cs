@@ -36,15 +36,15 @@ namespace CacheCow.Client.Tests
         }
 
         [Fact]
-        public void RespectsExpiry()
+        public async Task RespectsExpiry()
         {
             _dummyHandler.Response = ResponseHelper.GetOkMessage(1, true);
-            var response = _httpClient.GetAsync(DummyUrl).Result;
+            var response = await _httpClient.GetAsync(DummyUrl);
             Thread.Sleep(100);
             _dummyHandler.Response = ResponseHelper.GetNotModifiedMessage(1);
 
             // first caching
-            response = _httpClient.GetAsync(DummyUrl).Result;
+            response = await _httpClient.GetAsync(DummyUrl);
             Console.WriteLine(response.Headers.GetCacheCowHeader().ToString());
             Assert.NotNull(response.Headers.GetCacheCowHeader().RetrievedFromCache);
             Assert.True(response.Headers.GetCacheCowHeader().RetrievedFromCache.Value);
@@ -52,19 +52,19 @@ namespace CacheCow.Client.Tests
             // stale go getter
             Thread.Sleep(1500);
             _dummyHandler.Response = ResponseHelper.GetOkMessage(1, true);
-            response = _httpClient.GetAsync(DummyUrl).Result;
+            response = await _httpClient.GetAsync(DummyUrl);
             Console.WriteLine(response.Headers.GetCacheCowHeader().ToString());
             Assert.NotNull(response.Headers.GetCacheCowHeader().DidNotExist);
             Assert.True(response.Headers.GetCacheCowHeader().DidNotExist.Value);
 
             // immediate, get it from cache - short circuit
-            response = _httpClient.GetAsync(DummyUrl).Result;
+            response = await _httpClient.GetAsync(DummyUrl);
             Console.WriteLine(response.Headers.GetCacheCowHeader().ToString());
             Assert.Null(response.Headers.GetCacheCowHeader().WasStale);
         }
 
         [Fact]
-        public void ContentGetsSerializedCorrectly()
+        public async Task ContentGetsSerializedCorrectly()
         {
             _dummyHandler.Response = ResponseHelper.GetOkMessage(2000, true);
 
@@ -72,13 +72,13 @@ namespace CacheCow.Client.Tests
             {
                 // first caching
                 string url = DummyUrl + Guid.NewGuid().ToString();
-                var response = _httpClient.GetAsync(url).Result;
+                var response = await _httpClient.GetAsync(url);
                 _dummyHandler.Response = ResponseHelper.GetOkMessage();
 
                 // read from cache
-                response = _httpClient.GetAsync(url).Result;
+                response = await _httpClient.GetAsync(url);
 
-                Assert.Equal(ResponseHelper.ContentString, response.Content.ReadAsStringAsync().Result);
+                Assert.Equal(ResponseHelper.ContentString, await response.Content.ReadAsStringAsync());
             }
         }
     }

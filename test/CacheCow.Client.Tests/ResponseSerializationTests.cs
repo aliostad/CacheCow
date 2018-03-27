@@ -14,52 +14,43 @@ namespace CacheCow.Client.Tests
 	
 	public class ResponseSerializationTests
 	{
-		[Fact(Skip = "Run manually")]
-		public void IntegrationTest_Serialize()
+
+		[Fact]
+		public async Task IntegrationTest_Deserialize()
 		{
-			var httpClient = new HttpClient();
-			var httpResponseMessage = httpClient.GetAsync("http://google.com").Result;
-			Console.WriteLine(httpResponseMessage.Headers.ToString());
-			var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
-			var fileStream = new FileStream("msg.bin", FileMode.Create);
-			defaultHttpResponseMessageSerializer.SerializeAsync(httpResponseMessage, fileStream).Wait();
+            var httpClient = new HttpClient();
+            var httpResponseMessage = await httpClient.GetAsync("http://bbc.com");
+            Console.WriteLine(httpResponseMessage.Headers.ToString());
+            var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
+            var fileStream = new FileStream("msg.bin", FileMode.Create);
+            await defaultHttpResponseMessageSerializer.SerializeAsync(httpResponseMessage, fileStream);
+            fileStream.Close();
+
+            var fileStream2 = new FileStream("msg.bin", FileMode.Open);
+			var httpResponseMessage2 = await defaultHttpResponseMessageSerializer.DeserializeToResponseAsync(fileStream2);
 			fileStream.Close();
 		}
 
-		[Fact(Skip = "Run manually")]
-		public void IntegrationTest_Deserialize()
-		{	var fileStream = new FileStream("msg.bin", FileMode.Open);
-			var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
-			var httpResponseMessage = defaultHttpResponseMessageSerializer.DeserializeToResponseAsync(fileStream).Result;
-			fileStream.Close();
-		}
-
-		[Fact(Skip = "Run manually")]
-		public void IntegrationTest_Serialize_Deserialize()
+		[Fact]
+		public async Task IntegrationTest_Serialize_Deserialize()
 		{
-			
 			var httpClient = new HttpClient();
-			var httpResponseMessage = httpClient.GetAsync("http://google.com").Result;
+			var httpResponseMessage = await httpClient.GetAsync("http://bbc.com");
 			var contentLength = httpResponseMessage.Content.Headers.ContentLength; // access to make sure is populated http://aspnetwebstack.codeplex.com/discussions/388196
 			var memoryStream = new MemoryStream();
 			var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
-			defaultHttpResponseMessageSerializer.SerializeAsync(httpResponseMessage, memoryStream).Wait();
+			await defaultHttpResponseMessageSerializer.SerializeAsync(httpResponseMessage, memoryStream);
 			memoryStream.Position = 0;
-			var httpResponseMessage2 = defaultHttpResponseMessageSerializer.DeserializeToResponseAsync(memoryStream).Result;
+			var httpResponseMessage2 = await defaultHttpResponseMessageSerializer.DeserializeToResponseAsync(memoryStream);
 			Assert.Equal(httpResponseMessage.StatusCode, httpResponseMessage2.StatusCode);
 			Assert.Equal(httpResponseMessage.ReasonPhrase, httpResponseMessage2.ReasonPhrase);
 			Assert.Equal(httpResponseMessage.Version, httpResponseMessage2.Version);
 			Assert.Equal(httpResponseMessage.Headers.ToString(), httpResponseMessage2.Headers.ToString());
-			Assert.Equal(httpResponseMessage.Content.ReadAsStringAsync().Result, 
-				httpResponseMessage2.Content.ReadAsStringAsync().Result);
+			Assert.Equal(await httpResponseMessage.Content.ReadAsStringAsync(), 
+				await httpResponseMessage2.Content.ReadAsStringAsync());
 			Assert.Equal(httpResponseMessage.Content.Headers.ToString(),
 				httpResponseMessage2.Content.Headers.ToString());
 
 		}
-
-
-
-
-
 	}
 }
