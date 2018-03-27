@@ -20,7 +20,7 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public async Task Response_Deserialize_Serialize()
 		{
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Response.bin");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Response.cs");
 			var serializer = new MessageContentHttpMessageSerializer();
 			var response = await serializer.DeserializeToResponseAsync(stream);
 
@@ -37,7 +37,7 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public async Task Request_Deserialize_Serialize()
 		{
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Request.bin");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Request.cs");
 			var serializer = new MessageContentHttpMessageSerializer();
 			var request = await serializer.DeserializeToRequestAsync(stream);
 
@@ -56,7 +56,7 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public async Task Response_Deserialize_Serialize_File()
 		{
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Response.bin");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Response.cs");
 			var serializer = new MessageContentHttpMessageSerializer();
 			var response = await serializer.DeserializeToResponseAsync(stream);
 
@@ -75,7 +75,7 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public async Task Request_Deserialize_Serialize_File()
 		{
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Request.bin");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Request.cs");
 			var serializer = new MessageContentHttpMessageSerializer();
 			var request = await serializer.DeserializeToRequestAsync(stream);
 
