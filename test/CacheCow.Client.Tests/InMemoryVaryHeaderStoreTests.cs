@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 
 namespace CacheCow.Client.Tests
 {
     public class InMemoryVaryHeaderStoreTests
     {
         private const string TestUrl = "/api/Test?a=1";
-        [Test]
+        [Fact]
         public void Test_Insert_Get()
         {
             // arrange
@@ -22,12 +22,12 @@ namespace CacheCow.Client.Tests
             var result = store.TryGetValue(TestUrl, out headers);
 
             // assert
-            Assert.IsTrue(result);
-            Assert.IsNotNull(headers);
-            Assert.AreEqual(hdrs, headers);
+            Assert.True(result);
+            Assert.NotNull(headers);
+            Assert.Equal(hdrs, headers);
         }
 
-        [Test]
+        [Fact]
         public void Test_Insert_remove()
         {
             // arrange
@@ -41,13 +41,13 @@ namespace CacheCow.Client.Tests
             var result = store.TryGetValue(TestUrl, out headers);
 
             // assert
-            Assert.IsFalse(result);
-            Assert.IsNull(headers);
-            Assert.IsTrue(tryRemove);
+            Assert.False(result);
+            Assert.Null(headers);
+            Assert.True(tryRemove);
             
         }
 
-        [Test]
+        [Fact]
         public void Test_Get_NonExisting()
         {
             // arrange
@@ -58,8 +58,8 @@ namespace CacheCow.Client.Tests
             var result = store.TryGetValue(TestUrl, out headers);
 
             // assert
-            Assert.IsFalse(result);
-            Assert.IsNull(headers);
+            Assert.False(result);
+            Assert.Null(headers);
 
         }
     }

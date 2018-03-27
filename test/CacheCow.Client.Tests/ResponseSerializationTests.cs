@@ -6,16 +6,15 @@ using System.Net.Http;
 using System.Text;
 using CacheCow.Client;
 using CacheCow.Common;
-using NUnit.Framework;
+using Xunit;
 using System.Threading.Tasks;
 
 namespace CacheCow.Client.Tests
 {
-	[TestFixture]
+	
 	public class ResponseSerializationTests
 	{
-		[Test]
-		[Ignore]
+		[Fact(Skip = "Run manually")]
 		public void IntegrationTest_Serialize()
 		{
 			var httpClient = new HttpClient();
@@ -27,8 +26,7 @@ namespace CacheCow.Client.Tests
 			fileStream.Close();
 		}
 
-		[Test]
-		[Ignore]
+		[Fact(Skip = "Run manually")]
 		public void IntegrationTest_Deserialize()
 		{	var fileStream = new FileStream("msg.bin", FileMode.Open);
 			var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
@@ -36,8 +34,7 @@ namespace CacheCow.Client.Tests
 			fileStream.Close();
 		}
 
-		[Test]
-		[Ignore]
+		[Fact(Skip = "Run manually")]
 		public void IntegrationTest_Serialize_Deserialize()
 		{
 			
@@ -49,14 +46,14 @@ namespace CacheCow.Client.Tests
 			defaultHttpResponseMessageSerializer.SerializeAsync(httpResponseMessage, memoryStream).Wait();
 			memoryStream.Position = 0;
 			var httpResponseMessage2 = defaultHttpResponseMessageSerializer.DeserializeToResponseAsync(memoryStream).Result;
-			Assert.AreEqual(httpResponseMessage.StatusCode, httpResponseMessage2.StatusCode, "StatusCode");
-			Assert.AreEqual(httpResponseMessage.ReasonPhrase, httpResponseMessage2.ReasonPhrase, "ReasonPhrase");
-			Assert.AreEqual(httpResponseMessage.Version, httpResponseMessage2.Version, "Version");
-			Assert.AreEqual(httpResponseMessage.Headers.ToString(), httpResponseMessage2.Headers.ToString(), "Headers.ToString()");
-			Assert.AreEqual(httpResponseMessage.Content.ReadAsStringAsync().Result, 
-				httpResponseMessage2.Content.ReadAsStringAsync().Result, "Content");
-			Assert.AreEqual(httpResponseMessage.Content.Headers.ToString(),
-				httpResponseMessage2.Content.Headers.ToString(), "Headers.ToString()");
+			Assert.Equal(httpResponseMessage.StatusCode, httpResponseMessage2.StatusCode);
+			Assert.Equal(httpResponseMessage.ReasonPhrase, httpResponseMessage2.ReasonPhrase);
+			Assert.Equal(httpResponseMessage.Version, httpResponseMessage2.Version);
+			Assert.Equal(httpResponseMessage.Headers.ToString(), httpResponseMessage2.Headers.ToString());
+			Assert.Equal(httpResponseMessage.Content.ReadAsStringAsync().Result, 
+				httpResponseMessage2.Content.ReadAsStringAsync().Result);
+			Assert.Equal(httpResponseMessage.Content.Headers.ToString(),
+				httpResponseMessage2.Content.Headers.ToString());
 
 		}
 

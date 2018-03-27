@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,15 +11,14 @@ using System.Diagnostics;
 
 namespace CacheCow.Client.RedisCacheStore.Tests
 {
-    [TestFixture]
+    
     public class PerfTest
     {
         private const string ConnectionString = "localhost";
         private const string UrlStem = "http://foofoo.com/";
         private Random _r = new Random();
 
-        [Ignore("Requires local redis running")]
-        [Test]
+        [Fact(Skip = "Requires local redis running")]
         public void AccessingLocalRedis100TimesLessThanASecond()
         {
             var c = new RedisStore(ConnectionString);
@@ -42,7 +41,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
 
             if(sw.ElapsedMilliseconds > 1000)
             {
-                Assert.Fail("Took more than 1000 ms");
+                throw new Exception("Took more than 1000 ms");
             }
         }
     }

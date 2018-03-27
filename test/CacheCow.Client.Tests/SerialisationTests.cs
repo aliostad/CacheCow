@@ -7,20 +7,20 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CacheCow.Client;
-using NUnit.Framework;
+using Xunit;
 using CacheCow.Common;
 
 
 namespace CacheCow.Client.Tests
 {
-	[TestFixture]
+	
 	public class SerialisationTests
 	{
 
-		[Test]
+		[Fact]
 		public void Response_Deserialize_Serialize()
 		{
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Response.cs");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Response.bin");
 			var serializer = new MessageContentHttpMessageSerializer();
 			var response = serializer.DeserializeToResponseAsync(stream).Result;
 
@@ -31,13 +31,13 @@ namespace CacheCow.Client.Tests
 			var response2 = serializer.DeserializeToResponseAsync(memoryStream).Result;
 			var result = DeepComparer.Compare(response, response2);
 			if(result.Count()>0)
-				Assert.Fail(string.Join("\r\n", result));
+				throw new Exception(string.Join("\r\n", result));
 		}
 
-		[Test]
+		[Fact]
 		public void Request_Deserialize_Serialize()
 		{
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Request.cs");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Request.bin");
 			var serializer = new MessageContentHttpMessageSerializer();
 			var request = serializer.DeserializeToRequestAsync(stream).Result;
 
@@ -53,10 +53,10 @@ namespace CacheCow.Client.Tests
 				//Assert.Fail(string.Join("\r\n", result));
 		}
 
-		[Test]
+		[Fact]
 		public void Response_Deserialize_Serialize_File()
 		{
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Response.cs");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Response.bin");
 			var serializer = new MessageContentHttpMessageSerializer();
 			var response = serializer.DeserializeToResponseAsync(stream).Result;
 
@@ -68,14 +68,14 @@ namespace CacheCow.Client.Tests
 				var response2 = serializer.DeserializeToResponseAsync(fileStream).Result;
 				var result = DeepComparer.Compare(response, response2);
 				if (result.Count() > 0)
-					Assert.Fail(string.Join("\r\n", result));
+					throw new Exception(string.Join("\r\n", result));
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void Request_Deserialize_Serialize_File()
 		{
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Request.cs");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CacheCow.Client.Tests.Data.Request.bin");
 			var serializer = new MessageContentHttpMessageSerializer();
 			var request = serializer.DeserializeToRequestAsync(stream).Result;
 
@@ -88,7 +88,7 @@ namespace CacheCow.Client.Tests
 				var result = DeepComparer.Compare(request, request2);
 
 				if (result.Count() > 0)
-				Assert.Fail(string.Join("\r\n", result));
+				    throw new Exception(string.Join("\r\n", result));
 			}
 		}
 	

@@ -4,11 +4,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.Caching;
 using System.Text;
 using CacheCow.Common;
 using System.Threading.Tasks;
 using CacheCow.Common.Helpers;
+
+#if NET452
+using System.Runtime.Caching;
+#else
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+#endif
 
 namespace CacheCow.Client
 {
@@ -17,8 +23,13 @@ namespace CacheCow.Client
         private const string CacheStoreEntryName = "###InMemoryCacheStore_###";
 	    private static TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(6);
 
-        private MemoryCache _responseCache = new MemoryCache(CacheStoreEntryName);
-		private MessageContentHttpMessageSerializer _messageSerializer = new MessageContentHttpMessageSerializer(true);
+#if NET452
+        private MemoryCache _responseCache = new MemoryCache(CacheStoreEntryName);  
+#else
+        private MemoryCache _responseCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));       
+#endif
+
+        private MessageContentHttpMessageSerializer _messageSerializer = new MessageContentHttpMessageSerializer(true);
 	    private readonly TimeSpan _defaultExpiry;
 
 	    public InMemoryCacheStore()
@@ -59,13 +70,22 @@ namespace CacheCow.Client
 
 	    public Task<bool> TryRemoveAsync(CacheKey key)
 	    {
+#if NET452
             return Task.FromResult(_responseCache.Remove(key.HashBase64) != null);
-	    }
+#else
+            _responseCache.Remove(key.HashBase64);
+            return Task.FromResult(true);
+#endif
+        }
 
 	    public Task ClearAsync()
 	    {
             _responseCache.Dispose();
-            _responseCache = new MemoryCache(CacheStoreEntryName);
+#if NET452
+            _responseCache = new MemoryCache(CacheStoreEntryName);  
+#else
+            _responseCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));       
+#endif
 	        return Task.FromResult(0);
 	    }
 	}

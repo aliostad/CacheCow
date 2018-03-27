@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +10,10 @@ using System.Net;
 
 namespace CacheCow.Client.RedisCacheStore.Tests
 {
-    [TestFixture]
+    
     public class ExceptionPolicyTests
     {
-        [Test]
+        [Fact]
         public void IfNotThrowThenDoesNot()
         {
             var s = new RedisStore("NoneExisting", throwExceptions: false);
@@ -22,8 +22,8 @@ namespace CacheCow.Client.RedisCacheStore.Tests
             s.AddOrUpdateAsync(k, r).Wait();
             var r2 = s.GetValueAsync(k).Result;
             var removed = s.TryRemoveAsync(k).Result;
-            Assert.IsNull(r2, "response");
-            Assert.IsFalse(removed, "removed");
+            Assert.Null(r2);
+            Assert.False(removed);
         }
     }
 }

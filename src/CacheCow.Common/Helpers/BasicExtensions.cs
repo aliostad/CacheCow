@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Threading.Tasks;
 
 namespace CacheCow.Common.Helpers
@@ -36,15 +35,20 @@ namespace CacheCow.Common.Helpers
 
 		public static string ToHex(this byte[] data)
 		{
-			var shb = new SoapHexBinary(data);
-			return shb.ToString();
-		}
+            StringBuilder hex = new StringBuilder(data.Length * 2);
+            foreach (byte b in data)
+                hex.AppendFormat("{0:x2}", b);
+            return hex.ToString();
+        }
 
-		public static byte[] FromHex(this string data)
+		public static byte[] FromHex(this string hex)
 		{
-			var shb = SoapHexBinary.Parse(data);
-			return shb.Value;
-		}
+            int NumberChars = hex.Length;
+            byte[] bytes = new byte[NumberChars / 2];
+            for (int i = 0; i < NumberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
+        }
 
 	}
 

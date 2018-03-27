@@ -1,6 +1,6 @@
 ﻿using CacheCow.Client.Tests.Helper;
 using CacheCow.Common;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace CacheCow.Client.Tests
 {
-    [TestFixture]
+    
     public class InMemoryCacheStoreTests
     {
         private const string DummyUrl = "http://myserver/api/dummy";
 
-        [Test]
+        [Fact]
         public void CanStore()
         {
             var store = new InMemoryCacheStore();

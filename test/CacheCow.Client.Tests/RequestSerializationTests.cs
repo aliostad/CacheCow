@@ -7,14 +7,14 @@ using System.Net.Http.Headers;
 using System.Text;
 using CacheCow.Client;
 using CacheCow.Common;
-using NUnit.Framework;
+using Xunit;
 
 namespace CacheCow.Tests.Client
 {
-	[TestFixture]
+	
 	public class RequestSerializationTests
 	{
-		[Test]
+		[Fact]
 		public void IntegrationTest_Serialize()
 		{
 			var requestMessage = new HttpRequestMessage( HttpMethod.Get, "http://some.server/api/foo");
@@ -24,7 +24,7 @@ namespace CacheCow.Tests.Client
 			serializer.SerializeAsync(requestMessage, memoryStream).Wait();
 			memoryStream.Position = 0;
 			var request = serializer.DeserializeToRequestAsync(memoryStream).Result;
-			Assert.AreEqual(requestMessage.Headers.Range.Unit, request.Headers.Range.Unit);
+			Assert.Equal(requestMessage.Headers.Range.Unit, request.Headers.Range.Unit);
 		}
 	}
 }

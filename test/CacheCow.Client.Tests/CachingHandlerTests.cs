@@ -11,11 +11,11 @@ using CacheCow.Client;
 using CacheCow.Client.Headers;
 using CacheCow.Common;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace CacheCow.Client.Tests
 {
-	[TestFixture]
+	
 	public class CachingHandlerTests
 	{
 		private const string DummyUrl = "http://myserver/api/dummy";
@@ -25,8 +25,7 @@ namespace CacheCow.Client.Tests
 		private DummyMessageHandler _messageHandler;
 	    private CachingHandler _cachingHandler;
 
-		[SetUp]
-		public void Setup()
+		public CachingHandlerTests()
 		{
 			_cacheStore = new Mock<ICacheStore>();
 			_messageHandler = new DummyMessageHandler();
@@ -38,7 +37,7 @@ namespace CacheCow.Client.Tests
             _client = new HttpClient(_cachingHandler);
 		}
 
-		[Test]
+		[Fact]
 		public void Methods_Other_Than_PUT_GET_Ignored()
 		{
 			var request = new HttpRequestMessage(HttpMethod.Delete, DummyUrl);
@@ -47,12 +46,12 @@ namespace CacheCow.Client.Tests
 			var task = _client.SendAsync(request);
 			var response = task.Result;
 
-			Assert.AreEqual(response, httpResponseMessage);
-			Assert.IsNull(response.Headers.CacheControl);
-			Assert.IsNull(request.Headers.CacheControl);
+			Assert.Equal(response, httpResponseMessage);
+			Assert.Null(response.Headers.CacheControl);
+			Assert.Null(request.Headers.CacheControl);
 		}
 
-		[Test]
+		[Fact]
 		public void NoStore_Ignored()
 		{
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -63,12 +62,12 @@ namespace CacheCow.Client.Tests
 			var task = _client.SendAsync(request);
 			var response = task.Result;
 
-			Assert.AreEqual(response, httpResponseMessage);
-			Assert.IsNull(response.Headers.CacheControl);
+			Assert.Equal(response, httpResponseMessage);
+			Assert.Null(response.Headers.CacheControl);
 
 		}
 
-        [Test]
+        [Fact]
         public void TestMemoryLeak()
         {
             var memorySize64 = Process.GetCurrentProcess().PrivateMemorySize64;
@@ -80,11 +79,11 @@ namespace CacheCow.Client.Tests
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
                 if (Process.GetCurrentProcess().PrivateMemorySize64 - memorySize64 > 2 * 1024 * 1024)
-                    Assert.Fail("Memory leak");
+                    throw new Exception("Memory leak");
             }
         }
 
-		[Test]
+		[Fact]
 		public void Get_OK_But_Not_In_Cache_To_Insert_In_Cache()
 		{
 			// setup 
@@ -103,13 +102,13 @@ namespace CacheCow.Client.Tests
 			CacheCowHeader.TryParse(header.Value.First() , out cacheCowHeader);
 			
             // verify
-			Assert.IsNotNull(cacheCowHeader);
-			Assert.AreEqual(true, cacheCowHeader.DidNotExist);
+			Assert.NotNull(cacheCowHeader);
+			Assert.Equal(true, cacheCowHeader.DidNotExist);
 
 
 		}
 
-		[Test]
+		[Fact]
 		public void Get_Stale_And_In_Cache_To_Get_From_Cache()
 		{
 			// setup 
@@ -127,15 +126,15 @@ namespace CacheCow.Client.Tests
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
 
 			// verify
-			Assert.IsNotNull(cacheCowHeader);
-			Assert.AreSame(response, responseReturned);
-			Assert.AreEqual(true, cacheCowHeader.RetrievedFromCache);
+			Assert.NotNull(cacheCowHeader);
+			Assert.Equal(response, responseReturned);
+			Assert.Equal(true, cacheCowHeader.RetrievedFromCache);
 
 		}
 
 
 
-		[Test]
+		[Fact]
 		public void Get_Stale_ApplyValidation_NotModified()
 		{
 			// setup 
@@ -163,15 +162,15 @@ namespace CacheCow.Client.Tests
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
 
 			// verify
-			Assert.IsNotNull(cacheCowHeader);
-			Assert.AreSame(responseFromCache, responseReturned);
-            Assert.AreEqual(true, cacheCowHeader.WasStale);
-            Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
-            Assert.AreNotEqual(then, responseFromCache.Headers.Date);
+			Assert.NotNull(cacheCowHeader);
+			Assert.Equal(responseFromCache, responseReturned);
+            Assert.Equal(true, cacheCowHeader.WasStale);
+            Assert.Equal(true, cacheCowHeader.CacheValidationApplied);
+            Assert.NotEqual(then, responseFromCache.Headers.Date);
 
 		}
 
-		[Test]
+		[Fact]
 		public void Get_Must_Revalidate_Etag_NotModified()
 		{
 			// setup 
@@ -193,14 +192,14 @@ namespace CacheCow.Client.Tests
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
 
 			// verify
-			Assert.IsNotNull(cacheCowHeader);
-			Assert.AreEqual(ETagValue, request.Headers.IfNoneMatch.First().Tag);
-			Assert.AreSame(responseFromCache, responseReturned);
-			Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
+			Assert.NotNull(cacheCowHeader);
+			Assert.Equal(ETagValue, request.Headers.IfNoneMatch.First().Tag);
+			Assert.Equal(responseFromCache, responseReturned);
+			Assert.Equal(true, cacheCowHeader.CacheValidationApplied);
 
 		}
 
-		[Test]
+		[Fact]
 		public void Get_Must_Revalidate_Expires_NotModified()
 		{
 			// setup 
@@ -227,14 +226,14 @@ namespace CacheCow.Client.Tests
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
 
 			// verify
-			Assert.IsNotNull(cacheCowHeader);
-			Assert.AreEqual(lastModified.ToString(), request.Headers.IfModifiedSince.Value.ToString());
-			Assert.AreSame(responseFromCache, responseReturned);
-			Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
+			Assert.NotNull(cacheCowHeader);
+			Assert.Equal(lastModified.ToString(), request.Headers.IfModifiedSince.Value.ToString());
+			Assert.Equal(responseFromCache, responseReturned);
+			Assert.Equal(true, cacheCowHeader.CacheValidationApplied);
 
 		}
 
-		[Test]
+		[Fact]
 		public void Get_Must_Revalidate_Expires_Modified()
 		{
 			// setup 
@@ -260,13 +259,13 @@ namespace CacheCow.Client.Tests
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
 
 			// verify
-			Assert.IsNotNull(cacheCowHeader);
-			Assert.AreSame(responseFromServer, responseReturned);
-			Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
+			Assert.NotNull(cacheCowHeader);
+			Assert.Equal(responseFromServer, responseReturned);
+			Assert.Equal(true, cacheCowHeader.CacheValidationApplied);
 
 		}
 
-        [Test]
+        [Fact]
         public void Get_NoMustRevalidate_Expires_Modified()
         {
             // setup 
@@ -291,13 +290,13 @@ namespace CacheCow.Client.Tests
             CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
 
             // verify
-            Assert.IsNotNull(cacheCowHeader);
-            Assert.AreSame(responseFromServer, responseReturned);
-            Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
+            Assert.NotNull(cacheCowHeader);
+            Assert.Equal(responseFromServer, responseReturned);
+            Assert.Equal(true, cacheCowHeader.CacheValidationApplied);
 
         }
 
-        [Test]
+        [Fact]
         public void Get_NoCache_Expires_ResultsInValidation()
         {
             // setup 
@@ -323,13 +322,13 @@ namespace CacheCow.Client.Tests
             CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
 
             // verify
-            Assert.IsNotNull(cacheCowHeader);
-            Assert.AreSame(responseFromServer, responseReturned);
-            Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
+            Assert.NotNull(cacheCowHeader);
+            Assert.Equal(responseFromServer, responseReturned);
+            Assert.Equal(true, cacheCowHeader.CacheValidationApplied);
 
         }
 
-        [Test]
+        [Fact]
         public void Get_NoMustRevalidate_NoMustRevalidateByDefault_Expires_GetFromCache()
         {
             // setup 
@@ -354,13 +353,13 @@ namespace CacheCow.Client.Tests
             CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
 
             // verify
-            Assert.IsNotNull(cacheCowHeader);
-            Assert.AreSame(responseFromCache, responseReturned);
-            Assert.AreEqual(true, cacheCowHeader.WasStale);
+            Assert.NotNull(cacheCowHeader);
+            Assert.Equal(responseFromCache, responseReturned);
+            Assert.Equal(true, cacheCowHeader.WasStale);
 
         }
 
-		[Test]
+		[Fact]
 		public void Get_NotModified_With_Stale_Client_Cache_Shall_Update_Date_Header()
 		{
 			// setup 
@@ -386,12 +385,12 @@ namespace CacheCow.Client.Tests
 
 
 			// verify
-			Assert.IsNotNull(cacheCowHeader);
-			Assert.AreEqual(true, cacheCowHeader.CacheValidationApplied);
-			Assert.AreEqual(true, cacheCowHeader.WasStale);
+			Assert.NotNull(cacheCowHeader);
+			Assert.Equal(true, cacheCowHeader.CacheValidationApplied);
+			Assert.Equal(true, cacheCowHeader.WasStale);
 		}
 
-		[Test]
+		[Fact]
 		public void Put_Validate_Etag()
 		{
 			// setup 
@@ -407,12 +406,12 @@ namespace CacheCow.Client.Tests
 			var responseReturned = task.Result;
 
 			// verify
-			Assert.AreEqual(ETagValue, request.Headers.IfMatch.First().Tag);
-			Assert.AreSame(responseFromServer, responseReturned);
+			Assert.Equal(ETagValue, request.Headers.IfMatch.First().Tag);
+			Assert.Equal(responseFromServer, responseReturned);
 
 		}
 
-		[Test]
+		[Fact]
 		public void Put_Validate_Expires()
 		{
 			// setup 
@@ -432,13 +431,13 @@ namespace CacheCow.Client.Tests
 			var responseReturned = task.Result;
 
 			// verify
-			Assert.AreEqual(lastModified.ToString(), request.Headers.IfUnmodifiedSince.Value.ToString());
-			Assert.AreSame(responseFromServer, responseReturned);
+			Assert.Equal(lastModified.ToString(), request.Headers.IfUnmodifiedSince.Value.ToString());
+			Assert.Equal(responseFromServer, responseReturned);
 
 		}
 
       
-        [Test]
+        [Fact]
 	    public void DoesNotDisposeCacheStoreIfPassedToIt()
         {
             var mock = new Moq.Mock<ICacheStore>(MockBehavior.Strict);
@@ -447,7 +446,7 @@ namespace CacheCow.Client.Tests
             mock.Verify();
         }
 
-        [Test]
+        [Fact]
         public void DoesNotDisposeVaryHeaderStoreIfPassedToIt()
         {
             var mockcs = new Moq.Mock<ICacheStore>();

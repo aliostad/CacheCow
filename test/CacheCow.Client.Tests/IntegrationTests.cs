@@ -8,15 +8,14 @@ using System.Text;
 using System.Threading;
 using CacheCow.Client;
 using CacheCow.Client.Headers;
-using NUnit.Framework;
+using Xunit;
 
 namespace CacheCow.Client.Tests
 {
-	[TestFixture]
+	
 	public class IntegrationTests
 	{
-		[Test]
-		[Ignore]
+		[Fact(Skip = "Run manually")]
 		public void Test_GoogleImage_WorksOnFirstSecondRequestNotThird()
 		{
 			const string Url = "https://ssl.gstatic.com/gb/images/j_e6a6aca6.png";
@@ -29,8 +28,8 @@ namespace CacheCow.Client.Tests
 			var httpResponseMessage = httpClient.GetAsync(Url).Result;
 			var httpResponseMessage2 = httpClient.GetAsync(Url).Result;
 			var cacheCowHeader = httpResponseMessage2.Headers.GetCacheCowHeader();
-			Assert.IsNotNull(cacheCowHeader);
-			Assert.AreEqual(true, cacheCowHeader.RetrievedFromCache);
+			Assert.NotNull(cacheCowHeader);
+			Assert.Equal(true, cacheCowHeader.RetrievedFromCache);
 		}
  	}
 }

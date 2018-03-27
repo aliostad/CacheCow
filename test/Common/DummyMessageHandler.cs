@@ -10,7 +10,7 @@ namespace CacheCow
 			CancellationToken cancellationToken)
 		{
 			Request = request;
-			return TaskHelpers.FromResult(Response);
+			return Task.FromResult(Response);
 		}
 
 		public HttpRequestMessage Request { get; set; }

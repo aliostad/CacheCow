@@ -7,7 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 using CacheCow.Client.Headers;
 using CacheCow.Client.Tests.Helper;
 
@@ -24,8 +24,7 @@ namespace CacheCow.Client.Tests
         private const string ETagValue = "\"abcdef\"";
         private InMemoryCacheStore _store = new InMemoryCacheStore();
 
-        [SetUp]
-        public void Setup()
+        public FauxServerTests()
         {
 
             var _cachingHandler = new CachingHandler(_store)
@@ -36,7 +35,7 @@ namespace CacheCow.Client.Tests
             _httpClient = new HttpClient(_cachingHandler);
         }
 
-        [Test]
+        [Fact]
         public void RespectsExpiry()
         {
             _dummyHandler.Response = ResponseHelper.GetOkMessage(1, true);
@@ -47,24 +46,24 @@ namespace CacheCow.Client.Tests
             // first caching
             response = _httpClient.GetAsync(DummyUrl).Result;
             Console.WriteLine(response.Headers.GetCacheCowHeader().ToString());
-            Assert.NotNull(response.Headers.GetCacheCowHeader().RetrievedFromCache, "RetrievedFromCache");
-            Assert.IsTrue(response.Headers.GetCacheCowHeader().RetrievedFromCache.Value);
+            Assert.NotNull(response.Headers.GetCacheCowHeader().RetrievedFromCache);
+            Assert.True(response.Headers.GetCacheCowHeader().RetrievedFromCache.Value);
 
             // stale go getter
             Thread.Sleep(1500);
             _dummyHandler.Response = ResponseHelper.GetOkMessage(1, true);
             response = _httpClient.GetAsync(DummyUrl).Result;
             Console.WriteLine(response.Headers.GetCacheCowHeader().ToString());
-            Assert.NotNull(response.Headers.GetCacheCowHeader().DidNotExist, "DidNotExist");
-            Assert.IsTrue(response.Headers.GetCacheCowHeader().DidNotExist.Value);
+            Assert.NotNull(response.Headers.GetCacheCowHeader().DidNotExist);
+            Assert.True(response.Headers.GetCacheCowHeader().DidNotExist.Value);
 
             // immediate, get it from cache - short circuit
             response = _httpClient.GetAsync(DummyUrl).Result;
             Console.WriteLine(response.Headers.GetCacheCowHeader().ToString());
-            Assert.IsNull(response.Headers.GetCacheCowHeader().WasStale);
+            Assert.Null(response.Headers.GetCacheCowHeader().WasStale);
         }
 
-        [Test]
+        [Fact]
         public void ContentGetsSerializedCorrectly()
         {
             _dummyHandler.Response = ResponseHelper.GetOkMessage(2000, true);
@@ -79,7 +78,7 @@ namespace CacheCow.Client.Tests
                 // read from cache
                 response = _httpClient.GetAsync(url).Result;
 
-                Assert.AreEqual(ResponseHelper.ContentString, response.Content.ReadAsStringAsync().Result);
+                Assert.Equal(ResponseHelper.ContentString, response.Content.ReadAsStringAsync().Result);
             }
         }
     }

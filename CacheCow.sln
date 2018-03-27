@@ -5,40 +5,27 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B1901128-F84A-46CE-B8FD-E863465F94C2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{039FAC3C-D681-4028-ADB3-A382C695F7E9}"
-	ProjectSection(SolutionItems) = preProject
-		CacheCow.msbuild = CacheCow.msbuild
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{141CEBF7-F872-4181-8B16-1E0FAE517D59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Common", "src\CacheCow.Common\CacheCow.Common.csproj", "{88E170E4-B857-42FE-963C-0505502B548C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Common", "src\CacheCow.Common\CacheCow.Common.csproj", "{88E170E4-B857-42FE-963C-0505502B548C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server", "src\CacheCow.Server\CacheCow.Server.csproj", "{B67727F4-5B65-41D0-8D26-8D1C32CEA63D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Client", "src\CacheCow.Client\CacheCow.Client.csproj", "{943325CB-7189-42FE-9DA4-E513DB3E0E87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client", "src\CacheCow.Client\CacheCow.Client.csproj", "{943325CB-7189-42FE-9DA4-E513DB3E0E87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Tests", "test\CacheCow.Tests\CacheCow.Tests.csproj", "{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{943325CB-7189-42FE-9DA4-E513DB3E0E87} = {943325CB-7189-42FE-9DA4-E513DB3E0E87}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Tests", "test\CacheCow.Tests\CacheCow.Tests.csproj", "{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.RedisCacheStore", "src\CacheCow.Client.RedisCacheStore\CacheCow.Client.RedisCacheStore.csproj", "{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Client.RedisCacheStore", "src\CacheCow.Client.RedisCacheStore\CacheCow.Client.RedisCacheStore.csproj", "{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.RedisCacheStore.Tests", "test\CacheCow.Client.RedisCacheStore.Tests\CacheCow.Client.RedisCacheStore.Tests.csproj", "{53E2C779-A780-41B2-A55B-0E4156C5AD7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.Tests", "test\CacheCow.Client.Tests\CacheCow.Client.Tests.csproj", "{1ADB6175-95B9-4BB9-AF56-B4291196554C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{9CB641A4-8F76-42AC-BFE4-2991EBC868E0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.LoadTesting", "test\CacheCow.LoadTesting\CacheCow.LoadTesting.csproj", "{F8652DD6-6031-4BFC-8387-2175ABA211A0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.IntegrationTesting", "test\CacheCow.IntegrationTesting\CacheCow.IntegrationTesting.csproj", "{F65D37F5-2F97-4CD2-BC90-E67670108FC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Client.Tests", "test\CacheCow.Client.Tests\CacheCow.Client.Tests.csproj", "{1ADB6175-95B9-4BB9-AF56-B4291196554C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Testing.Common", "test\CacheCow.Testing.Common\CacheCow.Testing.Common.csproj", "{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.Redis", "src\CacheCow.Server.EntityTagStore.Redis\CacheCow.Server.EntityTagStore.Redis.csproj", "{096C9308-DD7A-4EE0-87A0-BF76BF278873}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.Redis.Tests", "test\CacheCow.Server.EntityTagStore.Redis.Tests\CacheCow.Server.EntityTagStore.Redis.Tests.csproj", "{54E6669E-C714-40EE-863E-A579A2A99078}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.EntityTagStore.SqlServer", "src\CacheCow.Server.EntityTagStore.SqlServer\CacheCow.Server.EntityTagStore.SqlServer.csproj", "{F603783D-4974-4F1E-B3CF-91F32CC05C75}"
+	ProjectSection(ProjectDependencies) = postProject
+		{88E170E4-B857-42FE-963C-0505502B548C} = {88E170E4-B857-42FE-963C-0505502B548C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,10 +37,6 @@ Global
 		{88E170E4-B857-42FE-963C-0505502B548C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88E170E4-B857-42FE-963C-0505502B548C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88E170E4-B857-42FE-963C-0505502B548C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B67727F4-5B65-41D0-8D26-8D1C32CEA63D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B67727F4-5B65-41D0-8D26-8D1C32CEA63D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B67727F4-5B65-41D0-8D26-8D1C32CEA63D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B67727F4-5B65-41D0-8D26-8D1C32CEA63D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{943325CB-7189-42FE-9DA4-E513DB3E0E87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{943325CB-7189-42FE-9DA4-E513DB3E0E87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{943325CB-7189-42FE-9DA4-E513DB3E0E87}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -74,48 +57,22 @@ Global
 		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F8652DD6-6031-4BFC-8387-2175ABA211A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F8652DD6-6031-4BFC-8387-2175ABA211A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F8652DD6-6031-4BFC-8387-2175ABA211A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F8652DD6-6031-4BFC-8387-2175ABA211A0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F65D37F5-2F97-4CD2-BC90-E67670108FC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F65D37F5-2F97-4CD2-BC90-E67670108FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F65D37F5-2F97-4CD2-BC90-E67670108FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F65D37F5-2F97-4CD2-BC90-E67670108FC5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186}.Release|Any CPU.Build.0 = Release|Any CPU
-		{096C9308-DD7A-4EE0-87A0-BF76BF278873}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{096C9308-DD7A-4EE0-87A0-BF76BF278873}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{096C9308-DD7A-4EE0-87A0-BF76BF278873}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{096C9308-DD7A-4EE0-87A0-BF76BF278873}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54E6669E-C714-40EE-863E-A579A2A99078}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54E6669E-C714-40EE-863E-A579A2A99078}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54E6669E-C714-40EE-863E-A579A2A99078}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54E6669E-C714-40EE-863E-A579A2A99078}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F603783D-4974-4F1E-B3CF-91F32CC05C75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F603783D-4974-4F1E-B3CF-91F32CC05C75}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F603783D-4974-4F1E-B3CF-91F32CC05C75}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F603783D-4974-4F1E-B3CF-91F32CC05C75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{88E170E4-B857-42FE-963C-0505502B548C} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
-		{B67727F4-5B65-41D0-8D26-8D1C32CEA63D} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 		{943325CB-7189-42FE-9DA4-E513DB3E0E87} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 		{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 		{53E2C779-A780-41B2-A55B-0E4156C5AD7F} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{1ADB6175-95B9-4BB9-AF56-B4291196554C} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
-		{F8652DD6-6031-4BFC-8387-2175ABA211A0} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
-		{F65D37F5-2F97-4CD2-BC90-E67670108FC5} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{31D0EF4E-6E30-46D4-9D8B-BAA69F24E186} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
-		{096C9308-DD7A-4EE0-87A0-BF76BF278873} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
-		{54E6669E-C714-40EE-863E-A579A2A99078} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
-		{F603783D-4974-4F1E-B3CF-91F32CC05C75} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4EFCA3E6-84FB-4520-8C47-62D010919E88}
