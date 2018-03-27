@@ -35,5 +35,5 @@ nuget/
 packages/
 artifacts/
 script.sql
-.vs/
 .idea/
+.vs/

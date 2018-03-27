@@ -1,146 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CacheCow.Tests</RootNamespace>
-    <AssemblyName>CacheCow.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'NoTest|AnyCPU'">
-    <OutputPath>bin\NoTest\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.6.1.12217, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NUnit.2.6.1\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Mocks">
-      <HintPath>..\..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.Formatting">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Core.4.0.20710.0\lib\net40\System.Web.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.20710.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="TechTalk.SpecFlow">
-      <HintPath>..\..\packages\SpecFlow.1.9.0\lib\net35\TechTalk.SpecFlow.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\Common\DummyMessageHandler.cs">
-      <Link>Common\DummyMessageHandler.cs</Link>
-    </Compile>
-    <Compile Include="Common\NotFoundControllerSelector.cs" />
-    <Compile Include="Server\Integration\CacheInvalidation.feature.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CacheInvalidation.feature</DependentUpon>
-    </Compile>
-    <Compile Include="Server\Integration\ExceptionHandling.feature.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ExceptionHandling.feature</DependentUpon>
-    </Compile>
-    <Compile Include="Server\Integration\MiniServer\InMemoryServer.cs" />
-    <Compile Include="Server\Integration\MiniServer\Item.cs" />
-    <Compile Include="Server\Integration\MiniServer\ItemController.cs" />
-    <Compile Include="Server\Integration\Steps.cs" />
-    <Compile Include="Server\RoutePatternPolicy\ConventionalRoutePatternProviderTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Server\CacheControlPolicy\AttributeBasedCachePolicyTests.cs" />
-    <Compile Include="Server\CacheRefreshPolicy\AttributeBasedCacheRefreshPolicyTests.cs" />
-    <Compile Include="Server\CachingHandlerRulesTests.cs" />
-    <Compile Include="Server\CachingHandlerTests.cs" />
-    <Compile Include="Server\InMemoryEntityTagStoreTests.cs" />
-    <Compile Include="TimedEntityTagHeaderValueTests.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-    <None Include="Server\Integration\CacheInvalidation.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>CacheInvalidation.feature.cs</LastGenOutput>
-    </None>
-    <None Include="Server\Integration\ExceptionHandling.feature">
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>ExceptionHandling.feature.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj">
-      <Project>{88e170e4-b857-42fe-963c-0505502b548c}</Project>
-      <Name>CacheCow.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\CacheCow.Server\CacheCow.Server.csproj">
-      <Project>{b67727f4-5b65-41d0-8d26-8d1c32cea63d}</Project>
-      <Name>CacheCow.Server</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>netcoreapp2.0;net452</TargetFrameworks>
+		<Summary>Client constructs for HTTP Caching</Summary>
+		<AssemblyName>CacheCow.Tests</AssemblyName>
+		<PackageId>CacheCow.Tests</PackageId>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Include="..\Common\DummyMessageHandler.cs" Link="DummyMessageHandler.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
+		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.4" />
+		<PackageReference Include="xunit" Version="2.3.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+		<PackageReference Include="Moq" Version="4.8.2" />		
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj" />
+		
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+		<Reference Include="System" />
+	</ItemGroup>		
 </Project>

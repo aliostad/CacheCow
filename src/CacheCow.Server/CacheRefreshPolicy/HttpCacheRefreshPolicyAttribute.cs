@@ -49,7 +49,7 @@ namespace CacheCow.Server.CacheRefreshPolicy
                 throw new InvalidOperationException("This appSettingsKeyName does not exist: " + appSettingsKeyName);
 
             int refreshSeconds;
-            if (!int.TryParse(appSettingValue, out refreshSeconds))
+            if(!int.TryParse(appSettingValue, out refreshSeconds))
                 throw new FormatException("This appSettings value cannot be converted to int: " + appSettingValue);
 
             _refreshInterval = TimeSpan.FromSeconds(refreshSeconds);

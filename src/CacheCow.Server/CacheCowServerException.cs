@@ -9,7 +9,7 @@ namespace CacheCow.Server
     {
         public CacheCowServerException() : base()
         {
-
+            
         }
 
         public CacheCowServerException(string message)

@@ -29,21 +29,21 @@ namespace CacheCow.Server.CacheControlPolicy
         protected CacheControlHeaderValue CloneCacheControlHeaderValue(CacheControlHeaderValue headerValue)
         {
             return new CacheControlHeaderValue()
-            {
-                MaxAge = headerValue.MaxAge,
-                MaxStale = headerValue.MaxStale,
-                MaxStaleLimit = headerValue.MaxStaleLimit,
-                MinFresh = headerValue.MinFresh,
-                MustRevalidate = headerValue.MustRevalidate,
-                NoCache = headerValue.NoCache,
-                NoStore = headerValue.NoStore,
-                NoTransform = headerValue.NoTransform,
-                OnlyIfCached = headerValue.OnlyIfCached,
-                Private = headerValue.Private,
-                ProxyRevalidate = headerValue.ProxyRevalidate,
-                Public = headerValue.Public,
-                SharedMaxAge = headerValue.SharedMaxAge
-            };
+                       {
+                           MaxAge = headerValue.MaxAge,
+                           MaxStale = headerValue.MaxStale,
+                           MaxStaleLimit = headerValue.MaxStaleLimit,
+                           MinFresh = headerValue.MinFresh,
+                           MustRevalidate = headerValue.MustRevalidate,
+                           NoCache = headerValue.NoCache,
+                           NoStore = headerValue.NoStore,
+                           NoTransform = headerValue.NoTransform,
+                           OnlyIfCached = headerValue.OnlyIfCached,
+                           Private = headerValue.Private,
+                           ProxyRevalidate = headerValue.ProxyRevalidate,
+                           Public = headerValue.Public,
+                           SharedMaxAge = headerValue.SharedMaxAge
+                       };
         }
     }
 }

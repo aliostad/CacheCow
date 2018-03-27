@@ -1,1 +1,0 @@
-powershell.exe -file build.ps1 -buildParams "/p:Configuration=NoTest;SignAssembly=true;AssemblyOriginatorKeyFile=..\..\CacheCow.key" -buildTarget "/t:sn-publish"

@@ -13,11 +13,11 @@ namespace CacheCow.Server.CacheRefreshPolicy
     {
         public AttributeBasedCacheRefreshPolicy() : base()
         {
-
+            
         }
 
         public AttributeBasedCacheRefreshPolicy(TimeSpan defaultRefreshInterval)
-            : base(defaultRefreshInterval)
+            :base(defaultRefreshInterval)
         {
 
         }
