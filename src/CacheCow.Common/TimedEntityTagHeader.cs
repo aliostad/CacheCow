@@ -6,65 +6,46 @@ using System.Text;
 
 namespace CacheCow.Common
 {
-	public class TimedEntityTagHeaderValue : EntityTagHeaderValue
+    /// <summary>
+    /// A construct representing two options of Cache Validation: ETag and LastModified
+    /// </summary>
+	public class TimedEntityTagHeaderValue
 	{
+		public DateTimeOffset? LastModified { get; set; }
 
-		public DateTimeOffset LastModified { get; set; }
-
-		public TimedEntityTagHeaderValue(string tag)
-			: this(tag, false)
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="tag">Opaque string representing the version of the resource</param>
+        /// <param name="isWeak">Whether it is weak</param>
+		public TimedEntityTagHeaderValue(string tag, bool isWeak = false)
 		{
-
+            if (tag == null)
+                throw new ArgumentNullException("tag");
+            ETag = new EntityTagHeaderValue(tag, isWeak);
 		}
 
-		public TimedEntityTagHeaderValue(EntityTagHeaderValue entityTagHeaderValue)
-			: this(entityTagHeaderValue.Tag, entityTagHeaderValue.IsWeak)
-		{
+        /// <summary>
+        /// .ctor
+        /// </summary>
+        /// <param name="entityTagHeaderValue">ETag</param>
+        public TimedEntityTagHeaderValue(EntityTagHeaderValue entityTagHeaderValue)
+        {
+            ETag = entityTagHeaderValue;
+        }
 
-		}
+        /// <summary>
+        /// .ctor so the Cache validation is done using LastModified
+        /// Beware! Use this option if you do not care about milliseconds. Sadly, HTTP time does not have millisecond accuracy.
+        /// </summary>
+        /// <param name="lastModified">Last modified of the resource</param>
+        public TimedEntityTagHeaderValue(DateTimeOffset lastModified)
+            : this((string)null)
+        {
+            LastModified = lastModified;
+        }
 
-		public TimedEntityTagHeaderValue(string tag, bool isWeak)
-			: base(tag, isWeak)
-		{
-			LastModified = DateTimeOffset.Parse(DateTimeOffset.UtcNow.ToString("r")); // to remove milliseconds
-		}
-
-
-		public override string ToString()
-		{
-			return base.ToString() + "\r\n" + LastModified.ToString("r");
-		}
-
-		public static bool TryParse(string timedETagValue, out TimedEntityTagHeaderValue value)
-		{
-			value = null;
-			if (timedETagValue == null)
-				return false;
-
-			var strings = timedETagValue.Split(new[] { "\r\n" }, StringSplitOptions.None);
-			if (strings.Length != 2)
-				return false;
-
-			EntityTagHeaderValue etag = null;
-			DateTimeOffset lastModified;
-			if (!EntityTagHeaderValue.TryParse(strings[0], out etag))
-				return false;
-
-			if (!DateTimeOffset.TryParse(strings[1], out lastModified))
-				return false;
-
-			value = new TimedEntityTagHeaderValue(etag.Tag, etag.IsWeak)
-			{
-				LastModified = lastModified
-			};
-			return true;
-
-		}
-
-		public EntityTagHeaderValue ToEntityTagHeaderValue()
-		{
-			return new EntityTagHeaderValue(this.Tag, this.IsWeak);
-		}
+        public EntityTagHeaderValue ETag { get; }
 
 	}
 }

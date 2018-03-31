@@ -22,6 +22,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Client.RedisCacheS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Client.Tests", "test\CacheCow.Client.Tests\CacheCow.Client.Tests.csproj", "{1ADB6175-95B9-4BB9-AF56-B4291196554C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Server.Core", "src\CacheCow.Server.Core\CacheCow.Server.Core.csproj", "{CA86052F-492F-4C04-9F9D-D7B7D2A3C830}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.Core.Mvc", "src\CacheCow.Server.Core.Mvc\CacheCow.Server.Core.Mvc.csproj", "{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +56,14 @@ Global
 		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA86052F-492F-4C04-9F9D-D7B7D2A3C830}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA86052F-492F-4C04-9F9D-D7B7D2A3C830}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA86052F-492F-4C04-9F9D-D7B7D2A3C830}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA86052F-492F-4C04-9F9D-D7B7D2A3C830}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,6 +75,8 @@ Global
 		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 		{53E2C779-A780-41B2-A55B-0E4156C5AD7F} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 		{1ADB6175-95B9-4BB9-AF56-B4291196554C} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
+		{CA86052F-492F-4C04-9F9D-D7B7D2A3C830} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
+		{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4EFCA3E6-84FB-4520-8C47-62D010919E88}

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<Summary>Server constructs for HTTP Caching in ASP.NET Core MVC</Summary>
+		<AssemblyName>CacheCow.Server.Core.Mvc</AssemblyName>
+		<PackageId>CacheCow.Server.Core.Mvc</PackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.2" />
+	</ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj" />
+    <ProjectReference Include="..\CacheCow.Server.Core\CacheCow.Server.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -14,7 +14,6 @@ namespace CacheCow.Client.Tests
 	
 	public class ResponseSerializationTests
 	{
-
 		[Fact]
 		public async Task IntegrationTest_Deserialize()
 		{
