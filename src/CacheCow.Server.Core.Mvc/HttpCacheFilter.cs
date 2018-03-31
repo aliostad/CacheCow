@@ -13,10 +13,12 @@ namespace CacheCow.Server.Core.Mvc
     public class HttpCacheFilter : IAsyncResourceFilter
     { 
         private ICacheabilityValidator _validator;
+        private readonly IHasher _hasher;
 
-        public HttpCacheFilter(ICacheabilityValidator validator)
+        public HttpCacheFilter(ICacheabilityValidator validator, IHasher hasher)
         {
             _validator = validator;
+            _hasher = hasher;
         }
 
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)

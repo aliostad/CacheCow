@@ -18,15 +18,15 @@ namespace CacheCow.Server.Core
                 return false;
 
             // auth
-            if (request.Headers.ContainsKey("Authorization"))
+            if (request.Headers.Any(x => x.Key.Equals("Authorization", StringComparison.InvariantCultureIgnoreCase)))
                 return false;
 
             // pragma no-cache
-            if (request.Headers.ContainsKey("Pragma") &&
+            if (request.Headers.Any(x => x.Key.Equals("Pragma", StringComparison.InvariantCultureIgnoreCase)) &&
                 request.Headers["Pragma"].Any(x => x.Contains("no-cache")))
                 return false;
 
-            if (request.Headers.ContainsKey("Cache-Control") &&
+            if (request.Headers.Any(x => x.Key.Equals("Cache-Control", StringComparison.InvariantCultureIgnoreCase)) &&
                 request.Headers["Cache-Control"].Any(x => x.Contains("no-cache")))
                 return false;
 
@@ -35,7 +35,13 @@ namespace CacheCow.Server.Core
 
         public bool IsCacheable(HttpResponse response)
         {
-            if (!response.StatusCode.IsIn(200, 201, 202, 301)) // cacheable statuses
+
+            // cacheable statuses
+            if (!response.StatusCode.IsIn(200, 201, 202, 301))
+                return false;
+
+            // cookie
+            if (response.Headers.Any(x => x.Key.Equals("set-cookie", StringComparison.InvariantCultureIgnoreCase)))
                 return false;
 
             return true;
