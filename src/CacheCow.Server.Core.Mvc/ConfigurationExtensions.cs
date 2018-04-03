@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CacheCow.Common;
 
 namespace CacheCow.Server.Core.Mvc
 {
@@ -18,8 +19,13 @@ namespace CacheCow.Server.Core.Mvc
         {
             services.AddTransient<ICacheabilityValidator, DefaultCacheabilityValidator>();
             services.AddTransient<HttpCacheFilter>();
+            services.AddTransient<ConstantExpiryProvider>();
+            services.AddTransient<StrongConsistencyProvider>();
             services.AddTransient<ISerialiser, JsonSerialiser>();
             services.AddTransient<IHasher, Sha1Hasher>();
+            services.AddTransient<ICacheDirectiveProvider, NoCacheNoStoreProvider>();
+            services.AddTransient<ITimedETagExtractor, DefaultTimedETagExtractor>();
+            services.AddTransient<ITimedETagQueryProvider, NullQueryProvider>();
         }
 
         internal static T GetService<T>(this IServiceProvider provider)

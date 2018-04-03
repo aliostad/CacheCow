@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using CacheCow.Common;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CacheCow.Common
+namespace CacheCow.Server.Core
 {
     /// <summary>
     /// Provides TETHV by querying a store to get the most recent value
