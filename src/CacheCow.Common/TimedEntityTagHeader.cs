@@ -11,6 +11,9 @@ namespace CacheCow.Common
     /// </summary>
 	public class TimedEntityTagHeaderValue
 	{
+        /// <summary>
+        /// Either this or ETag is null. I could have used Scala's Either but pattern matching is new in c#
+        /// </summary>
 		public DateTimeOffset? LastModified { get; set; }
 
         /// <summary>
@@ -45,6 +48,9 @@ namespace CacheCow.Common
             LastModified = lastModified;
         }
 
+        /// <summary>
+        /// Either this or LastModified is null. I could have used Scala's Either but pattern matching is new in c#
+        /// </summary>
         public EntityTagHeaderValue ETag { get; }
 
 	}

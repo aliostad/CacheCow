@@ -14,6 +14,6 @@ namespace CacheCow.Server.Core
         /// </summary>
         /// <param name="o">object</param>
         /// <returns>buffer</returns>
-        byte[] Serialiser(object o);
+        byte[] Serialise(object o);
     }
 }

@@ -10,7 +10,7 @@ namespace CacheCow.Server.Core
     /// </summary>
     public class JsonSerialiser : ISerialiser
     {
-        public byte[] Serialiser(object o)
+        public byte[] Serialise(object o)
         {
             if (o == null)
                 throw new ArgumentNullException("o");
