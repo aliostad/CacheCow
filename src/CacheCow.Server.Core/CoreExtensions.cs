@@ -80,5 +80,17 @@ namespace CacheCow.Server.Core
             response.Headers[HttpHeaderNames.CacheControl] = "no-cache;no-store";
             response.Headers[HttpHeaderNames.Expires] = "-1";
         }
+
+        public static void ApplyTimedETag(this HttpResponse response, TimedEntityTagHeaderValue timedETag)
+        {
+            if(timedETag.LastModified.HasValue)
+            {
+                response.Headers[HttpHeaderNames.LastModified] = timedETag.LastModified.Value.ToUniversalTime().ToString("r");
+            }
+            else if(timedETag.ETag != null)
+            {
+                response.Headers[HttpHeaderNames.ETag] = timedETag.ETag.ToString();
+            }
+        }
     }
 }

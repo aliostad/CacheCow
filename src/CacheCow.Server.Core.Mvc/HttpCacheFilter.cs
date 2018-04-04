@@ -9,6 +9,7 @@ using CacheCow.Common.Helpers;
 using CacheCow.Server.Core;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Headers;
+using System.IO;
 
 namespace CacheCow.Server.Core.Mvc
 {
@@ -19,18 +20,17 @@ namespace CacheCow.Server.Core.Mvc
     public class HttpCacheFilter : IAsyncResourceFilter
     {
         private ICacheabilityValidator _validator;
-        private readonly ISerialiser _serialiser;
         private readonly ITimedETagExtractor _timedETagExtractor;
         private readonly ITimedETagQueryProvider _timedETagQueryProvider;
 
+        private const string StreamName = "##__travesty_that_I_have_to_do_this__##";
+
         public HttpCacheFilter(ICacheabilityValidator validator,
-            ISerialiser serialiser,
             ICacheDirectiveProvider cacheDirectiveProvider,
             ITimedETagExtractor timedETagExtractor,
             ITimedETagQueryProvider timedETagQueryProvider)
         {
             _validator = validator;
-            _serialiser = serialiser;
             CacheDirectiveProvider = cacheDirectiveProvider;
             _timedETagExtractor = timedETagExtractor;
             _timedETagQueryProvider = timedETagQueryProvider;
@@ -140,67 +140,59 @@ namespace CacheCow.Server.Core.Mvc
                 }
             }
 
+            context.HttpContext.Items[StreamName] = context.HttpContext.Response.Body;
+            context.HttpContext.Response.Body = new MemoryStream();
+
             var execCtx = await next(); // _______________________________________________________________________________
 
-            if (execCtx.Canceled)
-                return;
+            var ms = context.HttpContext.Response.Body as MemoryStream;
+            bool mustReflush = ms != null && ms.Length > 0;
+            context.HttpContext.Response.Body = (Stream) context.HttpContext.Items[StreamName];
 
-            var or = execCtx.Result as ObjectResult;
-            TimedEntityTagHeaderValue tet = null;
-            if (or != null && or.Value != null)
+            try
             {
-                tet = GetTimedETagFromResult(execCtx, or.Value);
+                if (HttpMethods.IsGet(context.HttpContext.Request.Method))
+                {
+                    var or = execCtx.Result as ObjectResult;
+                    TimedEntityTagHeaderValue tet = null;
+                    if (or != null && or.Value != null)
+                    {
+                        tet = _timedETagExtractor.Extract(or.Value);
+                    }
+
+                    if (cacheValidated == null  // could not validate
+                        && tet != null
+                        && cacheValidationStatus != CacheValidationStatus.None) // can only do GET validation, PUT is already impacted backend stores
+                    {
+                        cacheValidated = ApplyCacheValidation(tet, cacheValidationStatus, context);
+                        if (cacheValidated ?? false)
+                            return;
+                    }
+
+                    if (tet != null)
+                        context.HttpContext.Response.ApplyTimedETag(tet);
+
+                    var isResponseCacheable = _validator.IsCacheable(context.HttpContext.Response);
+                    if (!isRequestCacheable || !isResponseCacheable)
+                    {
+                        if (!execCtx.Canceled)
+                            context.HttpContext.Response.MakeNonCacheable();
+                    }
+
+                    if (isResponseCacheable)
+                    {
+                        context.HttpContext.Response.Headers[HttpHeaderNames.CacheControl] =
+                            CacheDirectiveProvider.Get(context.HttpContext).ToString();
+                    }
+                }
+
             }
-
-            if (cacheValidated == null  // could not validate
-                && tet != null
-                && (cacheValidationStatus.IsIn(CacheValidationStatus.GetIfModifiedSince, CacheValidationStatus.GetIfNoneMatch))) // can only do GET validation, PUT is already impacted backend stores
+            finally
             {
-                cacheValidated = ApplyCacheValidation(tet, cacheValidationStatus, context);
-                if (cacheValidated ?? false)
-                    return;
-            }
-
-            var isResponseCacheable = _validator.IsCacheable(context.HttpContext.Response);
-            if (!isRequestCacheable || !isResponseCacheable)
-            {
-                if (!execCtx.Canceled)
-                    context.HttpContext.Response.MakeNonCacheable();
-            }
-
-            if (isResponseCacheable)
-            {
-                context.HttpContext.Response.Headers[HttpHeaderNames.CacheControl] =
-                    CacheDirectiveProvider.Get(context.HttpContext).ToString();
-            }
-
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        protected virtual TimedEntityTagHeaderValue GetTimedETagFromResult(ResourceExecutedContext context, object result)
-        {
-            var t = typeof(ITimedETagExtractor<>);
-            var gt = t.MakeGenericType(result.GetType());
-            var tetp = (ITimedETagExtractor)context.HttpContext.RequestServices.GetService(gt);
-            if (tetp != null)
-            {
-                var tet = tetp.Extract(result);
-                return tet;
-            }
-
-            var cr = result as ICacheResource;
-            if (cr != null)
-                return cr.GetTimedETag();
-
-            var buffer = _serialiser.Serialise(result);
-            using (var hasher = context.HttpContext.RequestServices.GetService<IHasher>())
-            {
-                return new TimedEntityTagHeaderValue(hasher.ComputeHash(buffer));
+                if (mustReflush)
+                {
+                    ms.CopyTo(context.HttpContext.Response.Body);
+                }
             }
         }
 
@@ -218,20 +210,12 @@ namespace CacheCow.Server.Core.Mvc
     /// <typeparam name="T">View Model Type</typeparam>
     public class HttpCacheFilter<T> : HttpCacheFilter
     {
-        private ICacheabilityValidator _validator;
-        private readonly ISerialiser _serialiser;
-        private readonly ICacheDirectiveProvider _cacheDirectiveProvider;
-        private readonly ITimedETagExtractor _timedETagExtractor;
-        private readonly ITimedETagQueryProvider _timedETagQueryProvider;
-
         public HttpCacheFilter(ICacheabilityValidator validator,
-            ISerialiser serialiser,
             ICacheDirectiveProvider<T> cacheDirectiveProvider,
             ITimedETagExtractor<T> timedETagExtractor,
             ITimedETagQueryProvider<T> timedETagQueryProvider) :
-            base(validator, serialiser, cacheDirectiveProvider, timedETagExtractor, timedETagQueryProvider)
+            base(validator, cacheDirectiveProvider, timedETagExtractor, timedETagQueryProvider)
         {
-
         }
     }
 }

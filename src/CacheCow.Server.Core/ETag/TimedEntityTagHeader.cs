@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace CacheCow.Common
+namespace CacheCow.Server.Core
 {
     /// <summary>
     /// A construct representing two options of Cache Validation: ETag and LastModified
@@ -25,6 +25,13 @@ namespace CacheCow.Common
 		{
             if (tag == null)
                 throw new ArgumentNullException("tag");
+
+            if (!tag.StartsWith("\""))
+                tag = "\"" + tag;
+
+            if (!tag.EndsWith("\""))
+                tag = tag + "\"";
+
             ETag = new EntityTagHeaderValue(tag, isWeak);
 		}
 
