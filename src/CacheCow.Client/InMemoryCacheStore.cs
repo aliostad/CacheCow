@@ -22,6 +22,7 @@ namespace CacheCow.Client
 	{
         private const string CacheStoreEntryName = "###InMemoryCacheStore_###";
 	    private static TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(6);
+        private static TimeSpan MinCacheExpiry = TimeSpan.FromMinutes(30);
 
 #if NET452
         private MemoryCache _responseCache = new MemoryCache(CacheStoreEntryName);  
@@ -65,7 +66,10 @@ namespace CacheCow.Client
             var memoryStream = new MemoryStream();
 	        await _messageSerializer.SerializeAsync(response, memoryStream);
             response.RequestMessage = req;
-            _responseCache.Set(key.HashBase64, memoryStream.ToArray(), response.GetExpiry() ?? DateTimeOffset.UtcNow.Add(_defaultExpiry));
+            var suggestedExpiry = response.GetExpiry() ?? DateTimeOffset.UtcNow.Add(_defaultExpiry);
+            var minExpiry = DateTimeOffset.UtcNow.Add(MinCacheExpiry);
+            var optimalExpiry = (suggestedExpiry > minExpiry) ? suggestedExpiry : minExpiry;
+            _responseCache.Set(key.HashBase64, memoryStream.ToArray(), optimalExpiry);
 	    }
 
 	    public Task<bool> TryRemoveAsync(CacheKey key)

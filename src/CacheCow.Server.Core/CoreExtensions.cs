@@ -28,7 +28,7 @@ namespace CacheCow.Server.Core
             {
                 if (typedHeaders.IfModifiedSince.HasValue)
                     return CacheValidationStatus.GetIfModifiedSince;
-                if (typedHeaders.IfNoneMatch != null && typedHeaders.IfNoneMatch.Count == 0)
+                if (typedHeaders.IfNoneMatch != null && typedHeaders.IfNoneMatch.Count > 0)
                     return CacheValidationStatus.GetIfNoneMatch;
             }
             
@@ -36,7 +36,7 @@ namespace CacheCow.Server.Core
             {
                 if (typedHeaders.IfUnmodifiedSince.HasValue)
                     return CacheValidationStatus.PutIfUnModifiedSince;
-                if (typedHeaders.IfMatch != null && typedHeaders.IfMatch.Count == 0)
+                if (typedHeaders.IfMatch != null && typedHeaders.IfMatch.Count > 0)
                     return CacheValidationStatus.PutIfMatch;
             }
 

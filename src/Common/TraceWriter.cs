@@ -10,7 +10,9 @@ namespace CacheCow
 		private static readonly TraceSwitch _switch = new TraceSwitch(CacheCowTraceSwitch, "CacheCow Trace Switch");
 
 
-		public static void WriteLine(string message, TraceLevel level, params object[] args)
+        public static void WriteLine(string message, TraceLevel level, params object[] args)
+
+        //public static void WriteLine(Func<string> message, TraceLevel level, params object[] args)
 		{
 
 			if (_switch.Level < level)

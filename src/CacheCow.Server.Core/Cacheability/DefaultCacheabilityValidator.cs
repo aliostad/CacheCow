@@ -37,7 +37,7 @@ namespace CacheCow.Server.Core
         {
 
             // cacheable statuses
-            if (!response.StatusCode.IsIn(200, 201, 202, 301))
+            if (!response.StatusCode.IsIn(200, 201, 202, 301, 304))
                 return false;
 
             // cookie

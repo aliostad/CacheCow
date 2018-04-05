@@ -26,6 +26,7 @@ namespace CacheCow.Client.RedisCacheStore
 		private bool _dispose;
 		private MessageContentHttpMessageSerializer _serializer = new MessageContentHttpMessageSerializer();
 	    private bool _throwExceptions;
+        private static TimeSpan MinLifeTime = TimeSpan.FromMinutes(30);
 
 	    public RedisStore(string connectionString, 
             int databaseId = 0,
@@ -130,15 +131,15 @@ namespace CacheCow.Client.RedisCacheStore
             memoryStream.Position = 0;
             var data = memoryStream.ToArray();
             var expiry = response.GetExpiry() ?? DateTimeOffset.UtcNow.AddDays(1);
-            var now = DateTimeOffset.UtcNow;
-            if (expiry <= now)
+            var minExpiry = DateTimeOffset.UtcNow.Add(MinLifeTime);
+            if (expiry <= minExpiry)
             {
                 // NOTE: Eventhough the expiry might be now or maxage=0, there is still
                 // benefit in storing so you can do conditional get after expiry
-                expiry = DateTimeOffset.UtcNow.AddHours(6);
+                expiry = minExpiry;
             }
 
-            await _database.StringSetAsync(key.HashBase64, data, expiry.Subtract(now));
+            await _database.StringSetAsync(key.HashBase64, data, expiry.Subtract(DateTimeOffset.UtcNow));
             return true;
         }
 

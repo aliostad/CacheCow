@@ -11,12 +11,17 @@ namespace CacheCow.Server.Core.Mvc
     public class HttpCacheFactoryAttribute : Attribute, IFilterFactory
     {
         public bool IsReusable => false;
+        private int? _expirySeconds;
 
-        /// <summary>
-        /// Set this property if the resource does a constant expiry.
-        /// 
-        /// </summary>
-        public int? ExpirySeconds { get; set; }
+        public HttpCacheFactoryAttribute()
+        {
+
+        }
+
+        public HttpCacheFactoryAttribute(int expirySeconds)
+        {
+            _expirySeconds = expirySeconds;
+        }
 
         /// <summary>
         /// Type parameter for ITimedETagQueryProvider&lt;T&gt; and ICacheDirectiveProvider&lt;T&gt;. 
@@ -38,11 +43,11 @@ namespace CacheCow.Server.Core.Mvc
                 filter = (HttpCacheFilter)serviceProvider.GetService(filterType);
             }
             
-            if(ExpirySeconds.HasValue)
+            if(_expirySeconds.HasValue)
             {
-                filter.CacheDirectiveProvider = ExpirySeconds.Value == 0 ?
+                filter.CacheDirectiveProvider = _expirySeconds.Value == 0 ?
                     (ICacheDirectiveProvider) serviceProvider.GetService<StrongConsistencyProvider>() :
-                    serviceProvider.GetService<ConstantExpiryProvider>();
+                    new ConstantExpiryProvider(TimeSpan.FromSeconds(_expirySeconds.Value));
             }
 
             return filter;

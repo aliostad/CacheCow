@@ -69,6 +69,7 @@ namespace CacheCow.Server.Core.Mvc
                         else
                         {
                             context.Result = new StatusCodeResult(StatusCodes.Status304NotModified);
+                            context.HttpContext.Response.StatusCode = StatusCodes.Status304NotModified;
                             return true;
                         }
                     }
@@ -81,6 +82,7 @@ namespace CacheCow.Server.Core.Mvc
                         if (headers.IfNoneMatch.Any(x => x.Tag == timedEtag.ETag.Tag))
                         {
                             context.Result = new StatusCodeResult(StatusCodes.Status304NotModified);
+                            context.HttpContext.Response.StatusCode = StatusCodes.Status304NotModified;
                             return true;
                         }
                         else
@@ -96,6 +98,7 @@ namespace CacheCow.Server.Core.Mvc
                         else
                         {
                             context.Result = new StatusCodeResult(StatusCodes.Status409Conflict);
+                            context.HttpContext.Response.StatusCode = StatusCodes.Status409Conflict;
                             return true;
                         }
                     }
@@ -107,6 +110,7 @@ namespace CacheCow.Server.Core.Mvc
                         if (timedEtag.LastModified > headers.IfUnmodifiedSince.Value)
                         {
                             context.Result = new StatusCodeResult(StatusCodes.Status409Conflict);
+                            context.HttpContext.Response.StatusCode = StatusCodes.Status409Conflict;
                             return true;
                         }
                         else

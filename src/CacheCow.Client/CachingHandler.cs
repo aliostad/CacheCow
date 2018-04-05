@@ -300,7 +300,7 @@ namespace CacheCow.Client
             if (request.Method == HttpMethod.Put && validationResultForCachedResponse.IsIn(
                  ResponseValidationResult.OK, ResponseValidationResult.MustRevalidate))
             {
-                DoPutValidation(request, cacheCowHeader, cachedResponse);
+                ApplyPutValidationHeaders(request, cacheCowHeader, cachedResponse);
                 return await base.SendAsync(request, cancellationToken); // EXIT !! _____________________________
             }
 
@@ -324,15 +324,13 @@ namespace CacheCow.Client
                 }
                 else
                     validationResultForCachedResponse = ResponseValidationResult.MustRevalidate; // revalidate
-
             }
 
             // cache validation for GET
             else if (validationResultForCachedResponse == ResponseValidationResult.MustRevalidate)
             {
-                DoCacheValidationForGet(request, cacheCowHeader, cachedResponse);
+                ApplyGetCacheValidationHeaders(request, cacheCowHeader, cachedResponse);
             }
-
 
 
             // _______________________________ RESPONSE only GET  ___________________________________________
@@ -424,7 +422,7 @@ namespace CacheCow.Client
 
         }
 
-        private void DoPutValidation(HttpRequestMessage request, CacheCowHeader cacheCowHeader,
+        private void ApplyPutValidationHeaders(HttpRequestMessage request, CacheCowHeader cacheCowHeader,
             HttpResponseMessage cachedResponse)
         {
             // add headers for a cache validation. First check ETag since is better 
@@ -477,7 +475,7 @@ namespace CacheCow.Client
             }
         }
 
-        private static void DoCacheValidationForGet(HttpRequestMessage request, CacheCowHeader cacheCowHeader,
+        private static void ApplyGetCacheValidationHeaders(HttpRequestMessage request, CacheCowHeader cacheCowHeader,
             HttpResponseMessage cachedResponse)
         {
             cacheCowHeader.CacheValidationApplied = true;

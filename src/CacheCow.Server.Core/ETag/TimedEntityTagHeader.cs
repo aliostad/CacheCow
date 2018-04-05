@@ -50,7 +50,7 @@ namespace CacheCow.Server.Core
         /// </summary>
         /// <param name="lastModified">Last modified of the resource</param>
         public TimedEntityTagHeaderValue(DateTimeOffset lastModified)
-            : this((string)null)
+            : this((EntityTagHeaderValue)null)
         {
             LastModified = lastModified;
         }
