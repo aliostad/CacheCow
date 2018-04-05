@@ -21,8 +21,7 @@ namespace CacheCow.Client
 	public class InMemoryCacheStore : ICacheStore
 	{
         private const string CacheStoreEntryName = "###InMemoryCacheStore_###";
-	    private static TimeSpan DefaultCacheExpiry = TimeSpan.FromHours(6);
-        private static TimeSpan MinCacheExpiry = TimeSpan.FromMinutes(30);
+	    private static TimeSpan MinCacheExpiry = TimeSpan.FromHours(6);
 
 #if NET452
         private MemoryCache _responseCache = new MemoryCache(CacheStoreEntryName);  
@@ -31,17 +30,17 @@ namespace CacheCow.Client
 #endif
 
         private MessageContentHttpMessageSerializer _messageSerializer = new MessageContentHttpMessageSerializer(true);
-	    private readonly TimeSpan _defaultExpiry;
+	    private readonly TimeSpan _minExpiry;
 
 	    public InMemoryCacheStore()
-            : this(DefaultCacheExpiry)
+            : this(MinCacheExpiry)
         {
             
         }
 
-        public InMemoryCacheStore(TimeSpan defaultExpiry)
+        public InMemoryCacheStore(TimeSpan minExpiry)
         {
-            _defaultExpiry = defaultExpiry;
+            _minExpiry = minExpiry;
         }
 
 	    public void Dispose()
@@ -66,8 +65,8 @@ namespace CacheCow.Client
             var memoryStream = new MemoryStream();
 	        await _messageSerializer.SerializeAsync(response, memoryStream);
             response.RequestMessage = req;
-            var suggestedExpiry = response.GetExpiry() ?? DateTimeOffset.UtcNow.Add(_defaultExpiry);
-            var minExpiry = DateTimeOffset.UtcNow.Add(MinCacheExpiry);
+            var suggestedExpiry = response.GetExpiry() ?? DateTimeOffset.UtcNow.Add(_minExpiry);
+            var minExpiry = DateTimeOffset.UtcNow.Add(_minExpiry);
             var optimalExpiry = (suggestedExpiry > minExpiry) ? suggestedExpiry : minExpiry;
             _responseCache.Set(key.HashBase64, memoryStream.ToArray(), optimalExpiry);
 	    }

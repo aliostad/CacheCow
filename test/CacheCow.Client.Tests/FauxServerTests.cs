@@ -38,6 +38,14 @@ namespace CacheCow.Client.Tests
         [Fact]
         public async Task RespectsExpiry()
         {
+            _store = new InMemoryCacheStore(TimeSpan.Zero);
+            var _cachingHandler = new CachingHandler(_store)
+            {
+                InnerHandler = _dummyHandler
+            };
+
+            _httpClient = new HttpClient(_cachingHandler);
+
             _dummyHandler.Response = ResponseHelper.GetOkMessage(1, true);
             var response = await _httpClient.GetAsync(DummyUrl);
             Thread.Sleep(100);

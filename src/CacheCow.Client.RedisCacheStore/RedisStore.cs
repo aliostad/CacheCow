@@ -26,7 +26,7 @@ namespace CacheCow.Client.RedisCacheStore
 		private bool _dispose;
 		private MessageContentHttpMessageSerializer _serializer = new MessageContentHttpMessageSerializer();
 	    private bool _throwExceptions;
-        private static TimeSpan MinLifeTime = TimeSpan.FromMinutes(30);
+        private static TimeSpan DefaultMinLifeTime = TimeSpan.FromHours(6);
 
 	    public RedisStore(string connectionString, 
             int databaseId = 0,
@@ -68,6 +68,15 @@ namespace CacheCow.Client.RedisCacheStore
             _connection = connection;
             _database = _connection.GetDatabase(databaseId);
             _throwExceptions = throwExceptions;
+        }
+
+        /// <summary>
+        /// Minimum expiry of items. Default is 6 hours.
+        /// Bear in mind, even expired items can be used if we do a cache validation request and get back 304
+        /// </summary>
+        public TimeSpan MinExpiry
+        {
+            get; set;
         }
 
         public void Dispose()
@@ -131,7 +140,7 @@ namespace CacheCow.Client.RedisCacheStore
             memoryStream.Position = 0;
             var data = memoryStream.ToArray();
             var expiry = response.GetExpiry() ?? DateTimeOffset.UtcNow.AddDays(1);
-            var minExpiry = DateTimeOffset.UtcNow.Add(MinLifeTime);
+            var minExpiry = DateTimeOffset.UtcNow.Add(DefaultMinLifeTime);
             if (expiry <= minExpiry)
             {
                 // NOTE: Eventhough the expiry might be now or maxage=0, there is still
