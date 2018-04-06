@@ -9,16 +9,25 @@ namespace CacheCow.Server.Core
     /// <summary>
     /// This class sets expiry to zero so that teh client should always revalidate
     /// </summary>
-    public class StrongConsistencyProvider : ICacheDirectiveProvider
+    public class StrongConsistencyProvider : CacheDirectiveProviderBase
     {
-        public CacheControlHeaderValue Get(HttpContext context)
+        public StrongConsistencyProvider(ITimedETagExtractor timedETagExtractor) : base(timedETagExtractor)
+        {
+        }
+
+        public override CacheControlHeaderValue Get(HttpContext context)
         {
             return new CacheControlHeaderValue()
             {
-                Private = true,
+                Private = true, // because cache intermediaries can be sloppy
                 MustRevalidate = true,
                 MaxAge = TimeSpan.Zero
             };
+        }
+
+        protected override bool ShouldTryExtract()
+        {
+            return true;
         }
     }
 }

@@ -9,15 +9,24 @@ namespace CacheCow.Server.Core
     /// <summary>
     /// Default cache directive provider
     /// </summary>
-    public class NoCacheNoStoreProvider : ICacheDirectiveProvider
+    public class NoCacheNoStoreProvider : CacheDirectiveProviderBase
     {
-        public CacheControlHeaderValue Get(HttpContext context)
+        public NoCacheNoStoreProvider(ITimedETagExtractor timedETagExtractor) : base(timedETagExtractor)
+        {
+        }
+
+        public override CacheControlHeaderValue Get(HttpContext context)
         {
             return new CacheControlHeaderValue()
             {
                 NoCache = true,
                 NoStore = true
             };
+        }
+
+        protected override bool ShouldTryExtract()
+        {
+            return false;
         }
     }
 }

@@ -9,37 +9,34 @@ namespace CacheCow.Server.Core
     /// <summary>
     /// 
     /// </summary>
-    public class ConstantExpiryProvider : ICacheDirectiveProvider
+    public class ConstantExpiryProvider : CacheDirectiveProviderBase
     {
-        private readonly bool _isPublic;
-        private readonly bool _mustRevalidate;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public ConstantExpiryProvider(TimeSpan expiry, bool isPublic = true, bool mustRevalidate = true)
+        public ConstantExpiryProvider(ITimedETagExtractor timedETagExtractor) : base(timedETagExtractor)
         {
-            Expiry = expiry;
-            this._isPublic = isPublic;
-            this._mustRevalidate = mustRevalidate;
         }
 
-        public TimeSpan Expiry { get; }
+        public TimeSpan Expiry { get; set; }
+
+        public bool IsPublic { get; set; }
 
         public void Dispose()
         {
             // nilch
         }
 
-        public CacheControlHeaderValue Get(HttpContext context)
+        public override CacheControlHeaderValue Get(HttpContext context)
         {
             return new CacheControlHeaderValue()
             {
                 MaxAge = Expiry,
-                MustRevalidate = _mustRevalidate,
-                Private = !_isPublic,
-                Public = _isPublic
+                MustRevalidate = true,
+                Public = IsPublic,
+                Private = !IsPublic
             };
+        }
+        protected override bool ShouldTryExtract()
+        {
+            return true;
         }
     }
 }

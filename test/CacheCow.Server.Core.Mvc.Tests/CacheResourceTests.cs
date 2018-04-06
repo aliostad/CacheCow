@@ -63,6 +63,14 @@ namespace CacheCow.Server.Core.Mvc.Tests
             Assert.True(cch.CacheValidationApplied);
             Assert.True(cch.RetrievedFromCache);
         }
+
+        [Fact]
+        public async Task HasEitherLastModifiedOrETag()
+        {
+            var response = await _client.GetAsync("/api/bettertest/1");
+            var response2 = await _client.GetAsync("/api/bettertest/1");
+            Assert.NotNull((object) response.Headers.ETag ?? response.Content.Headers.LastModified);
+        }
     }
 
 }

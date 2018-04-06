@@ -10,7 +10,7 @@ namespace CacheCow.Server.Core
     /// Main interface for providing Cache headers for a resource. 
     /// Use generic interface if you can.
     /// </summary>
-    public interface ICacheDirectiveProvider
+    public interface ICacheDirectiveProvider : ITimedETagExtractor
     {
         CacheControlHeaderValue Get(HttpContext context);
     }
@@ -18,11 +18,8 @@ namespace CacheCow.Server.Core
     /// <summary>
     /// Main interface for providing Cache headers for a resource.
     /// </summary>
-    public interface ICacheDirectiveProvider<TModel> : ICacheDirectiveProvider
+    public interface ICacheDirectiveProvider<TViewModel> : ICacheDirectiveProvider
     {
         CacheControlHeaderValue Get(HttpContext context);
     }
-
-
-
 }

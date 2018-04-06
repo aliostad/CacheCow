@@ -19,14 +19,46 @@ namespace CacheCow.Server.Core.Mvc
         {
             services.AddTransient<ICacheabilityValidator, DefaultCacheabilityValidator>();
             services.AddTransient<HttpCacheFilter>();
-            services.AddTransient<ConstantExpiryProvider>();
             services.AddTransient<StrongConsistencyProvider>();
+            services.AddTransient<ConstantExpiryProvider>();
             services.AddTransient<ISerialiser, JsonSerialiser>();
             services.AddTransient<IHasher, Sha1Hasher>();
             services.AddTransient<ICacheDirectiveProvider, NoCacheNoStoreProvider>();
             services.AddTransient<ITimedETagExtractor, DefaultTimedETagExtractor>();
             services.AddTransient<ITimedETagQueryProvider, NullQueryProvider>();
         }
+        /*
+        public static void AddHttpCachingForViewModel<TViewModel, TETagExtractor>(this IServiceCollection services, bool transient = true)
+            where TETagExtractor : class, ITimedETagExtractor<TViewModel>
+        {
+//            ICacheDirectiveProvider<T> cacheDirectiveProvider,
+//ITimedETagExtractor< T > timedETagExtractor,
+//            ITimedETagQueryProvider<T> timedETagQueryProvider) :
+
+           if (transient)
+            {
+                services.AddTransient<ITimedETagExtractor<TViewModel>, TETagExtractor>();
+                services.AddTransient<HttpCacheFilter<TViewModel>>();
+                services.AddTransient<HttpCacheFilter<TViewModel>>();
+                services.AddTransient<HttpCacheFilter<TViewModel>>();
+            }
+           else
+            {
+
+            }
+        }
+        */
+
+        private static void AddServiceConditional<TService, TImplementation>(this IServiceCollection services, bool transient)
+            where TImplementation : class, TService
+            where TService : class
+        {
+            if (transient)
+                services.AddTransient<TService, TImplementation>();
+            else
+                services.AddSingleton<TService, TImplementation>();
+        }
+
 
         internal static T GetService<T>(this IServiceProvider provider)
         {

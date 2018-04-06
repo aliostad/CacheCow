@@ -20,19 +20,16 @@ namespace CacheCow.Server.Core.Mvc
     public class HttpCacheFilter : IAsyncResourceFilter
     {
         private ICacheabilityValidator _validator;
-        private readonly ITimedETagExtractor _timedETagExtractor;
         private readonly ITimedETagQueryProvider _timedETagQueryProvider;
 
         private const string StreamName = "##__travesty_that_I_have_to_do_this__##";
 
         public HttpCacheFilter(ICacheabilityValidator validator,
             ICacheDirectiveProvider cacheDirectiveProvider,
-            ITimedETagExtractor timedETagExtractor,
             ITimedETagQueryProvider timedETagQueryProvider)
         {
             _validator = validator;
             CacheDirectiveProvider = cacheDirectiveProvider;
-            _timedETagExtractor = timedETagExtractor;
             _timedETagQueryProvider = timedETagQueryProvider;
             ApplyNoCacheNoStoreForNonCacheableResponse = true;
         }
@@ -161,7 +158,7 @@ namespace CacheCow.Server.Core.Mvc
                     TimedEntityTagHeaderValue tet = null;
                     if (or != null && or.Value != null)
                     {
-                        tet = _timedETagExtractor.Extract(or.Value);
+                        tet = CacheDirectiveProvider.Extract(or.Value);
                     }
 
                     if (cacheValidated == null  // could not validate
@@ -216,9 +213,8 @@ namespace CacheCow.Server.Core.Mvc
     {
         public HttpCacheFilter(ICacheabilityValidator validator,
             ICacheDirectiveProvider<T> cacheDirectiveProvider,
-            ITimedETagExtractor<T> timedETagExtractor,
             ITimedETagQueryProvider<T> timedETagQueryProvider) :
-            base(validator, cacheDirectiveProvider, timedETagExtractor, timedETagQueryProvider)
+            base(validator, cacheDirectiveProvider, timedETagQueryProvider)
         {
         }
     }

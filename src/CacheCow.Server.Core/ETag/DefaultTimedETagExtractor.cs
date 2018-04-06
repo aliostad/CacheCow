@@ -27,18 +27,4 @@ namespace CacheCow.Server.Core
             return new TimedEntityTagHeaderValue(_hasher.ComputeHash(_serialiser.Serialise(viewModel)));
         }
     }
-
-    public class DefaultTimedETagExtractor<TViewModel> : DefaultTimedETagExtractor, ITimedETagExtractor<TViewModel>
-    {
-        public DefaultTimedETagExtractor(ISerialiser serialiser, IHasher hasher)
-            : base(serialiser, hasher)
-        {
-        }
-
-        public TimedEntityTagHeaderValue Extract(TViewModel t)
-        {
-            return base.Extract(t);
-        }
-    }
-
 }

@@ -32,27 +32,13 @@ namespace CacheCow.Server.Core.Mvc.Tests
             var response = await _client.GetAsync("/api/test/1");
             var viewModel = await response.Content.ReadAsAsync<TestViewModel>();
             Assert.NotNull(response.Headers.CacheControl);
-            Assert.NotNull(response.Headers.ETag);
         }
 
         [Fact]
-        public async Task ETagNotWeek()
+        public async Task NoETagSinceNoCaching()
         {
             var response = await _client.GetAsync("/api/test/1");
-            Assert.NotNull(response.Headers.ETag);
-            Assert.NotNull(response.Headers.ETag);
-            Assert.False(response.Headers.ETag.IsWeak);
-        }
-
-        [Fact]
-        public async Task HashingReturnsTheSameValue()
-        {
-            var response = await _client.GetAsync("/api/test/1");
-            var response2 = await _client.GetAsync("/api/test/1");
-            Assert.NotNull(response.Headers.ETag);
-            Assert.NotNull(response2.Headers.ETag);
-            Assert.Equal(response.Headers.ETag.Tag, response2.Headers.ETag.Tag);
-            Assert.Equal(response.Headers.ETag.IsWeak, response2.Headers.ETag.IsWeak);
+            Assert.Null(response.Headers.ETag);
         }
     }
 
