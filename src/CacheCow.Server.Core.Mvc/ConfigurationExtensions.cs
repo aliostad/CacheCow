@@ -27,29 +27,33 @@ namespace CacheCow.Server.Core.Mvc
             services.AddTransient<ITimedETagExtractor, DefaultTimedETagExtractor>();
             services.AddTransient<ITimedETagQueryProvider, NullQueryProvider>();
         }
-        /*
-        public static void AddHttpCachingForViewModel<TViewModel, TETagExtractor>(this IServiceCollection services, bool transient = true)
-            where TETagExtractor : class, ITimedETagExtractor<TViewModel>
-        {
-//            ICacheDirectiveProvider<T> cacheDirectiveProvider,
-//ITimedETagExtractor< T > timedETagExtractor,
-//            ITimedETagQueryProvider<T> timedETagQueryProvider) :
 
-           if (transient)
-            {
-                services.AddTransient<ITimedETagExtractor<TViewModel>, TETagExtractor>();
-                services.AddTransient<HttpCacheFilter<TViewModel>>();
-                services.AddTransient<HttpCacheFilter<TViewModel>>();
-                services.AddTransient<HttpCacheFilter<TViewModel>>();
-            }
-           else
-            {
-
-            }
+        public static void AddDirectiveProviderForViewModel<TViewModel, TCacheDirectiveProvider>(this IServiceCollection services, bool transient = true)
+            where TCacheDirectiveProvider : class, ICacheDirectiveProvider<TViewModel>
+        {           
+            services.AddServiceWithLifeTime<ICacheDirectiveProvider<TViewModel>, TCacheDirectiveProvider>(transient);
+            services.AddServiceWithLifeTime<ITimedETagQueryProvider<TViewModel>, NullQueryProvider<TViewModel>>(transient);
+            services.AddServiceWithLifeTime<HttpCacheFilter<TViewModel>>(transient);                
         }
-        */
+        public static void AddDirectiveAndQueryProviderForViewModel<TViewModel, TCacheDirectiveProvider, TQueryProvider>(this IServiceCollection services, bool transient = true)
+            where TCacheDirectiveProvider : class, ICacheDirectiveProvider<TViewModel>
+            where TQueryProvider: class, ITimedETagQueryProvider<TViewModel>
+        {
+            services.AddServiceWithLifeTime<ICacheDirectiveProvider<TViewModel>, TCacheDirectiveProvider>(transient);
+            services.AddServiceWithLifeTime<ITimedETagQueryProvider<TViewModel>, TQueryProvider>(transient);
+            services.AddServiceWithLifeTime<HttpCacheFilter<TViewModel>>(transient);
+        }
 
-        private static void AddServiceConditional<TService, TImplementation>(this IServiceCollection services, bool transient)
+        public static void AddQueryProviderForViewModel<TViewModel, TQueryProvider>(this IServiceCollection services, bool transient = true)
+            where TQueryProvider : class, ITimedETagQueryProvider<TViewModel>
+        {
+            services.AddServiceWithLifeTime<ICacheDirectiveProvider<TViewModel>, NoCacheNoStoreProvider<TViewModel>>(transient);
+            services.AddServiceWithLifeTime<ITimedETagQueryProvider<TViewModel>, TQueryProvider>(transient);
+            services.AddServiceWithLifeTime<HttpCacheFilter<TViewModel>>(transient);
+        }
+
+
+        private static void AddServiceWithLifeTime<TService, TImplementation>(this IServiceCollection services, bool transient)
             where TImplementation : class, TService
             where TService : class
         {
@@ -59,6 +63,14 @@ namespace CacheCow.Server.Core.Mvc
                 services.AddSingleton<TService, TImplementation>();
         }
 
+        private static void AddServiceWithLifeTime<TService>(this IServiceCollection services, bool transient)
+            where TService : class
+        {
+            if (transient)
+                services.AddTransient<TService>();
+            else
+                services.AddSingleton<TService>();
+        }
 
         internal static T GetService<T>(this IServiceProvider provider)
         {

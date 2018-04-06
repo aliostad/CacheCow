@@ -13,13 +13,13 @@ using System.Net;
 
 namespace CacheCow.Server.Core.Mvc.Tests
 {
-    public class SimpleHashBasedHttpCacheFilterTests
+    public class SimpleNoCacheHttpCacheFilterTests
     {
 
         private TestServer _server;
         private HttpClient _client;
 
-        public SimpleHashBasedHttpCacheFilterTests()
+        public SimpleNoCacheHttpCacheFilterTests()
         {
             _server = new TestServer(new WebHostBuilder()
                 .UseStartup<HttpCacheFilterTestsStartup>());

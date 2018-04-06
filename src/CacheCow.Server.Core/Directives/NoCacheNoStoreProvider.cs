@@ -29,4 +29,11 @@ namespace CacheCow.Server.Core
             return false;
         }
     }
+
+    public class NoCacheNoStoreProvider<TViewModel> : NoCacheNoStoreProvider, ICacheDirectiveProvider<TViewModel>
+    {
+        public NoCacheNoStoreProvider(ITimedETagExtractor timedETagExtractor) : base(timedETagExtractor)
+        {
+        }
+    }
 }
