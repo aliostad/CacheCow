@@ -34,6 +34,7 @@ namespace CacheCow.Server.Core.Mvc
             services.AddServiceWithLifeTime<ITimedETagExtractor<TViewModel>, DefaultTimedETagExtractor<TViewModel>>(transient);
             services.AddServiceWithLifeTime<HttpCacheFilter<TViewModel>>(transient);                
         }
+
         public static void AddSeparateDirectiveAndQueryProviderForViewModel<TViewModel, TCacheDirectiveProvider, TQueryProvider>(this IServiceCollection services, bool transient = true)
             where TCacheDirectiveProvider : class, ICacheDirectiveProvider<TViewModel>
             where TQueryProvider: class, ITimedETagQueryProvider<TViewModel>
@@ -53,6 +54,14 @@ namespace CacheCow.Server.Core.Mvc
             services.AddServiceWithLifeTime<HttpCacheFilter<TViewModel>>(transient);
         }
 
+        public static void AddExtractorForViewModel<TViewModel, TExtractor>(this IServiceCollection services, bool transient = true)
+            where TExtractor : class, ITimedETagExtractor<TViewModel>
+        {
+            services.AddServiceWithLifeTime<ICacheDirectiveProvider<TViewModel>, DefaultCacheDirectiveProvider<TViewModel>>(transient);
+            services.AddServiceWithLifeTime<ITimedETagQueryProvider<TViewModel>, NullQueryProvider<TViewModel>>(transient);
+            services.AddServiceWithLifeTime<ITimedETagExtractor<TViewModel>, DefaultTimedETagExtractor<TViewModel>>(transient);
+            services.AddServiceWithLifeTime<HttpCacheFilter<TViewModel>>(transient);
+        }
 
         private static void AddServiceWithLifeTime<TService, TImplementation>(this IServiceCollection services, bool transient)
             where TImplementation : class, TService

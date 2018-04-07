@@ -104,10 +104,10 @@ namespace CacheCow.Server.Core.Mvc.Tests
         {
         }
 
-        public Task<TimedEntityTagHeaderValue> QueryAsync(ResourceExecutingContext context)
+        public async Task<TimedEntityTagHeaderValue> QueryAsync(ResourceExecutingContext context)
         {
             if (context.HttpContext.Request.Headers.ContainsKey(HeaderName))
-                return Task.FromResult(new TimedEntityTagHeaderValue(context.HttpContext.Request.Headers[HeaderName]));
+                return new TimedEntityTagHeaderValue(context.HttpContext.Request.Headers[HeaderName]);
             return null;
         }
 
