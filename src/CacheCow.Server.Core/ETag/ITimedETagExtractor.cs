@@ -11,4 +11,14 @@ namespace CacheCow.Server.Core
     {
         TimedEntityTagHeaderValue Extract(object viewModel);
     }
+
+    /// <summary>
+    /// Generic version
+    /// </summary>
+    /// <typeparam name="TViewModel"></typeparam>
+    public interface ITimedETagExtractor<TViewModel> : ITimedETagExtractor
+    {
+        TimedEntityTagHeaderValue Extract(TViewModel viewModel);
+    }
+
 }

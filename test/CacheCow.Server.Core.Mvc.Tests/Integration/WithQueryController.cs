@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CacheCow.Server.Core.Mvc.Tests.Integration
+namespace CacheCow.Server.Core.Mvc.Tests
 {
     public class WithQueryController
     {
+        public static int NumbersCalled = 0;
+
         [HttpCacheFactory(expirySeconds: 0, ViewModelType = typeof(TestViewModel))]
         public TestViewModel Get(int id)
         {
+            NumbersCalled++;
             return new TestViewModel()
             {
                 Id = id,
@@ -20,6 +23,7 @@ namespace CacheCow.Server.Core.Mvc.Tests.Integration
         [HttpCacheFactory(expirySeconds: 0, ViewModelType = typeof(IEnumerable<TestViewModel>))]
         public IEnumerable<TestViewModel> GetAll()
         {
+            NumbersCalled++;
             return new[]{
                 new TestViewModel()
                 {

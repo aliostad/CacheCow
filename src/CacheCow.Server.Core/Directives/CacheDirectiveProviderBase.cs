@@ -2,45 +2,43 @@
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace CacheCow.Server.Core
 {
     public abstract class CacheDirectiveProviderBase : ICacheDirectiveProvider
     {
         private readonly ITimedETagExtractor _timedETagExtractor;
+        private readonly ITimedETagQueryProvider _queryProvider;
 
-        public CacheDirectiveProviderBase(ITimedETagExtractor timedETagExtractor)
+        public CacheDirectiveProviderBase(ITimedETagExtractor timedETagExtractor, ITimedETagQueryProvider queryProvider)
         {
             _timedETagExtractor = timedETagExtractor;
+            _queryProvider = queryProvider;
         }
-
-        /// <summary>
-        /// Whether it is worth trying to extracting TETHV
-        /// If resource is non-cacheable it is not worth it
-        /// </summary>
-        /// <returns></returns>
-        protected abstract bool ShouldTryExtract();
 
         public TimedEntityTagHeaderValue Extract(object viewModel)
         {
-            return ShouldTryExtract() ? _timedETagExtractor.Extract(viewModel) : null;
+            return _timedETagExtractor.Extract(viewModel);
         }
 
-        public abstract CacheControlHeaderValue Get(HttpContext context);
-        
-    }
+        public abstract CacheControlHeaderValue GetCacheControl(HttpContext context, TimeSpan? configuredExpiry);
 
-    public abstract class CacheDirectiveProviderBase<TViewModel> : CacheDirectiveProviderBase, ICacheDirectiveProvider<TViewModel>
-    {
-        public CacheDirectiveProviderBase(ITimedETagExtractor timedETagExtractor) : base(timedETagExtractor)
+        public Task<TimedEntityTagHeaderValue> QueryAsync(ResourceExecutingContext context)
         {
+            return _queryProvider.QueryAsync(context);
         }
 
-        public TimedEntityTagHeaderValue Extract(TViewModel t)
+        public virtual void Dispose()
         {
-            return base.Extract(t);
+            _queryProvider.Dispose();            
+        }
+
+        public IEnumerable<string> GetVaryHeaders(HttpContext context)
+        {
+            return new[] {"Accept"};
         }
     }
-
 }

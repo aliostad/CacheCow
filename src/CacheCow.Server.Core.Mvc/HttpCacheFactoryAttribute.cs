@@ -42,23 +42,11 @@ namespace CacheCow.Server.Core.Mvc
                 var filterType = t.MakeGenericType(ViewModelType);
                 filter = (HttpCacheFilter)serviceProvider.GetService(filterType);
             }
-            
-            if(_expirySeconds.HasValue)
-            {
-                // this is a code smell, I know but this class needs a configuration and
-                // this is the only least of evil I can get that configuration ot it
-                // Maybe I will register a factory later
-                if (_expirySeconds.Value == 0)
-                {
-                    filter.CacheDirectiveProvider = serviceProvider.GetService<StrongConsistencyProvider>();
-                }
-                else
-                {
-                    var cep = serviceProvider.GetService<ConstantExpiryProvider>();
-                    cep.Expiry = TimeSpan.FromSeconds(_expirySeconds.Value);
-                    filter.CacheDirectiveProvider = cep;
-                }
-            }
+
+            filter.ConfiguredExpiry = _expirySeconds.HasValue
+                ? (TimeSpan?) TimeSpan.FromSeconds(_expirySeconds.Value)
+                : null;
+
 
             return filter;
         }

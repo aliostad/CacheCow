@@ -10,6 +10,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using CacheCow.Client.Headers;
+using CacheCow.Client;
 
 namespace CacheCow.Server.Core.Mvc.Tests
 {
@@ -45,9 +47,41 @@ namespace CacheCow.Server.Core.Mvc.Tests
             Assert.NotNull(response2.Headers.ETag);
             Assert.NotNull(response2.Headers.ETag.Tag);
             Assert.Equal(response.Headers.ETag.Tag, response2.Headers.ETag.Tag);
-
         }
 
+        [Fact]
+        public async Task ETagsAreTheSameForCollection()
+        {
+            var response = await _client.GetAsync("/api/withquery");
+            var response2 = await _client.GetAsync("/api/withquery");
+            Assert.NotNull(response.Headers.ETag);
+            Assert.NotNull(response.Headers.ETag.Tag);
+            Assert.NotNull(response2.Headers.ETag);
+            Assert.NotNull(response2.Headers.ETag.Tag);
+            Assert.Equal(response.Headers.ETag.Tag, response2.Headers.ETag.Tag);
+        }
+
+        [Fact]
+        public async Task SecondTimeComesFromCacheBecauseOfQueryProvider()
+        {
+            var ETagThatHashingGenerates = "U/I5fgFOxAXw7An1tsyvLTZrQhvqCDIAagv7s5NopKA="; // this is based on the collection data
+
+            WithQueryController.NumbersCalled = 0;
+            var handler = _server.CreateHandler();
+            var client = ClientExtensions.CreateClient(handler);
+            client.BaseAddress = _server.BaseAddress;
+            client.DefaultRequestHeaders.Add(TestViewModelCollectionQueryProvider.HeaderName,
+                new TimedEntityTagHeaderValue(ETagThatHashingGenerates).ETag.Tag);
+            var response = await client.GetAsync("/api/withquery");
+            var response2 = await client.GetAsync("/api/withquery");
+            Assert.Equal(1, WithQueryController.NumbersCalled);
+
+            var cch = response2.Headers.GetCacheCowHeader();
+            Assert.NotNull(cch);
+            Assert.False(cch.DidNotExist);
+            Assert.True(cch.CacheValidationApplied);
+            Assert.True(cch.RetrievedFromCache);
+        }
     }
 
     public class TestViewModelQueryProvider : ITimedETagQueryProvider<TestViewModel>
@@ -64,6 +98,7 @@ namespace CacheCow.Server.Core.Mvc.Tests
 
     public class TestViewModelCollectionQueryProvider : ITimedETagQueryProvider<IEnumerable<TestViewModel>>
     {
+        
         public const string HeaderName = "x-test-etag";
         public void Dispose()
         {
@@ -75,6 +110,12 @@ namespace CacheCow.Server.Core.Mvc.Tests
                 return Task.FromResult(new TimedEntityTagHeaderValue(context.HttpContext.Request.Headers[HeaderName]));
             return null;
         }
+
+        public TestViewModelCollectionQueryProvider()
+        {
+
+        }
+
     }
 
     public class WithQueryProviderStartup

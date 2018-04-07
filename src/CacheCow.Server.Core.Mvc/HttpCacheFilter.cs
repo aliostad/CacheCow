@@ -10,6 +10,7 @@ using CacheCow.Server.Core;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Headers;
 using System.IO;
+using Microsoft.Net.Http.Headers;
 
 namespace CacheCow.Server.Core.Mvc
 {
@@ -20,17 +21,14 @@ namespace CacheCow.Server.Core.Mvc
     public class HttpCacheFilter : IAsyncResourceFilter
     {
         private ICacheabilityValidator _validator;
-        private readonly ITimedETagQueryProvider _timedETagQueryProvider;
 
         private const string StreamName = "##__travesty_that_I_have_to_do_this__##";
 
         public HttpCacheFilter(ICacheabilityValidator validator,
-            ICacheDirectiveProvider cacheDirectiveProvider,
-            ITimedETagQueryProvider timedETagQueryProvider)
+            ICacheDirectiveProvider cacheDirectiveProvider)
         {
             _validator = validator;
             CacheDirectiveProvider = cacheDirectiveProvider;
-            _timedETagQueryProvider = timedETagQueryProvider;
             ApplyNoCacheNoStoreForNonCacheableResponse = true;
         }
 
@@ -132,7 +130,7 @@ namespace CacheCow.Server.Core.Mvc
             var cacheValidationStatus = context.HttpContext.Request.GetCacheValidationStatus();
             if (cacheValidationStatus != CacheValidationStatus.None)
             {
-                var timedETag = await _timedETagQueryProvider.QueryAsync(context);
+                var timedETag = await CacheDirectiveProvider.QueryAsync(context);
                 cacheValidated = ApplyCacheValidation(timedETag, cacheValidationStatus, context);
                 if (cacheValidated ?? false)
                 {
@@ -154,37 +152,36 @@ namespace CacheCow.Server.Core.Mvc
             {
                 if (HttpMethods.IsGet(context.HttpContext.Request.Method))
                 {
-                    var or = execCtx.Result as ObjectResult;
-                    TimedEntityTagHeaderValue tet = null;
-                    if (or != null && or.Value != null)
-                    {
-                        tet = CacheDirectiveProvider.Extract(or.Value);
-                    }
-
-                    if (cacheValidated == null  // could not validate
-                        && tet != null
-                        && cacheValidationStatus != CacheValidationStatus.None) // can only do GET validation, PUT is already impacted backend stores
-                    {
-                        cacheValidated = ApplyCacheValidation(tet, cacheValidationStatus, context);
-                        if (cacheValidated ?? false)
-                            return;
-                    }
-
-                    if (tet != null)
-                        context.HttpContext.Response.ApplyTimedETag(tet);
-
+                    context.HttpContext.Response.Headers.Add(HeaderNames.Vary, string.Join(";", CacheDirectiveProvider.GetVaryHeaders(context.HttpContext)));
+                    var cacheControl = CacheDirectiveProvider.GetCacheControl(context.HttpContext, this.ConfiguredExpiry);
                     var isResponseCacheable = _validator.IsCacheable(context.HttpContext.Response);
-                    if (!isRequestCacheable || !isResponseCacheable)
+                    if (!cacheControl.NoStore && isResponseCacheable) // _______ is cacheable
                     {
-                        if (!execCtx.Canceled)
-                            context.HttpContext.Response.MakeNonCacheable();
+                        var or = execCtx.Result as ObjectResult;
+                        TimedEntityTagHeaderValue tet = null;
+                        if (or != null && or.Value != null)
+                        {
+                            tet = CacheDirectiveProvider.Extract(or.Value);
+                        }
+
+                        if (cacheValidated == null  // could not validate
+                            && tet != null
+                            && cacheValidationStatus != CacheValidationStatus.None) // can only do GET validation, PUT is already impacted backend stores
+                        {
+                            cacheValidated = ApplyCacheValidation(tet, cacheValidationStatus, context);
+                            if (cacheValidated ?? false)
+                                return;
+                        }
+
+                        if (tet != null)
+                            context.HttpContext.Response.ApplyTimedETag(tet);
                     }
 
-                    if (isResponseCacheable)
-                    {
-                        context.HttpContext.Response.Headers[HttpHeaderNames.CacheControl] =
-                            CacheDirectiveProvider.Get(context.HttpContext).ToString();
-                    }
+                    if (!isRequestCacheable || !isResponseCacheable)
+                        context.HttpContext.Response.MakeNonCacheable();
+                    else
+                        context.HttpContext.Response.Headers[HttpHeaderNames.CacheControl] = cacheControl.ToString();
+
                 }
 
             }
@@ -202,7 +199,16 @@ namespace CacheCow.Server.Core.Mvc
         /// </summary>
         public bool ApplyNoCacheNoStoreForNonCacheableResponse { get; set; }
 
+        /// <summary>
+        /// ICacheDirectiveProvider for this instance
+        /// </summary>
         public ICacheDirectiveProvider CacheDirectiveProvider { get; set; }
+
+        /// <summary>
+        /// Gets used to create Cache directives
+        /// </summary>
+        public TimeSpan? ConfiguredExpiry { get; set; }
+
     }
 
     /// <summary>
@@ -212,9 +218,8 @@ namespace CacheCow.Server.Core.Mvc
     public class HttpCacheFilter<T> : HttpCacheFilter
     {
         public HttpCacheFilter(ICacheabilityValidator validator,
-            ICacheDirectiveProvider<T> cacheDirectiveProvider,
-            ITimedETagQueryProvider<T> timedETagQueryProvider) :
-            base(validator, cacheDirectiveProvider, timedETagQueryProvider)
+            ICacheDirectiveProvider<T> cacheDirectiveProvider) :
+            base(validator, cacheDirectiveProvider)
         {
         }
     }
