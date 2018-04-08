@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{37A9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Samples.Common", "samples\CacheCow.Samples.Common\CacheCow.Samples.Common.csproj", "{E6E47933-3CC5-4099-86B0-0D2F365F3F33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Samples.MvcCore", "samples\CacheCow.Samples.MvcCore\CacheCow.Samples.MvcCore.csproj", "{7750962C-BA57-49F0-AD66-7ACC85A2BDF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{E6E47933-3CC5-4099-86B0-0D2F365F3F33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6E47933-3CC5-4099-86B0-0D2F365F3F33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6E47933-3CC5-4099-86B0-0D2F365F3F33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7750962C-BA57-49F0-AD66-7ACC85A2BDF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7750962C-BA57-49F0-AD66-7ACC85A2BDF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7750962C-BA57-49F0-AD66-7ACC85A2BDF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7750962C-BA57-49F0-AD66-7ACC85A2BDF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{4FACA538-2464-4C00-A031-9E52BBAD63CC} = {8F731FE7-74D7-4733-B402-249352235A33}
 		{1A01FA9D-3651-4BC9-AED7-4934FD994EFA} = {8F731FE7-74D7-4733-B402-249352235A33}
 		{E6E47933-3CC5-4099-86B0-0D2F365F3F33} = {37A9D060-F7CD-4FDE-8BE3-28C2AF1F21BD}
+		{7750962C-BA57-49F0-AD66-7ACC85A2BDF2} = {37A9D060-F7CD-4FDE-8BE3-28C2AF1F21BD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E7779A1-9A5D-4809-B8DF-D31B56406DFF}
