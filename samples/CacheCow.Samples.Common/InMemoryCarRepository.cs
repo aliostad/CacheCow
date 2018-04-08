@@ -6,7 +6,7 @@ namespace CacheCow.Samples.Common
 {
     public class InMemoryCarRepository : ICarRepository
     {
-        private Dictionary<int, Car> _cars = new Dictionary<int, Car>();
+        protected Dictionary<int, Car> _cars = new Dictionary<int, Car>();
         private Random _random = new Random();
 
         public Car CreateNewCar()
