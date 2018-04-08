@@ -13,7 +13,7 @@ namespace CacheCow.Client.Headers
 		// but it has the advantage of using at compile-time
 		// so conscious decision to use const instead of static readonly
 
-		public const string Name = "x-cachecow";
+		public const string Name = "x-cachecow-client";
 
 		public static class ExtensionNames
 		{

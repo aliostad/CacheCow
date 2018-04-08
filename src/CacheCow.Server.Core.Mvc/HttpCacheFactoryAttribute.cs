@@ -43,6 +43,11 @@ namespace CacheCow.Server.Core.Mvc
                 filter = (HttpCacheFilter)serviceProvider.GetService(filterType);
             }
 
+            if(filter == null)
+            {
+                throw new InvalidOperationException("Could not resolve the filter or its dependencies. If you have defined ViewModelType, make sure at least one generic registerations are done using ConfigurationExtensions.");
+            }
+
             filter.ConfiguredExpiry = _expirySeconds.HasValue
                 ? (TimeSpan?) TimeSpan.FromSeconds(_expirySeconds.Value)
                 : null;

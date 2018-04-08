@@ -8,8 +8,15 @@ using System.Threading.Tasks;
 
 namespace CacheCow.Samples.MvcCore
 {
-    public class TimedETagQueryCarRepository : InMemoryCarRepository, ITimedETagQueryCarRepository
+    public class TimedETagQueryCarRepository : ITimedETagQueryProvider<IEnumerable<Car>>, ITimedETagQueryProvider<Car>
     {
+        private readonly ICarRepository _repository;
+
+        public TimedETagQueryCarRepository(ICarRepository repository)
+        {
+            _repository = repository;
+        }
+
         public void Dispose()
         {
             // nothing
@@ -23,23 +30,16 @@ namespace CacheCow.Samples.MvcCore
             
             if(id.HasValue) // Get one car
             {
-                if (_cars.ContainsKey(id.Value))
-                    return Task.FromResult(new TimedEntityTagHeaderValue(TurnDatetimeOffsetToETag(_cars[id.Value].LastModified)));
+                var car = _repository.GetCar(id.Value);
+                if (car != null)
+                    return Task.FromResult(new TimedEntityTagHeaderValue(car.LastModified.ToETagString()));
                 else
                     return Task.FromResult((TimedEntityTagHeaderValue)null);
             }
             else // all cars
             {               
-                var maxDatetimeoffset = _cars.Values.Aggregate(DateTimeOffset.MinValue, (seed, car) => car.LastModified > seed ? car.LastModified : seed);
-                return Task.FromResult(new TimedEntityTagHeaderValue(TurnDatetimeOffsetToETag(maxDatetimeoffset)));
+                return Task.FromResult(new TimedEntityTagHeaderValue(_repository.GetMaxLastModified().ToETagString()));
             }
-        }
-
-        private string TurnDatetimeOffsetToETag(DateTimeOffset dateTimeOffset)
-        {
-            var dateBytes = BitConverter.GetBytes(dateTimeOffset.UtcDateTime.Ticks);
-            var offsetBytes = BitConverter.GetBytes((Int16)dateTimeOffset.Offset.TotalHours);
-            return Convert.ToBase64String(dateBytes.Concat(offsetBytes).ToArray());
         }
     }
 

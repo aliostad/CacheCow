@@ -1,4 +1,6 @@
-﻿using CacheCow.Server.Core.Mvc;
+﻿using CacheCow.Samples.Common;
+using CacheCow.Server.Core;
+using CacheCow.Server.Core.Mvc;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +25,12 @@ namespace CacheCow.Samples.MvcCore
         {
             services.AddMvc().AddWebApiConventions();
             services.AddHttpCaching();
+            services.AddQueryProviderForViewModel<Car, TimedETagQueryCarRepository>(false);
+            services.AddQueryProviderForViewModel<IEnumerable<Car>, TimedETagQueryCarRepository>(false);
+            services.AddSingleton<ICarRepository, InMemoryCarRepository>();
+            services.AddSingleton<ITimedETagExtractor<IEnumerable<Car>>, CarCollectionETagExtractor>();
+            services.AddSingleton<ITimedETagExtractor<Car>, CarETagExtractor>();
+
         }
 
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -30,8 +38,8 @@ namespace CacheCow.Samples.MvcCore
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
-                    name: "api-get",
-                    template: "api/{controller}/{id:int}");
+                    name: "api",
+                    template: "api/{controller}/{id:int?}");
             });
         }
     }
