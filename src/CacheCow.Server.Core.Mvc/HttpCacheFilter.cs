@@ -189,6 +189,7 @@ namespace CacheCow.Server.Core.Mvc
             {
                 if (mustReflush)
                 {
+                    ms.Position = 0;
                     ms.CopyTo(context.HttpContext.Response.Body);
                 }
             }

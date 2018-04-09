@@ -24,7 +24,7 @@ namespace CacheCow.Samples.MvcCore
 
         public Task<TimedEntityTagHeaderValue> QueryAsync(ResourceExecutingContext context)
         {
-            int? id = 0;
+            int? id = null;
             if (context.RouteData.Values.ContainsKey("id"))
                 id = (int)context.RouteData.Values["id"];
             

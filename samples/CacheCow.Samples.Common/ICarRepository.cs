@@ -14,7 +14,7 @@ namespace CacheCow.Samples.Common
 
         Car GetCar(int id);
 
-        IEnumerable<Car> ListCars();
+        Car[] ListCars();
 
         DateTimeOffset GetMaxLastModified();
     }

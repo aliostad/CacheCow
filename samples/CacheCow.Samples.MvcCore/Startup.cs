@@ -40,6 +40,11 @@ namespace CacheCow.Samples.MvcCore
                 routes.MapRoute(
                     name: "api",
                     template: "api/{controller}/{id:int?}");
+                routes.MapRoute(
+                    name: "api-collections",
+                    defaults: new { action = "GetAll" },
+                    template: "api/{controller}s");
+
             });
         }
     }

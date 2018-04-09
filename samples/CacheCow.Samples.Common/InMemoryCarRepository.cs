@@ -25,6 +25,7 @@ namespace CacheCow.Samples.Common
                 Year = _random.Next(2000, 2018)
             };
 
+            _cars.Add(car.Id, car);
             return car;
         }
 
@@ -48,10 +49,10 @@ namespace CacheCow.Samples.Common
         {
             return _cars.Values.GetMaxLastModified();
         }
-
-        public IEnumerable<Car> ListCars()
+        
+        public Car[] ListCars()
         {
-            return _cars.Values.OrderBy(x => x.Id);
+            return _cars.Values.OrderBy(x => x.Id).ToArray();
         }
 
         public bool UpdateCar(int id)
