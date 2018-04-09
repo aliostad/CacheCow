@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using System.Net.Http.Headers;
 using System.IO;
 using Microsoft.Net.Http.Headers;
+using CacheCow.Server.Core.Headers;
 
 namespace CacheCow.Server.Core.Mvc
 {
@@ -125,6 +126,7 @@ namespace CacheCow.Server.Core.Mvc
         /// <returns></returns>
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
         {
+            var cacheCowHeader = new CacheCowHeader();
             bool? cacheValidated = null;
             bool isRequestCacheable = _validator.IsCacheable(context.HttpContext.Request);
             var cacheValidationStatus = context.HttpContext.Request.GetCacheValidationStatus();
@@ -132,8 +134,12 @@ namespace CacheCow.Server.Core.Mvc
             {
                 var timedETag = await CacheDirectiveProvider.QueryAsync(context);
                 cacheValidated = ApplyCacheValidation(timedETag, cacheValidationStatus, context);
+                cacheCowHeader.ValidationApplied = true;
                 if (cacheValidated ?? false)
                 {
+                    cacheCowHeader.ShortCircuited = true;
+                    cacheCowHeader.ValidationMatched = true;
+                    context.HttpContext.Response.Headers.Add(CacheCowHeader.Name, cacheCowHeader.ToString());
                     // the response would have been set and no need to run the rest of the pipeline
                     return;
                 }
@@ -169,8 +175,15 @@ namespace CacheCow.Server.Core.Mvc
                             && cacheValidationStatus != CacheValidationStatus.None) // can only do GET validation, PUT is already impacted backend stores
                         {
                             cacheValidated = ApplyCacheValidation(tet, cacheValidationStatus, context);
+                            cacheCowHeader.ValidationApplied = true;
+                            // the response would have been set and no need to run the rest of the pipeline
+
                             if (cacheValidated ?? false)
+                            {
+                                cacheCowHeader.ValidationMatched = true;
+                                context.HttpContext.Response.Headers.Add(CacheCowHeader.Name, cacheCowHeader.ToString());
                                 return;
+                            }
                         }
 
                         if (tet != null)
@@ -182,6 +195,7 @@ namespace CacheCow.Server.Core.Mvc
                     else
                         context.HttpContext.Response.Headers[HttpHeaderNames.CacheControl] = cacheControl.ToString();
 
+                    context.HttpContext.Response.Headers.Add(CacheCowHeader.Name, cacheCowHeader.ToString());
                 }
 
             }

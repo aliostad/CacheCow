@@ -19,14 +19,6 @@ namespace CacheCow.Samples.MvcCore
         }
 
         [HttpGet]
-        [HttpCacheFactory(0, ViewModelType = typeof(IEnumerable<Car>))]
-        public Car[] GetAll()
-        {
-            var cars = _repository.ListCars();
-            return cars;
-        }
-
-        [HttpGet]
         [HttpCacheFactory(0, ViewModelType = typeof(Car))]
         public IActionResult Get(int id)
         {

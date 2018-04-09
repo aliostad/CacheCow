@@ -27,23 +27,23 @@ namespace CacheCow.Samples.MvcCore
             services.AddHttpCaching();
             services.AddQueryProviderForViewModel<Car, TimedETagQueryCarRepository>(false);
             services.AddQueryProviderForViewModel<IEnumerable<Car>, TimedETagQueryCarRepository>(false);
-            services.AddSingleton<ICarRepository, InMemoryCarRepository>();
+            services.AddSingleton<ICarRepository>(InMemoryCarRepository.Instance);
             services.AddSingleton<ITimedETagExtractor<IEnumerable<Car>>, CarCollectionETagExtractor>();
             services.AddSingleton<ITimedETagExtractor<Car>, CarETagExtractor>();
-
         }
 
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseMvc(routes =>
             {
+
+                routes.MapRoute(
+                    name: "api-createorlist",
+                    template: "api/{controller}");
+
                 routes.MapRoute(
                     name: "api",
-                    template: "api/{controller}/{id:int?}");
-                routes.MapRoute(
-                    name: "api-collections",
-                    defaults: new { action = "GetAll" },
-                    template: "api/{controller}s");
+                    template: "api/{controller}/{id:int}");
 
             });
         }

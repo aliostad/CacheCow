@@ -359,7 +359,7 @@ namespace CacheCow.Client
 
                 await UpdateCachedResponseAsync(cacheKey, cachedResponse, serverResponse, _cacheStore);
                 ConsumeAndDisposeResponse(serverResponse);
-                return cachedResponse.AddCacheCowHeader(cacheCowHeader); // EXIT !! _______________
+                return cachedResponse.AddCacheCowHeader(cacheCowHeader).CopyOtherCacheCowHeaders(serverResponse); // EXIT !! _______________
             }
 
             var validationResult = ResponseValidator(serverResponse);

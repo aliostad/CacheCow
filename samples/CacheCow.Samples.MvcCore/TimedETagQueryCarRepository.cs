@@ -26,7 +26,7 @@ namespace CacheCow.Samples.MvcCore
         {
             int? id = null;
             if (context.RouteData.Values.ContainsKey("id"))
-                id = (int)context.RouteData.Values["id"];
+                id = Convert.ToInt32(context.RouteData.Values["id"]);
             
             if(id.HasValue) // Get one car
             {

@@ -9,9 +9,12 @@ namespace CacheCow.Samples.Common
         protected Dictionary<int, Car> _cars = new Dictionary<int, Car>();
         private Random _random = new Random();
 
-        public InMemoryCarRepository()
+        public static readonly ICarRepository Instance = new InMemoryCarRepository();
+
+        private InMemoryCarRepository()
         {
             Console.WriteLine("Repo created.");
+            Console.WriteLine();
         }
 
         public Car CreateNewCar()
@@ -45,12 +48,19 @@ namespace CacheCow.Samples.Common
             return _cars.ContainsKey(id) ? _cars[id] : null;
         }
 
+        public int? GetLastId()
+        {
+            var lastId = 
+                _cars.Values.Aggregate(-1, (seed, car) => seed > car.Id ? seed : car.Id);
+            return lastId < 0 ? null : (int?) lastId;
+        }
+
         public DateTimeOffset GetMaxLastModified()
         {
             return _cars.Values.GetMaxLastModified();
         }
         
-        public Car[] ListCars()
+        public IEnumerable<Car> ListCars()
         {
             return _cars.Values.OrderBy(x => x.Id).ToArray();
         }
