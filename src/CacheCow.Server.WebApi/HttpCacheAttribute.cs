@@ -8,8 +8,18 @@ using System.Web.Http.Filters;
 
 namespace CacheCow.Server.WebApi
 {
+    /// <summary>
+    /// TODO: this is not done
+    /// </summary>
     public class HttpCacheAttribute : ActionFilterAttribute
     {
+
+        public HttpCacheAttribute()
+        {
+
+        }
+
+
         public override Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
         {
             return base.OnActionExecutingAsync(actionContext, cancellationToken);
