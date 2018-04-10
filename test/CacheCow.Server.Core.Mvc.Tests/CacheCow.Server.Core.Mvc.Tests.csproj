@@ -16,6 +16,7 @@
 	  <ProjectReference Include="..\..\src\CacheCow.Client\CacheCow.Client.csproj" />
 	  <ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj" />
 	  <ProjectReference Include="..\..\src\CacheCow.Server.Core.Mvc\CacheCow.Server.Core.Mvc.csproj" />
+	  <ProjectReference Include="..\..\src\CacheCow.Server\CacheCow.Server.csproj" />
 	</ItemGroup>
 
 </Project>

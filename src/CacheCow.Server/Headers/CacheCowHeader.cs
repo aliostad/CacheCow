@@ -7,7 +7,7 @@ namespace CacheCow.Server.Headers
     public class CacheCowHeader
     {
         public const string Name = "x-cachecow-server";
-        private const string Pattern = "ValidationApplied=(true|false);ValidationMatched=(true|false);ShortCircuited=(true|false)";
+        private const string Pattern = "ValidationApplied=(True|False);ValidationMatched=(True|False);ShortCircuited=(True|False)";
         private static Regex _regex = new Regex(Pattern);
 
         /// <summary>

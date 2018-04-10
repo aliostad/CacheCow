@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Linq;
 using CacheCow.Client;
 using CacheCow.Client.Headers;
+using CacheCow.Server.Headers;
 using Xunit;
 using System.Threading.Tasks;
 
@@ -29,14 +30,14 @@ namespace CacheCow.Server.Core.Mvc.Tests
         [Fact]
         public async Task SecondTimeComesFromCacheBecauseOfExtractor()
         {
-            WithQueryController.NumbersCalled = 0;
             var handler = _server.CreateHandler();
             var client = ClientExtensions.CreateClient(handler);
             client.BaseAddress = _server.BaseAddress;
-            
             var response = await client.GetAsync("/api/withquery");
             var response2 = await client.GetAsync("/api/withquery");
-            Assert.Equal(2, WithQueryController.NumbersCalled);
+            var serverCch = response2.GetCacheCowHeader();
+            Assert.NotNull(serverCch);
+            Assert.False(serverCch.ShortCircuited);
 
             var cch = response2.Headers.GetCacheCowHeader();
             Assert.NotNull(cch);

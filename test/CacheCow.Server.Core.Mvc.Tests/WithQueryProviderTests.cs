@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Xunit;
 using CacheCow.Client.Headers;
 using CacheCow.Client;
+using CacheCow.Server.Headers;
 
 namespace CacheCow.Server.Core.Mvc.Tests
 {
@@ -66,7 +67,6 @@ namespace CacheCow.Server.Core.Mvc.Tests
         {
             var ETagThatHashingGenerates = "U/I5fgFOxAXw7An1tsyvLTZrQhvqCDIAagv7s5NopKA="; // this is based on the collection data
 
-            WithQueryController.NumbersCalled = 0;
             var handler = _server.CreateHandler();
             var client = ClientExtensions.CreateClient(handler);
             client.BaseAddress = _server.BaseAddress;
@@ -74,7 +74,9 @@ namespace CacheCow.Server.Core.Mvc.Tests
                 new TimedEntityTagHeaderValue(ETagThatHashingGenerates).ETag.Tag);
             var response = await client.GetAsync("/api/withquery");
             var response2 = await client.GetAsync("/api/withquery");
-            Assert.Equal(1, WithQueryController.NumbersCalled);
+            var serverCch = response2.GetCacheCowHeader();
+            Assert.NotNull(serverCch);
+            Assert.True(serverCch.ShortCircuited);
 
             var cch = response2.Headers.GetCacheCowHeader();
             Assert.NotNull(cch);
