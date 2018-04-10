@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace CacheCow.Server.Core.Headers
+namespace CacheCow.Server.Headers
 {
     public class CacheCowHeader
     {

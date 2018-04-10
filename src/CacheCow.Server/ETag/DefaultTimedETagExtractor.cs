@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CacheCow.Server.Core
+namespace CacheCow.Server
 {
     /// <summary>
     /// Default impl where it tries to cast as ICacheResource and if successful, calls the method

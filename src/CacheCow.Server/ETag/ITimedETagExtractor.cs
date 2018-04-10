@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CacheCow.Server.Core
+namespace CacheCow.Server
 {
     /// <summary>
     /// Non-generic interface. Meant for internal use - please use the generic interface.

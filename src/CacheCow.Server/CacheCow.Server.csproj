@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
+		<Summary>Server constructs for HTTP Caching</Summary>
+		<AssemblyName>CacheCow.Server</AssemblyName>
+		<PackageId>CacheCow.Server</PackageId>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Include="..\Common\TraceWriter.cs" Link="TraceWriter.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
+		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.4" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+		<PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.4" />
+	</ItemGroup>	
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
+	</ItemGroup>	
+
+</Project>

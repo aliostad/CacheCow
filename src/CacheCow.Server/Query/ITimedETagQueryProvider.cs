@@ -1,11 +1,16 @@
 ﻿using CacheCow.Common;
+#if NET452
+using System.Web.Http.Controllers;
+#else
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CacheCow.Server.Core
+namespace CacheCow.Server
 {
     /// <summary>
     /// Provides TETHV by querying a store to get the most recent value
@@ -18,7 +23,12 @@ namespace CacheCow.Server.Core
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
+        /// 
+#if NET452
+        Task<TimedEntityTagHeaderValue> QueryAsync(HttpActionContext context);
+#else
         Task<TimedEntityTagHeaderValue> QueryAsync(ResourceExecutingContext context);
+#endif
     }
 
     /// <summary>

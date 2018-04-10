@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 using System.Net.Http.Headers;
 using System.IO;
 using Microsoft.Net.Http.Headers;
-using CacheCow.Server.Core.Headers;
+using CacheCow.Server.Headers;
 
 namespace CacheCow.Server.Core.Mvc
 {

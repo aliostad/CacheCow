@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CacheCow.Server.Core
+namespace CacheCow.Server
 {
     /// <summary>
     /// To be implemented by Models/ViewModels that can take part in HTTP Cache/Concurrency 

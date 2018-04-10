@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CacheCow.Server.Core
+namespace CacheCow.Server
 {
     /// <summary>
     /// Sha1 impl
