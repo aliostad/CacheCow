@@ -9,7 +9,7 @@ namespace CacheCow.Server.WebApi
     /// <summary>
     /// Runtime environment for fine-tuning configuration of cache filters
     /// </summary>
-    public static class ServerRuntime
+    public static class CachingRuntime
     {
         public static event EventHandler<HttpCacheCreatedEventArgs> CacheFilterCreated;
 

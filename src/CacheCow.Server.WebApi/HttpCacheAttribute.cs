@@ -20,10 +20,10 @@ namespace CacheCow.Server.WebApi
             Type timedETagQueryProviderType = null)
         {
 
-            if(ServerRuntime.Factory == null)
+            if(CachingRuntime.Factory == null)
             {
-                CacheabilityValidator = ServerRuntime.Get<ICacheabilityValidator>();
-                CacheDirectiveProvider = ServerRuntime.Get<ICacheDirectiveProvider>();
+                CacheabilityValidator = CachingRuntime.Get<ICacheabilityValidator>();
+                CacheDirectiveProvider = CachingRuntime.Get<ICacheDirectiveProvider>();
             }
             else
             {
@@ -44,7 +44,7 @@ namespace CacheCow.Server.WebApi
                     (ICacheDirectiveProvider) Activator.CreateInstance(cacheDirectiveProviderType);
             }
 
-            ServerRuntime.OnHttpCacheCreated(new HttpCacheCreatedEventArgs(this));
+            CachingRuntime.OnHttpCacheCreated(new HttpCacheCreatedEventArgs(this));
         }
 
 
