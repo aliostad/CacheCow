@@ -14,10 +14,40 @@ namespace CacheCow.Server.WebApi
     public class HttpCacheAttribute : ActionFilterAttribute
     {
 
-        public HttpCacheAttribute()
+        public HttpCacheAttribute(Type cacheabilityValidatorType = null,
+            Type cacheDirectiveProviderType = null,
+            Type timedETagExtractorType = null,
+            Type timedETagQueryProviderType = null)
         {
 
+            if(ServerRuntime.Factory == null)
+            {
+                CacheabilityValidator = ServerRuntime.Get<ICacheabilityValidator>();
+                CacheDirectiveProvider = ServerRuntime.Get<ICacheDirectiveProvider>();
+            }
+            else
+            {
+                CacheabilityValidator = cacheabilityValidatorType == null ?
+                    new DefaultCacheabilityValidator() :
+                    (ICacheabilityValidator)Activator.CreateInstance(cacheabilityValidatorType);
+
+                var extractor = timedETagExtractorType == null ?
+                    new DefaultTimedETagExtractor(new JsonSerialiser(), new Sha1Hasher()) :
+                    (ITimedETagExtractor)Activator.CreateInstance(timedETagExtractorType);
+
+                var queryProvider = timedETagQueryProviderType == null ?
+                    new NullQueryProvider() :
+                    (ITimedETagQueryProvider) Activator.CreateInstance(timedETagQueryProviderType);
+
+                CacheDirectiveProvider = cacheDirectiveProviderType == null ?
+                    new DefaultCacheDirectiveProvider(extractor, queryProvider) :
+                    (ICacheDirectiveProvider) Activator.CreateInstance(cacheDirectiveProviderType);
+            }
+
+            ServerRuntime.OnHttpCacheCreated(new HttpCacheCreatedEventArgs(this));
         }
+
+
 
 
         public override Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
@@ -29,5 +59,11 @@ namespace CacheCow.Server.WebApi
         {
             return base.OnActionExecutedAsync(actionExecutedContext, cancellationToken);
         }
+
+        public ICacheabilityValidator CacheabilityValidator { get; set; }
+
+        public ICacheDirectiveProvider CacheDirectiveProvider { get; set; }
+
+
     }
 }

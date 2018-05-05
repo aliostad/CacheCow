@@ -8,5 +8,11 @@ namespace CacheCow.Server.WebApi
 {
     public class HttpCacheCreatedEventArgs : EventArgs
     {
+        public HttpCacheCreatedEventArgs(HttpCacheAttribute instance)
+        {
+            FilterInstance = instance;
+        }
+
+        public HttpCacheAttribute FilterInstance { get; }
     }
 }

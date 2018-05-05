@@ -15,6 +15,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj" />
+		<ProjectReference Include="..\CacheCow.Server\CacheCow.Server.csproj" />
 	</ItemGroup>
   
 </Project>
