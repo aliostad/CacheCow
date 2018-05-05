@@ -22,6 +22,19 @@ namespace CacheCow.Server.WebApi
         public static void RegisterFactory(Func<Type, object> factory, Action<Type, Type> registerationStub)
         {
             Factory = factory;
+
+            AddTransient<ICacheabilityValidator, DefaultCacheabilityValidator>(registerationStub);
+            AddTransient<HttpCacheAttribute, HttpCacheAttribute>(registerationStub);
+            AddTransient<ISerialiser, JsonSerialiser>(registerationStub);
+            AddTransient<IHasher, Sha1Hasher>(registerationStub);
+            AddTransient<ITimedETagExtractor, DefaultTimedETagExtractor>(registerationStub);
+            AddTransient<ITimedETagQueryProvider, NullQueryProvider>(registerationStub);
+            AddTransient<ICacheDirectiveProvider, DefaultCacheDirectiveProvider>(registerationStub);
+        }
+
+        private static void AddTransient<TI, TC>(Action<Type, Type> registerationStub)
+        {
+            registerationStub(typeof(TI), typeof(TC));
         }
 
         internal static Func<Type, object> Factory { get; set; }
