@@ -93,8 +93,8 @@ namespace CacheCow.Server.Core.Mvc
                             return false;
                         else
                         {
-                            context.Result = new StatusCodeResult(StatusCodes.Status409Conflict);
-                            context.HttpContext.Response.StatusCode = StatusCodes.Status409Conflict;
+                            context.Result = new StatusCodeResult(StatusCodes.Status412PreconditionFailed);
+                            context.HttpContext.Response.StatusCode = StatusCodes.Status412PreconditionFailed;
                             return true;
                         }
                     }
@@ -105,8 +105,8 @@ namespace CacheCow.Server.Core.Mvc
                     {
                         if (timedEtag.LastModified > headers.IfUnmodifiedSince.Value)
                         {
-                            context.Result = new StatusCodeResult(StatusCodes.Status409Conflict);
-                            context.HttpContext.Response.StatusCode = StatusCodes.Status409Conflict;
+                            context.Result = new StatusCodeResult(StatusCodes.Status412PreconditionFailed);
+                            context.HttpContext.Response.StatusCode = StatusCodes.Status412PreconditionFailed;
                             return true;
                         }
                         else
