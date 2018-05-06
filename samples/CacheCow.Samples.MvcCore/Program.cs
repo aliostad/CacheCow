@@ -11,72 +11,30 @@ using System.Threading.Tasks;
 
 namespace CacheCow.Samples.MvcCore
 {
-    class Program
+
+    class Program : MenuBase
     {
-        private static TestServer _server;
-        private static HttpClient _client;
+        private TestServer _server;
+        private HttpClient _client;
 
         static void Main(string[] args)
         {
+            var p = new Program();
             // setup
-            _server = new TestServer(new WebHostBuilder()
+            p._server = new TestServer(new WebHostBuilder()
                 .UseStartup<Startup>());
-            var handler = _server.CreateHandler();
+            var handler = p._server.CreateHandler();
 
-            _client = ClientExtensions.CreateClient(handler);
-            _client.BaseAddress = _server.BaseAddress;
+            p._client = ClientExtensions.CreateClient(handler);
+            p._client.BaseAddress = p._server.BaseAddress;
 
-            Task.Run(RunAsync).Wait();
+            Task.Run(async () => await p.Menu()).Wait();
 
         }
 
-        static async Task RunAsync()
-        {
-            await Menu();
-        }
+        
 
-        static async Task Menu()
-        {
-            while(true)
-            {
-                Console.WriteLine(
-@"CacheCow Cars Samples - (ASP.NET Core MVC and HttpClient)
-    - Press 0 to list all cars
-    - Press 1 to create a new car and add to repo
-    - Press 2 to update the last item (updates last modified)
-    - Press 3 to delete the last item
-    - Press 4 to get the last item
-    - Press x to exit
-"
-);
-                var key = Console.ReadKey(true);
-                switch (key.KeyChar)
-                {
-                    case 'x':
-                        return;
-                    case '0':
-                        await ListAll();
-                        break;
-                    case '1':
-                        await CreateNew();
-                        break;
-                    case '2':
-                        await UpdateLast();
-                        break;
-                    case '3':
-                        await DeleteLast();
-                        break;
-                    case '4':
-                        await GetLast();
-                        break;
-                    default:
-                        // nothing
-                        break;
-                }
-            }
-        }
-
-        static async Task ListAll()
+        public override async Task ListAll()
         {
             var response = await _client.GetAsync("/api/cars");
             response.EnsureSuccessStatusCode();
@@ -97,7 +55,7 @@ namespace CacheCow.Samples.MvcCore
             Console.ResetColor();
         }
 
-        static async Task CreateNew()
+        public override async Task CreateNew()
         {
             var response = await _client.SendAsync( new HttpRequestMessage(HttpMethod.Post, "/api/car"));
             response.EnsureSuccessStatusCode();
@@ -108,7 +66,7 @@ namespace CacheCow.Samples.MvcCore
 
         }
 
-        static async Task UpdateLast()
+        public override async Task UpdateLast()
         {
             var id = InMemoryCarRepository.Instance.GetLastId();
             if(id.HasValue)
@@ -125,7 +83,7 @@ namespace CacheCow.Samples.MvcCore
             }
         }
 
-        static async Task DeleteLast()
+        public override async Task DeleteLast()
         {
             var id = InMemoryCarRepository.Instance.GetLastId();
             if (id.HasValue)
@@ -142,7 +100,7 @@ namespace CacheCow.Samples.MvcCore
             }
 
         }
-        static async Task GetLast()
+        public override async Task GetLast()
         {
             var id = InMemoryCarRepository.Instance.GetLastId();
             if (id.HasValue)

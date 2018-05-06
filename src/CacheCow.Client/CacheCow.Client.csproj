@@ -10,7 +10,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
-		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.4" />
+		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.5" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj" />
