@@ -4,4 +4,14 @@
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CacheCow.Client\CacheCow.Client.csproj" />
+    <ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj" />
+    <ProjectReference Include="..\..\src\CacheCow.Server\CacheCow.Server.csproj" />
+  </ItemGroup>
+
 </Project>
