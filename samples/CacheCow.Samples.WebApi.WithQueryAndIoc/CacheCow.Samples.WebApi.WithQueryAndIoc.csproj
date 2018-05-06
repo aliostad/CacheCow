@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net452</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Castle.Windsor" Version="4.1.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.SelfHost" Version="5.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CacheCow.Client\CacheCow.Client.csproj" />
+    <ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj" />
+    <ProjectReference Include="..\..\src\CacheCow.Server.WebApi\CacheCow.Server.WebApi.csproj" />
+    <ProjectReference Include="..\..\src\CacheCow.Server\CacheCow.Server.csproj" />
+    <ProjectReference Include="..\CacheCow.Samples.Common\CacheCow.Samples.Common.csproj" />
+  </ItemGroup>
+
+</Project>

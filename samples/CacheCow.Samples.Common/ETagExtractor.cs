@@ -1,11 +1,9 @@
-﻿using CacheCow.Samples.Common;
-using CacheCow.Server;
-using CacheCow.Server.Core;
+﻿using CacheCow.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CacheCow.Samples.MvcCore
+namespace CacheCow.Samples.Common
 {
     public class CarETagExtractor : ITimedETagExtractor<Car>
     {
@@ -35,6 +33,21 @@ namespace CacheCow.Samples.MvcCore
         public TimedEntityTagHeaderValue Extract(object viewModel)
         {
             return Extract(viewModel as IEnumerable<Car>);
+        }
+    }
+
+    public class CarAndCollectionETagExtractor : ITimedETagExtractor
+    {
+        public TimedEntityTagHeaderValue Extract(object viewModel)
+        {
+            var car = viewModel as Car;
+            if(car != null)
+                return new TimedEntityTagHeaderValue(car.LastModified.ToETagString());
+            var cars = viewModel as IEnumerable<Car>;
+            if (cars != null)
+                return new TimedEntityTagHeaderValue(cars.GetMaxLastModified().ToETagString());
+
+            return null;
         }
     }
 
