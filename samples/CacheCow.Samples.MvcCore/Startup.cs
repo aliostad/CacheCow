@@ -1,4 +1,5 @@
 ﻿using CacheCow.Samples.Common;
+using CacheCow.Server;
 using CacheCow.Server.Core;
 using CacheCow.Server.Core.Mvc;
 using Microsoft.AspNetCore.Builder;

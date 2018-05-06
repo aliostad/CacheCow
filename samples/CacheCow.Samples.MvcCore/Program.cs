@@ -170,11 +170,11 @@ namespace CacheCow.Samples.MvcCore
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Client: {response.Headers.GetCacheCowHeader()}");
-            if(response.Headers.Contains(CacheCow.Server.Core.Headers.CacheCowHeader.Name))
+            if(response.Headers.Contains(CacheCowHeader.Name))
             {
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("Server: " + 
-                    response.Headers.GetValues(CacheCow.Server.Core.Headers.CacheCowHeader.Name).FirstOrDefault() ?? "");
+                    response.Headers.GetValues(CacheCowHeader.Name).FirstOrDefault() ?? "");
             }
 
             Console.ResetColor();
