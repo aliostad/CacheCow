@@ -6,36 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using CacheCow.Client.Headers;
+using CacheCow.Common.Helpers;
 
-
-
-/*
-#if NET452
-#else
-using Newtonsoft.Json;
-using System.Net.Http;
-using System.Threading.Tasks;
-namespace ReadAsAsyncCore
-{
-    public static class HttpContentExtensions
-    {
-        public static async Task<T> ReadAsJsonAsync<T>(this HttpContent content)
-        {
-            string json = await content.ReadAsStringAsync();
-            T value = JsonConvert.DeserializeObject<T>(json);
-            return value;
-        }
-    }
-}
-#endif
-*/
 namespace CacheCow.Samples.Common
 {
-    public class MenuBase
+    public class ConsoleMenu
     {
         private readonly HttpClient _client;
 
-        public MenuBase(HttpClient client)
+        public ConsoleMenu(HttpClient client)
         {
             this._client = client;
         }
@@ -84,7 +63,7 @@ namespace CacheCow.Samples.Common
         public async Task ListAll()
         {
             var response = await _client.GetAsync("/api/cars");
-            response.EnsureSuccessStatusCode();
+            await response.WhatEnsureSuccessShouldHaveBeen();
             await response.Content.LoadIntoBufferAsync();
             WriteCacheCowHeader(response);
             Console.ForegroundColor = ConsoleColor.White;
@@ -105,7 +84,7 @@ namespace CacheCow.Samples.Common
         public async Task CreateNew()
         {
             var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Post, "/api/car"));
-            response.EnsureSuccessStatusCode();
+            await response.WhatEnsureSuccessShouldHaveBeen();
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine($"Location header: {response.Headers.Location}");
             Console.WriteLine();
@@ -119,7 +98,7 @@ namespace CacheCow.Samples.Common
             if (id.HasValue)
             {
                 var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Put, $"/api/car/{id.Value}"));
-                response.EnsureSuccessStatusCode();
+                await response.WhatEnsureSuccessShouldHaveBeen();
             }
             else
             {
@@ -136,7 +115,7 @@ namespace CacheCow.Samples.Common
             if (id.HasValue)
             {
                 var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, $"/api/car/{id.Value}"));
-                response.EnsureSuccessStatusCode();
+                await response.WhatEnsureSuccessShouldHaveBeen();
             }
             else
             {
@@ -153,7 +132,7 @@ namespace CacheCow.Samples.Common
             if (id.HasValue)
             {
                 var response = await _client.GetAsync($"/api/car/{id.Value}");
-                response.EnsureSuccessStatusCode();
+                await response.WhatEnsureSuccessShouldHaveBeen();
                 WriteCacheCowHeader(response);
                 Console.ForegroundColor = ConsoleColor.White;
                 var c = await response.Content.ReadAsAsync<Car>();

@@ -26,6 +26,22 @@ namespace CacheCow.Common.Helpers
 			return response.Content != null && response.Content.Headers.Expires.HasValue
 				? response.Content.Headers.Expires.Value
 				: (DateTimeOffset?) null;
-		}		
+		}
+        
+        public static async Task WhatEnsureSuccessShouldHaveBeen(this HttpResponseMessage response)
+        {
+            if(!response.IsSuccessStatusCode)
+            {
+                if(response.Content == null)
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    throw new HttpRequestException($"Status: {response.StatusCode}\r\n Error: {error}");
+                }
+            }
+        }
 	}
 }

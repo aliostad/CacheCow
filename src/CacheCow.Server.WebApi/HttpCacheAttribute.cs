@@ -26,7 +26,7 @@ namespace CacheCow.Server.WebApi
             Type timedETagQueryProviderType = null)
         {
 
-            if (CachingRuntime.Factory == null)
+            if (CachingRuntime.Factory != null)
             {
                 CacheabilityValidator = CachingRuntime.Get<ICacheabilityValidator>();
                 CacheDirectiveProvider = CachingRuntime.Get<ICacheDirectiveProvider>();
@@ -252,7 +252,7 @@ namespace CacheCow.Server.WebApi
             if (HttpMethod.Get == context.Request.Method)
             {
                 context.Response.Headers.Add("Vary", string.Join(";", CacheDirectiveProvider.GetVaryHeaders(context)));
-                var cacheControl = CacheDirectiveProvider.GetCacheControl(context, this.ConfiguredExpiry);
+                var cacheControl = CacheDirectiveProvider.GetCacheControl(context, TimeSpan.FromSeconds(this.DefaultExpirySeconds));
                 var isResponseCacheable = CacheabilityValidator.IsCacheable(context.Response);
                 if (!cacheControl.NoStore && isResponseCacheable) // _______ is cacheable
                 {
@@ -309,7 +309,7 @@ namespace CacheCow.Server.WebApi
         /// <summary>
         /// Gets used to create Cache directives
         /// </summary>
-        public TimeSpan? ConfiguredExpiry { get; set; }
+        public int DefaultExpirySeconds { get; set; }
 
 
     }

@@ -22,7 +22,7 @@ namespace CacheCow.Samples.MvcCore
             var client = ClientExtensions.CreateClient(handler);
             client.BaseAddress = server.BaseAddress;
 
-            var p = new MenuBase(client);
+            var p = new ConsoleMenu(client);
 
             Task.Run(async () => await p.Menu()).Wait();
 
