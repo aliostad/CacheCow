@@ -55,9 +55,12 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
         static void ConfigDi(IWindsorContainer container)
         {
             container.Register(
-                Component.For<ApiController>().ImplementedBy<ApiController>(),
-                Component.For<ITimedETagExtractor>().ImplementedBy<CarAndCollectionETagExtractor>(),
-                Component.For<ITimedETagQueryProvider>().ImplementedBy<TimedETagQueryCarRepository>(),
+                Component.For<CarController>().ImplementedBy<CarController>()
+                    .LifestyleTransient(),
+                Component.For<ITimedETagExtractor>().ImplementedBy<CarAndCollectionETagExtractor>()
+                    .LifestyleSingleton(),
+                Component.For<ITimedETagQueryProvider>().ImplementedBy<TimedETagQueryCarRepository>()
+                    .LifestyleSingleton(),
                 Component.For<ICarRepository>().Instance(InMemoryCarRepository.Instance)
 
                 );

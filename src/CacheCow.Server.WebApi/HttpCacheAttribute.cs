@@ -19,6 +19,7 @@ namespace CacheCow.Server.WebApi
     public class HttpCacheAttribute : ActionFilterAttribute
     {
         private const string CacheValidatedKey = "###__cache_validated__###";
+        private const string CacheCowHeaderKey = "###__cachecow_header__###";
 
         public HttpCacheAttribute(Type cacheabilityValidatorType = null,
             Type cacheDirectiveProviderType = null,
@@ -67,88 +68,7 @@ namespace CacheCow.Server.WebApi
         /// </returns>
         protected bool? ApplyCacheValidation(TimedEntityTagHeaderValue timedEtag,
             CacheValidationStatus cacheValidationStatus,
-            HttpActionContext context)
-        {
-            if (timedEtag == null)
-                return null;
-
-            switch (cacheValidationStatus)
-            {
-                case CacheValidationStatus.GetIfModifiedSince:
-                    if (timedEtag.LastModified == null)
-                        return false;
-                    else
-                    {
-                        if (timedEtag.LastModified > context.Request.Headers.IfModifiedSince.Value)
-                            return false;
-                        else
-                        {
-                            context.Response = new HttpResponseMessage(HttpStatusCode.NotModified);
-                            return true;
-                        }
-                    }
-
-                case CacheValidationStatus.GetIfNoneMatch:
-                    if (timedEtag.ETag == null)
-                        return false;
-                    else
-                    {
-                        if (context.Request.Headers.IfNoneMatch.Any(x => x.Tag == timedEtag.ETag.Tag))
-                        {
-                            context.Response = new HttpResponseMessage(HttpStatusCode.NotModified);
-                            return true;
-                        }
-                        else
-                            return false;
-                    }
-                case CacheValidationStatus.PutIfMatch:
-                    if (timedEtag.ETag == null)
-                        return false;
-                    else
-                    {
-                        if (context.Request.Headers.IfMatch.Any(x => x.Tag == timedEtag.ETag.Tag))
-                            return false;
-                        else
-                        {
-                            context.Response = new HttpResponseMessage(HttpStatusCode.PreconditionFailed);
-                            return true;
-                        }
-                    }
-                case CacheValidationStatus.PutIfUnModifiedSince:
-                    if (timedEtag.LastModified == null)
-                        return false;
-                    else
-                    {
-                        if (timedEtag.LastModified > context.Request.Headers.IfUnmodifiedSince.Value)
-                        {
-                            context.Response = new HttpResponseMessage(HttpStatusCode.PreconditionFailed);
-                            return true;
-                        }
-                        else
-                            return false;
-                    }
-
-                default:
-                    return null;
-            }
-        }
-
-
-        /// <summary>
-        /// Happens at the incoming (executING)
-        /// </summary>
-        /// <param name="timedEtag"></param>
-        /// <param name="cacheValidationStatus"></param>
-        /// <param name="context">
-        /// </param>
-        /// <returns>
-        /// True: applied and the call can exit 
-        /// False: tried to apply but did not match hence the call should continue
-        /// null: could not apply (timedEtag was null)
-        /// </returns>
-        protected bool? ApplyCacheValidation(TimedEntityTagHeaderValue timedEtag,
-            CacheValidationStatus cacheValidationStatus,
-            HttpActionExecutedContext context)
+            ContextUnifier context)
         {
             if (timedEtag == null)
                 return null;
@@ -220,13 +140,15 @@ namespace CacheCow.Server.WebApi
             await base.OnActionExecutingAsync(context, cancellationToken);
 
             var cacheCowHeader = new CacheCowHeader();
+            context.Request.Properties[CacheCowHeaderKey] = cacheCowHeader;
             bool? cacheValidated = null;
             bool isRequestCacheable = CacheabilityValidator.IsCacheable(context.Request);
             var cacheValidationStatus = context.Request.GetCacheValidationStatus();
             if (cacheValidationStatus != CacheValidationStatus.None)
             {
                 var timedETag = await CacheDirectiveProvider.QueryAsync(context);
-                cacheValidated = ApplyCacheValidation(timedETag, cacheValidationStatus, context);
+                cacheCowHeader.QueryMadeAndSuccessful = timedETag != null;
+                cacheValidated = ApplyCacheValidation(timedETag, cacheValidationStatus, new ContextUnifier(context));
                 context.Request.Properties.Add(CacheValidatedKey, cacheValidated);
                 cacheCowHeader.ValidationApplied = true;
                 if (cacheValidated ?? false)
@@ -246,7 +168,7 @@ namespace CacheCow.Server.WebApi
             bool? cacheValidated = context.Request.Properties.ContainsKey(CacheValidatedKey) ?
                 (bool?) context.Request.Properties[CacheValidatedKey] : null;
             var cacheValidationStatus = context.Request.GetCacheValidationStatus();
-            var cacheCowHeader = new CacheCowHeader();
+            var cacheCowHeader = (CacheCowHeader) context.Request.Properties[CacheCowHeaderKey];
             bool isRequestCacheable = CacheabilityValidator.IsCacheable(context.Request);
 
             if (HttpMethod.Get == context.Request.Method)
@@ -267,7 +189,7 @@ namespace CacheCow.Server.WebApi
                         && tet != null
                         && cacheValidationStatus != CacheValidationStatus.None) // can only do GET validation, PUT is already impacted backend stores
                     {
-                        cacheValidated = ApplyCacheValidation(tet, cacheValidationStatus, context);
+                        cacheValidated = ApplyCacheValidation(tet, cacheValidationStatus, new ContextUnifier(context));
                         cacheCowHeader.ValidationApplied = true;
                         // the response would have been set and no need to run the rest of the pipeline
 

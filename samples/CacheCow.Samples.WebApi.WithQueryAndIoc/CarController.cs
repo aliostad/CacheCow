@@ -13,7 +13,12 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
 {
     public class CarController : ApiController
     {
-        private static readonly ICarRepository _repository = InMemoryCarRepository.Instance;
+        private readonly ICarRepository _repository;
+
+        public CarController(ICarRepository repository)
+        {
+            _repository = repository;
+        }
 
         [HttpGet]
         [HttpCache(DefaultExpirySeconds = 0)]

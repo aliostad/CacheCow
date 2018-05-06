@@ -133,6 +133,7 @@ namespace CacheCow.Server.Core.Mvc
             if (cacheValidationStatus != CacheValidationStatus.None)
             {
                 var timedETag = await CacheDirectiveProvider.QueryAsync(context);
+                cacheCowHeader.QueryMadeAndSuccessful = timedETag != null;
                 cacheValidated = ApplyCacheValidation(timedETag, cacheValidationStatus, context);
                 cacheCowHeader.ValidationApplied = true;
                 if (cacheValidated ?? false)

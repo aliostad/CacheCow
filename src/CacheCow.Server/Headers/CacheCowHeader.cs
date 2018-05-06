@@ -26,9 +26,14 @@ namespace CacheCow.Server.Headers
         /// </summary>
         public bool ValidationMatched { get; set; }
 
+        /// <summary>
+        /// Whether a Query was made and returned non-null
+        /// </summary>
+        public bool QueryMadeAndSuccessful { get; set; }
+
         public override string ToString()
         {
-            return $"ValidationApplied={ValidationApplied};ValidationMatched={ValidationMatched};ShortCircuited={ShortCircuited}";
+            return $"ValidationApplied={ValidationApplied};ValidationMatched={ValidationMatched};ShortCircuited={ShortCircuited};QueryMadeAndSuccessful={QueryMadeAndSuccessful}";
         }
 
         public static bool TryParse(string value, out CacheCowHeader header)
@@ -41,7 +46,8 @@ namespace CacheCow.Server.Headers
                 {
                     ShortCircuited = bool.Parse(m.Groups[3].Value),
                     ValidationApplied = bool.Parse(m.Groups[1].Value),
-                    ValidationMatched = bool.Parse(m.Groups[2].Value)
+                    ValidationMatched = bool.Parse(m.Groups[2].Value),
+                    QueryMadeAndSuccessful = bool.Parse(m.Groups[4].Value)
                 };
 
                 return true;
