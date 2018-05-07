@@ -19,5 +19,9 @@ namespace CacheCow.Samples.Common
         DateTimeOffset GetMaxLastModified();
 
         int? GetLastId();
+
+        int? GetFirstId();
+
+        int GetCount();
     }
 }

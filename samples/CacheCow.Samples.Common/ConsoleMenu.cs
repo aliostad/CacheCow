@@ -13,6 +13,7 @@ namespace CacheCow.Samples.Common
     public class ConsoleMenu
     {
         private readonly HttpClient _client;
+        private bool _verbose = false;
 
         public ConsoleMenu(HttpClient client)
         {
@@ -26,10 +27,12 @@ namespace CacheCow.Samples.Common
                 Console.WriteLine(
 @"CacheCow Cars Samples - (ASP.NET Core MVC and HttpClient)
     - Press 0 to list all cars
-    - Press 1 to create a new car and add to repo
-    - Press 2 to update the last item (updates last modified)
-    - Press 3 to delete the last item
-    - Press 4 to get the last item
+    - Press 1 to get the last item
+    - Press 2 to create a new car and add to repo
+    - Press 3 to update the last item (updates last modified)
+    - Press 4 to delete the last item
+    - Press 5 to delete the first item
+    - Press 6 to toggle on/off verbose header dump
     - Press x to exit
 "
 );
@@ -41,23 +44,57 @@ namespace CacheCow.Samples.Common
                     case '0':
                         await ListAll();
                         break;
-                    case '1':
+                    case '2':
                         await CreateNew();
                         break;
-                    case '2':
+                    case '3':
                         await UpdateLast();
                         break;
-                    case '3':
+                    case '4':
                         await DeleteLast();
                         break;
-                    case '4':
+                    case '1':
                         await GetLast();
+                        break;
+                    case '5':
+                        await DeleteFirst();
+                        break;
+                    case '6':
+                        Toggle();
                         break;
                     default:
                         // nothing
                         break;
                 }
             }
+        }
+
+        public void Toggle()
+        {
+            _verbose = !_verbose;
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(_verbose ? "Verbose toggle is ON" : "Verbose toggle is OFF");
+            Console.WriteLine();
+            Console.ResetColor();
+        }
+
+        public void DumpHeaders(HttpResponseMessage response)
+        {
+            if (!_verbose)
+                return;
+
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"REQUEST:\r\n{response.RequestMessage.Headers.ToString()}");
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine($"RESPONSE:\r\n{response.Headers.ToString()}");
+            if (response.Content != null)
+            {
+                Console.WriteLine($"RESPONSE CONTENT:\r\n{response.Content.Headers.ToString()}");
+                Console.WriteLine();
+            }
+            Console.ResetColor();
+
         }
 
         public async Task ListAll()
@@ -79,6 +116,8 @@ namespace CacheCow.Samples.Common
 
             Console.WriteLine("-----------------------------------------------------------------");
             Console.ResetColor();
+
+            DumpHeaders(response);
         }
 
         public async Task CreateNew()
@@ -90,6 +129,7 @@ namespace CacheCow.Samples.Common
             Console.WriteLine();
             Console.ResetColor();
 
+            DumpHeaders(response);
         }
 
         public async Task UpdateLast()
@@ -99,6 +139,7 @@ namespace CacheCow.Samples.Common
             {
                 var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Put, $"/api/car/{id.Value}"));
                 await response.WhatEnsureSuccessShouldHaveBeen();
+                DumpHeaders(response);
             }
             else
             {
@@ -116,6 +157,26 @@ namespace CacheCow.Samples.Common
             {
                 var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, $"/api/car/{id.Value}"));
                 await response.WhatEnsureSuccessShouldHaveBeen();
+                DumpHeaders(response);
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("Repo is empty");
+                Console.WriteLine();
+                Console.ResetColor();
+            }
+
+        }
+
+        public async Task DeleteFirst()
+        {
+            var id = InMemoryCarRepository.Instance.GetFirstId();
+            if (id.HasValue)
+            {
+                var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, $"/api/car/{id.Value}"));
+                await response.WhatEnsureSuccessShouldHaveBeen();
+                DumpHeaders(response);
             }
             else
             {
@@ -139,6 +200,7 @@ namespace CacheCow.Samples.Common
                 Console.WriteLine($"| {c.Id}\t| {c.NumberPlate}\t| {c.Year}\t| {c.LastModified} |");
                 Console.WriteLine();
                 Console.ResetColor();
+                DumpHeaders(response);
             }
             else
             {

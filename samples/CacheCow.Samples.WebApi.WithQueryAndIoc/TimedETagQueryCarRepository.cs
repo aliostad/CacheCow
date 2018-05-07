@@ -39,7 +39,7 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
             }
             else // all cars
             {
-                return Task.FromResult(new TimedEntityTagHeaderValue(_repository.GetMaxLastModified().ToETagString()));
+                return Task.FromResult(new TimedEntityTagHeaderValue(_repository.GetMaxLastModified().ToETagString(_repository.GetCount())));
             }
         }
     }

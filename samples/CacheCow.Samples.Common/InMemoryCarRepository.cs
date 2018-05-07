@@ -75,5 +75,18 @@ namespace CacheCow.Samples.Common
             else
                 return false;
         }
+
+        public int? GetFirstId()
+        {
+            var firstId =
+                _cars.Values.Aggregate(int.MaxValue, (seed, car) => seed < car.Id ? seed : car.Id);
+            return firstId == int.MaxValue ? null : (int?) firstId;
+
+        }
+
+        public int GetCount()
+        {
+            return _cars.Count();
+        }
     }
 }

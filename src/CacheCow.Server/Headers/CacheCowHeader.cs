@@ -22,7 +22,7 @@ namespace CacheCow.Server.Headers
 
         /// <summary>
         /// Whether the condition requested met
-        /// For GET it means resulted in 304 and for PUT resulted in 409
+        /// For GET it means resulted in 304 and for PUT resulted in 412
         /// </summary>
         public bool ValidationMatched { get; set; }
 

@@ -27,7 +27,7 @@ namespace CacheCow.Samples.Common
             if (viewModel == null)
                 return null;
 
-            return new TimedEntityTagHeaderValue(viewModel.GetMaxLastModified().ToETagString());
+            return new TimedEntityTagHeaderValue(viewModel.GetMaxLastModified().ToETagString(viewModel.Count()));
         }
 
         public TimedEntityTagHeaderValue Extract(object viewModel)
@@ -45,7 +45,7 @@ namespace CacheCow.Samples.Common
                 return new TimedEntityTagHeaderValue(car.LastModified.ToETagString());
             var cars = viewModel as IEnumerable<Car>;
             if (cars != null)
-                return new TimedEntityTagHeaderValue(cars.GetMaxLastModified().ToETagString());
+                return new TimedEntityTagHeaderValue(cars.GetMaxLastModified().ToETagString(cars.Count()));
 
             return null;
         }
