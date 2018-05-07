@@ -17,24 +17,88 @@ There are quite a few changes in the *server-side* implementation of CacheCow du
  
 ## Concepts and definitions
 
-It is useful to start with concepts but feel free to use it as a reference. If you get bored reading this 😀, jump straight to [samples](https://github.com/aliostad/CacheCow/tree/master/samples) and run a couple of them.
-
-- **Resource**: A RESTful resource - generally identified by its URI.
-- **Representation**: A particular embodiment of a resource according to its format, language, etc. For example `/api/car/1` is a resource and it can have two representations as JSON or XML. Also the same resource could have two representations in Chinese or Spanish. Headers by which representations will vary is defined by the `Vary` header from the server.
+It is useful to start with concepts but feel free to use it as a reference. If you get bored reading this 😀, jump straight to Getting Started sections or simply browse and run a couple of [samples](https://github.com/aliostad/CacheCow/tree/master/samples).
+ - **CacheCow.Client**: Client constructs for HTTP Caching when making HTTP calls with .NET's `HttpClient`.
+ - **CacheCow.Server**: Server constructs for HTTP Caching when serving HTTP APIs in ASP.NET Web API or MVC Core.
+ - **Resource**: A RESTful resource - generally identified by its URI.
+ - **Representation**: A particular embodiment of a resource according to its format, language, etc. For example `/api/car/1` is a resource and it might have two representations as JSON or XML. Also the same resource could have two representations in Chinese or Spanish. Headers by which representations will vary is defined by the `Vary` header from the server.
  - **HTTP Caching**: Caching as described in HTTP 1.1 Specification (RFC 7230 or 2616). Despite the common notion, the *representations* get cached on the *client* (not server) and the server is responsible for providing cache directives and validate conditional requests on *resources*.
+ - **ICacheStore**: CacheCow interface responsible for storing cacheable representation on the client. There are choice of storages, at this point InMemory and Redis are available. CacheCow itself is responsible for storing representations separately.
  - **Cache directives**: These are various cache-related headers that the server provides to guide the client on how best cache and validate the resources. These headers include `Cache-Control`, `Vary`, `ETag` and in HTTP 1.0 would include `Expires`, `Last-Modified` and `Pragma` (for the purpose of this article, we include `ETag` and `Last-Modified` as part of directives although purely speaking they are not). CacheCow has `ICacheDirectiveProvider` interface responsible for controlling these headers.
- - **`Expires` header**: Defines expiry of a resource in absolute time. `Cache-Control` header provides richer semantic and supersedes it. CacheCow sets both to support both HTTP 1.0 and 1.1.  
+ - **`Expires` header**: Defines expiry of a resource in absolute time. `Cache-Control` header provides richer semantic and supersedes it. CacheCow sets both to support both HTTP 1.0 and 1.1. 
+ - **Expiry**: Expiry of a cached representation on the client is defined by the directives sent by the server. It is crucial to note that the client normally keep does not eject the cached representation right after the expiry - the client can carry on using the cached representation provided it checks with the server if the representation is still valid (see Consistency below).   
  - **`Last-Modified` header**: Since its precision is at seconds, its use is not recommended for valiation and instead, it is recommended to use `ETag`.
  - **`ETag` header**: ETag or EntityTag is an opaque string that identifies a version of resource (not representation). If you have a high-precision Last-Modified date, it is better to turn it to ETag by binarising the date ([example](https://github.com/aliostad/CacheCow/blob/master/samples/CacheCow.Samples.Common/Extensions.cs#L15)).
  - **TimedETag**: A CacheCow construct that combines Last-Modifed and ETag (can have either of them but not both) and represents a version of the resource and implemented as `TimedEntityTagHeaderValue`. It is recommended to construct it with an ETag (due to low precision of DateTime in HTTP Spec's `Last-Modified` header).
  - **`ITimedETagExtractor`**: A CacheCow interface responsible for extracting TimedETag from view models sent back by the API. By default, it checks to see if the ViewModel has implemented ICacheResource, if so it enquires the TimedETag directly. If not, it will resort to serialising the ViewModel to JSON and use its hash as ETag. This can be expensive hence it is suggested to either your ViewModels implementing `ICacheResource` interface or implement `ITimedETagExtractor` - plenty of examples in the [samples](https://github.com/aliostad/CacheCow/tree/master/samples).
- - **Consistency**: Resources underlying the cached representationa could change without any notice making them invalid - this problem has been half-joking known as one of the [two most difficult problems in computer science](https://martinfowler.com/bliki/TwoHardThings.html), the other being nameing. For many resources this could be acceptable while for some simply not tolerable. HTTP solves this problem with a single round-trip call that would either approve the use of the version client has cached (by returing status 304) or return the latest version of the resource in the representation requested. This is known as conditional GET. HTTP also provides means for optimistic concurrency and only update (or delete) of the resource if it matches the ETag or has not changed since the `Last-Modified` date supplied. This is known as conditional PUT (or DELETE). CacheCow supports these scenarios OOB.
- - **Zero-Expiry resources**: These resources require a high consistency and the clients are allowed to cache the representations and re-use only if they make a conditional GET to confirm the version they have is valid. Essentially, the representation is *expired* as soon as it leaves the server but can be safely re-used if the client makes a conditional GET. It might seem that caching in these scenarios is not really beneficial, but in fact it helps to reduce network traffic, client and server resource usage and even can protect back-end systems. The trick is to know whether a resource has changed without loading it all the way from bak-end systems. For example, to know whether a record has been changed, we can check whether its LastMosifiedDate (or Timestamp) has been modified. Or for a list of records, the most recent LastModifiedDate can be used along with the count of records. Such queries will be much faster to run.
+ - **Consistency**: Resources underlying the cached representationa could change without any notice making them invalid - this problem has been half-joking known as one of the [two most difficult problems in computer science](https://martinfowler.com/bliki/TwoHardThings.html), the other being naming. For many resources this could be acceptable while for some simply not tolerable. HTTP solves this problem with a single round-trip call that would either approve the use of the version client has cached (by returing status 304) or return the latest version of the resource in the representation requested. This is known as conditional GET. HTTP also provides means for optimistic concurrency and only update (or delete) of the resource if it matches the ETag or has not changed since the `Last-Modified` date supplied. This is known as conditional PUT (or DELETE). CacheCow supports these scenarios OOB.
+ - **Zero-Expiry resources (consistent resources)**: These resources require a high consistency and the clients are allowed to cache the representations and re-use only if they make a conditional GET to confirm the version they have is valid. Essentially, the representation is *expired* as soon as it leaves the server but can be safely re-used if the client makes a conditional GET. It might seem that caching in these scenarios is not really beneficial, but in fact it helps to reduce network traffic, client and server resource usage and even can protect back-end systems. The trick on the server is to just find out whether a resource has changed without loading it all the way from bak-end systems. For example, to know whether a record has been changed, we can check whether its LastMosifiedDate (or Timestamp) has been modified against the ETag or a date. Or for a list of records, the most recent LastModifiedDate of all records along with the count can be used which can be executed in a single query (For example in SQL you would use `SELECT COUNT(1), MAX(LastModifiedDate) FROM MyTable`). Such queries will fast and cheap.  CacheCow provides `ITimedETagQueryProvider` interface to preemptively query the backend stores for conditional HTTP calls without load the resources.
+ - **`ITimedETagQueryProvider`**: This interface allows server implementations to query their back-end and carry out validation against it. This is the best way to have APIs support consistency and the most efficient level of caching. 
  
- CacheCow provides `ITimedETagQueryProvider` interface that 
- - **`ITimedETagQueryProvider`**: 
- 
- 
+## Getting started - Client
+Client scneario is perhaps the most common use case of CacheCow. Most of the concepts discussed above relate to the server-side. Client-side CacheCow has been implemented as a DelegatingHandler and has very few concept counts - most of the complexity of HTTP Caching has been hidden away from you. For the purpose of this guide, we choose an In-Memory storage which is default.
+
+### 1) Install the nuget package
+``` powershell
+> install-package CacheCow.Client
+```
+### 2) Use ClientExtensions to create an `HttpClient` (piped to a `CachingHandler` fronted by `HttpClientHandler`): 
+
+``` csharp
+var client = ClientExtensions.CreateClient();
+```
+This is simply a helper and you saves you writing a couple of lines of code.
+
+### 3) Make a call to a cacheable resource twice
+JQuery CDN is a handy little cacheable resource. We make a call twice and check CacheCow header:
+``` csharp
+const string CacheableResource = "https://code.jquery.com/jquery-3.3.1.slim.min.js";
+var response = client.GetAsync(CacheableResource).
+      ConfigureAwait(false).GetAwaiter().GetResult();
+var responseFromCache = client.GetAsync(CacheableResource).
+      ConfigureAwait(false).GetAwaiter().GetResult();
+Console.WriteLine(response.Headers.GetCacheCowHeader().ToString()); // outputs "2.0.0.0;did-not-exist=true"
+Console.WriteLine(responseFromCache.Headers.GetCacheCowHeader().ToString()); // outputs "2.0.0.0;did-not-exist=false;retrieved-from-cache=true"
+```
+
+NOTE: In-Memory storage is OK for test scenarios or cases where the load is limited. In many cases you would choose to use Redis storage or you can implement your own if you need to. Feel free to discuss opening an issue before sending a PR.
+
+## Getting started - ASP.NET MVC Core
+From CacheCow 2.0, ASP.NET MVC Core scenarios are supported. Server-side CacheCow has been implemented as a [Resource Filter](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/filters?view=aspnetcore-2.1#resource-filters).
+
+### 1) Add the nuget package:
+``` powershell
+> install-package CacheCow.Server.Core.Mvc
+```
+
+### 2) Add HTTP Caching dependencies:
+``` csharp
+public virtual void ConfigureServices(IServiceCollection services)
+{
+    ... // usual startup code
+    services.AddHttpCaching(); // add HTTP Caching
+}
+```
+
+### 3) Decorate your Controller's actions with `HttpCacheFactory` attribute
+Provide the expiry as the first parameter (number of seconds):
+``` csharp
+public class MyController : Controller
+{
+    [HttpGet]
+    [HttpCacheFactory(300)]
+    public IActionResult Get(int id)
+    {
+        ... // implementation
+    }
+}
+```
+Here we have set the expiry to 5 minutes. This covers the basic scenario, browse the samples for the advanced and efficient use cases.
+
+
+
+As you can see, second time round the resource came from the cache and the request did not even hit the network.
+ ![Benefits of different CacheCow.Server Approaches](https://raw.githubusercontent.com/aliostad/CacheCow/master/media/CacheCow-2-options.png)
 
 
  
