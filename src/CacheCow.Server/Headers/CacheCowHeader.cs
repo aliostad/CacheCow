@@ -33,7 +33,7 @@ namespace CacheCow.Server.Headers
 
         public override string ToString()
         {
-            return $"ValidationApplied={ValidationApplied};ValidationMatched={ValidationMatched};ShortCircuited={ShortCircuited};QueryMadeAndSuccessful={QueryMadeAndSuccessful}";
+            return $"validation-applied={ValidationApplied};validation-matched={ValidationMatched};short-circuited={ShortCircuited};query-made-and-successful={QueryMadeAndSuccessful}";
         }
 
         public static bool TryParse(string value, out CacheCowHeader header)
