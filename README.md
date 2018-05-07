@@ -49,7 +49,7 @@ var client = ClientExtensions.CreateClient();
 ```
 This is simply a helper and you saves you writing a couple of lines of code.
 
-### 3) Make a call to a cacheable resource twice
+### 3) Make two calls to a cacheable resource
 JQuery CDN is a handy little cacheable resource. We make a call twice and check CacheCow header:
 ``` csharp
 const string CacheableResource = "https://code.jquery.com/jquery-3.3.1.slim.min.js";
@@ -60,8 +60,9 @@ var responseFromCache = client.GetAsync(CacheableResource).
 Console.WriteLine(response.Headers.GetCacheCowHeader().ToString()); // outputs "2.0.0.0;did-not-exist=true"
 Console.WriteLine(responseFromCache.Headers.GetCacheCowHeader().ToString()); // outputs "2.0.0.0;did-not-exist=false;retrieved-from-cache=true"
 ```
+As you can see, second time round the resource came from the cache and the request did not even hit the network.
 
-NOTE: In-Memory storage is OK for test scenarios or cases where the load is limited. In many cases you would choose to use Redis storage or you can implement your own if you need to. Feel free to discuss opening an issue before sending a PR.
+> NOTE: In-Memory storage is OK for test scenarios or cases where the load is limited. In many cases you would choose to use Redis storage or you can implement your own if you need to. Feel free to discuss opening an issue before sending a PR.
 
 ## Getting started - ASP.NET MVC Core
 From CacheCow 2.0, ASP.NET MVC Core scenarios are supported. Server-side CacheCow has been implemented as a [Resource Filter](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/filters?view=aspnetcore-2.1#resource-filters).
@@ -95,9 +96,30 @@ public class MyController : Controller
 ```
 Here we have set the expiry to 5 minutes. This covers the basic scenario, browse the samples for the advanced and efficient use cases.
 
+## Getting started - ASP.NET Web API
+Web API has always been supported by CacheCow but the server-side has been radically changed. There is no more a DelegatingHandler and all you need is to decorate your actions with the `HttpCache` filter.
+
+### 1) Add the nuget package:
+``` powershell
+> install-package CacheCow.Server.WebApi
+```
+
+### 2) Decorate your Controller's actions with `HttpCache` attribute
+Provide the expiry as a parameter (number of seconds):
+``` csharp
+public class MyController : ApiController
+{
+    [HttpGet]
+    [HttpCache(DefaultExpirySeconds = 300)]
+    public IHttpActionResult Get(int id)
+    {
+        ...
+    }
+}
+```
+Here we have set the expiry to 5 minutes. This covers the basic scenario, browse the samples for the advanced and efficient use cases.
 
 
-As you can see, second time round the resource came from the cache and the request did not even hit the network.
  ![Benefits of different CacheCow.Server Approaches](https://raw.githubusercontent.com/aliostad/CacheCow/master/media/CacheCow-2-options.png)
 
 
