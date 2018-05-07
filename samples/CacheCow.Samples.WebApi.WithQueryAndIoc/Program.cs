@@ -14,6 +14,7 @@ using CacheCow.Server;
 using CacheCow.Server.WebApi;
 using System.Web.Http.Dependencies;
 using System.Collections.Concurrent;
+using CacheCow.Server.ETag;
 
 namespace CacheCow.Samples.WebApi.WithQueryAndIoc
 {
@@ -57,12 +58,14 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
             container.Register(
                 Component.For<CarController>().ImplementedBy<CarController>()
                     .LifestyleTransient(),
-                Component.For<ITimedETagExtractor>().ImplementedBy<CarAndCollectionETagExtractor>()
+                Component.For<ITimedETagExtractor<Car>>().ImplementedBy<CarETagExtractor>()
+                    .LifestyleSingleton(),
+                Component.For<ITimedETagExtractor<IEnumerable<Car>>>().ImplementedBy<CarCollectionETagExtractor>()
                     .LifestyleSingleton(),
                 Component.For<ITimedETagQueryProvider>().ImplementedBy<TimedETagQueryCarRepository>()
                     .LifestyleSingleton(),
-                Component.For<ICarRepository>().Instance(InMemoryCarRepository.Instance)
-
+                Component.For<ICarRepository>().Instance(InMemoryCarRepository.Instance),
+                Component.For<ITimedETagExtractor>().Instance(new GenericIocTimedETagExtractor(container.Resolve))
                 );
         }
     }

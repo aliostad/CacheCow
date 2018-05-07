@@ -62,7 +62,7 @@ namespace CacheCow.Samples.Common
         
         public IEnumerable<Car> ListCars()
         {
-            return _cars.Values.OrderBy(x => x.Id).ToArray();
+            return _cars.Values.OrderBy(x => x.Id).ToList();
         }
 
         public bool UpdateCar(int id)

@@ -13,12 +13,13 @@ namespace CacheCow.Server
     }
 
     /// <summary>
-    /// Generic version
+    /// Generic version.
+    /// This could have been implemented with an empty Interface (no generic Extract method) and then 
+    /// generic Extract as an Extension method. But frankly do not make much difference on implementors.
     /// </summary>
     /// <typeparam name="TViewModel"></typeparam>
     public interface ITimedETagExtractor<TViewModel> : ITimedETagExtractor
     {
         TimedEntityTagHeaderValue Extract(TViewModel viewModel);
     }
-
 }
