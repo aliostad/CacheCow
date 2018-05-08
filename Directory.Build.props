@@ -3,7 +3,7 @@
 	<Description>CacheCow is an HTTP Caching Library for .NET</Description>  
     <Authors>Ali Kheyrollahi</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>2.0.0-preview</Version>
+    <Version>2.0.0-preview3</Version>
 	<PackageProjectUrl>https://github.com/aliostad/CacheCow/</PackageProjectUrl>
 	<PackageLicenseUrl>https://github.com/aliostad/CacheCow/blob/master/LICENSE.txt</PackageLicenseUrl>	
   </PropertyGroup>
