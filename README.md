@@ -119,11 +119,24 @@ public class MyController : ApiController
 ```
 Here we have set the expiry to 5 minutes. This covers the basic scenario, browse the samples for the advanced and efficient use cases.
 
+## CacheCow.Server advanced options
 
+Scenarios in the Getting-Started sections above choose simple out-of-the-box options to get you started. Depending on the load on your server, these are not necessarily the optimal approach. To get the best out of your API's caching, you would have to do a little more work and help CacheCow optimise HTTP Caching. By default, CacheCow server relies on Serialising your payloads/viewmodels to generate ETag. While for low-mid traffic scenarios this could be sufficient, it would be detrimental for high-load APIs or cases where your payload is big. That is why, instead of leaving CacheCow to generate ETag (rather TimedETag) by serialisation, you could supply it yourself.
+
+There are two times when a TimedETag is needed: 
+ - when serving the viewmodel 
+ - when carrying out validation (conditional GET/PUT)
+
+### TimedETag when serving the ViewModel
+TimedETag needs to be included in the response headers (in the form of `ETag` or `Last-Modified` headers). If your view models implement `ICacheResource`, CacheCow will attempt to get TimedETag by calling interface's only method. Otherwise it will use serialisation unless you provide an alternative `ITimedETagExtractor` implementation that extracts the TimedETag. And example would be an implementation that uses LastModifiedDate field and turns it into an ETag by binarisation (example [here](https://github.com/aliostad/CacheCow/blob/master/samples/CacheCow.Samples.Common/Extensions.cs#L15)).
+
+### TimedETag when carrying out validation
+This is the preemotive validation of the resource in response to conditional GET (or PUT/Delete). In case of a conditional GET, client requests for a later version of the resource unless it has changed since it has had its version, providing its last modified date or ETag(s). In this case, by default, CacheCow allows the call to controller to load the view model and then generates its TimedETag (by querying `ICacheResource` or serialisation). If the version the client has is still the most recent, it will send back status 304 or NotModified. While this reduces network traffic and reduces server (and client) resource usage, it does not relieve pressure from your back-end services. That is where `ITimedETagQueryProvider` interface comes into play: by implementing this interface you could go back to your back-end store and check whether the condition is met without loading the whole view model from the back-end services. For example, you could go back to the record requested and check if the LastModifiedDate matches.
+
+This table highlights different options in CacheCow.Server and value associated with each.
  ![Benefits of different CacheCow.Server Approaches](https://raw.githubusercontent.com/aliostad/CacheCow/master/media/CacheCow-2-options.png)
 
-
- 
+## Dependency Injection scenarios on ASP.NET Core 
 
  
 ## Migrating older CacheCow.Server projects to the new CacheCow.Server.Core.Mvc or CacheCow.Server.WebApi 
