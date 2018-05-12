@@ -5,6 +5,19 @@ CacheCow
 
 An implementation of HTTP Caching in .NET Core and 4.52+ for HttpClient, ASP.NET Web API and ASP.NET MVC Core
 
+## TOC
+
+ - [Breaking changes in Version 2.0.0](#note-breaking-changes-in-version-200)
+ - [Concepts and definitions](#concepts-and-definitions)
+ - [Getting Started - Client](#getting-started---client)
+ - [Getting Started - ASP.NET Core MVC](#getting-started---aspnet-mvc-core)
+ - [Getting Started - ASP.NET Web API](#getting-started---aspnet-web-api)
+ - [CacheCow.Server Advanced Options](cachecowserver-advanced-options)
+ - [Dependency Injection scenarios in ASP.NET MVC Core](#dependency-injection-scenarios-on-aspnet-core)
+ - [Dependency Injection scnearios in ASP.NET Web API](#dependency-injection-scenarios-on-aspnet-web-api)
+ - [Migrating projects using older CacheCow.Server](#migrating-older-cachecowserver-projects-to-the-new-cachecowservercoremvc-or-cachecowserverwebapi)
+
+
 ## NOTE: Breaking changes in Version 2.0.0
 
 There are quite a few changes in the *server-side* implementation of CacheCow due to [shortcomings of previous approach](http://byterot.blogspot.co.uk/2017/04/Future-CacheCow-birth-CacheCore-REST-HTTP-dotnetcore-middleware-caching-conditional-put-get.html) while the *client-side* mostly remained the same. Hence if you have used CacheCow.Server in the past and you would like to migrate, read the guide on migration further down. CacheCow.Client has some changes which may or may not break your code (depending whether you had used .NET 4.5 packages) which includes:
