@@ -2,10 +2,9 @@
 
 CacheCow
 ========
+An implementation of HTTP Caching in .NET Core and 4.52+ for HttpClient, ASP.NET Web API and ASP.NET MVC Core.
 
-An implementation of HTTP Caching in .NET Core and 4.52+ for HttpClient, ASP.NET Web API and ASP.NET MVC Core
-
-## TOC
+This document covers topics below:
 
  - [Breaking changes in Version 2.0.0](#note-breaking-changes-in-version-200)
  - [Concepts and definitions](#concepts-and-definitions)
