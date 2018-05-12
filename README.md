@@ -137,6 +137,38 @@ This table highlights different options in CacheCow.Server and value associated 
  ![Benefits of different CacheCow.Server Approaches](https://raw.githubusercontent.com/aliostad/CacheCow/master/media/CacheCow-2-options.png)
 
 ## Dependency Injection scenarios on ASP.NET Core 
+ASP.NET Core can already integrate with Dependency Injection frameworks and supports resolving its own dependencies through such abstractions. One of the challenges with server-side CacheCow is that there interfaces such as `ITimedETagExtractor` or `ITimedETagQueryProvider` would have implementations that would be different for different resources (rather view models). For example, if an API serves 3 entities as `Customer`, `Product` and `Order` you would need 6 different implementations, one for each entity and one for each collection (e.g. `IEnumerable<Customer>`). It would be cenrtainly cleaner to have one implementation per each and somehow know the view model type of each action. Looking at the return type is an option but quite commonly actions return `IActionResult`.
 
- 
+So the solution is to let the filter on the action define the type of the view model. Hence, for example, on a `CarController`'s `Get` action, you would define `ViewModelType` in the attribute as below:
+
+``` csharp
+public class CarController : Controller
+{
+    [HttpGet]
+    [HttpCacheFactory(300, ViewModelType = typeof(Car))]
+    public IActionResult Get(int id)
+    {
+        ... // implementation
+    }
+}
+```
+This will help CacheCow to know that it should look for `ITimedETagExtractor<Car>` and you would create an implementation for `ITimedETagExtractor<Car>` and register it on your DI container. 
+
+The same applies to `ITimedETagQueryProvider<T>`, essentially: 1) define `ViewModelType` on filter 2) implement generic interfaces 3) register them in your container
+
+## Dependency Injection scenarios on ASP.NET Web API 
+You should first register default types in your Web API Dependency Resolver:
+``` csharp
+// registering in a Windsor Castle container
+CachingRuntime.RegisterDefaultTypes((
+    (t1, t2, isTransient) =>
+    {
+        if (isTransient)
+            container.Register(Component.For(t1).ImplementedBy(t2).LifestyleTransient());
+        else
+            container.Register(Component.For(t1).ImplementedBy(t2).LifestyleSingleton());
+    }));
+```
+The rest to use `ITimedETagExtractor<T>` and `ITimedETagQueryProvider<T>` is similar to ASP.NET Core: simply define ViewModelType and register your dependencies.
+
 ## Migrating older CacheCow.Server projects to the new CacheCow.Server.Core.Mvc or CacheCow.Server.WebApi 
