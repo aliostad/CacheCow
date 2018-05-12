@@ -11,7 +11,7 @@ This document covers topics below:
  - [Getting Started - Client](#getting-started---client)
  - [Getting Started - ASP.NET Core MVC](#getting-started---aspnet-mvc-core)
  - [Getting Started - ASP.NET Web API](#getting-started---aspnet-web-api)
- - [CacheCow.Server Advanced Options](cachecowserver-advanced-options)
+ - [CacheCow.Server Advanced Options](#cachecowserver-advanced-options)
  - [Dependency Injection scenarios in ASP.NET MVC Core](#dependency-injection-scenarios-on-aspnet-core)
  - [Dependency Injection scnearios in ASP.NET Web API](#dependency-injection-scenarios-on-aspnet-web-api)
  - [Migrating projects using older CacheCow.Server](#migrating-older-cachecowserver-projects-to-the-new-cachecowservercoremvc-or-cachecowserverwebapi)
@@ -184,3 +184,10 @@ CachingRuntime.RegisterDefaultTypes((
 The rest to use `ITimedETagExtractor<T>` and `ITimedETagQueryProvider<T>` is similar to ASP.NET Core: simply define ViewModelType and register your dependencies.
 
 ## Migrating older CacheCow.Server projects to the new CacheCow.Server.Core.Mvc or CacheCow.Server.WebApi 
+Almost all projects using CacheCow.Client would carry on working in version 2.0. But servider-side implementation has been radically changed and in many ways simplified. In order to migrate:
+
+ - Remove CachingHandler delegating handler
+ - Remove any storage since there is no need for a storage anymore
+ - Decorate your actions with `[HttpCache]` attribute
+ - For optimising caching see [above](#cachecowserver-advanced-options)
+ - For Dependency Injection options see [here](#dependency-injection-scenarios-on-aspnet-web-api)
