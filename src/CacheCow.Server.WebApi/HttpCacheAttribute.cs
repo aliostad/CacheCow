@@ -21,36 +21,9 @@ namespace CacheCow.Server.WebApi
         private const string CacheValidatedKey = "###__cache_validated__###";
         private const string CacheCowHeaderKey = "###__cachecow_header__###";
 
-        public HttpCacheAttribute(Type cacheabilityValidatorType = null,
-            Type cacheDirectiveProviderType = null,
-            Type timedETagExtractorType = null,
-            Type timedETagQueryProviderType = null)
+        public HttpCacheAttribute()
         {
-
-            if (CachingRuntime.Factory != null)
-            {
-                CacheabilityValidator = CachingRuntime.Get<ICacheabilityValidator>();
-                CacheDirectiveProvider = CachingRuntime.Get<ICacheDirectiveProvider>();
-            }
-            else
-            {
-                CacheabilityValidator = cacheabilityValidatorType == null ?
-                    new DefaultCacheabilityValidator() :
-                    (ICacheabilityValidator)Activator.CreateInstance(cacheabilityValidatorType);
-
-                var extractor = timedETagExtractorType == null ?
-                    new DefaultTimedETagExtractor(new JsonSerialiser(), new Sha1Hasher()) :
-                    (ITimedETagExtractor)Activator.CreateInstance(timedETagExtractorType);
-
-                var queryProvider = timedETagQueryProviderType == null ?
-                    new NullQueryProvider() :
-                    (ITimedETagQueryProvider)Activator.CreateInstance(timedETagQueryProviderType);
-
-                CacheDirectiveProvider = cacheDirectiveProviderType == null ?
-                    new DefaultCacheDirectiveProvider(extractor, queryProvider) :
-                    (ICacheDirectiveProvider)Activator.CreateInstance(cacheDirectiveProviderType);
-            }
-
+            ApplyNoCacheNoStoreForNonCacheableResponse = true;
             CachingRuntime.OnHttpCacheCreated(new HttpCacheCreatedEventArgs(this));
         }
 
@@ -139,14 +112,18 @@ namespace CacheCow.Server.WebApi
         {
             await base.OnActionExecutingAsync(context, cancellationToken);
 
+            var cacheabilityValidator = (ICacheabilityValidator) context.ControllerContext.Configuration.DependencyResolver.GetService(typeof(ICacheabilityValidator))
+                ?? new DefaultCacheabilityValidator();
+            var cacheDirectiveProvider = context.ControllerContext.Configuration.DependencyResolver.GetCacheDirectiveProvider(ViewModelType);
+
             var cacheCowHeader = new CacheCowHeader();
             context.Request.Properties[CacheCowHeaderKey] = cacheCowHeader;
             bool? cacheValidated = null;
-            bool isRequestCacheable = CacheabilityValidator.IsCacheable(context.Request);
+            bool isRequestCacheable = cacheabilityValidator.IsCacheable(context.Request);
             var cacheValidationStatus = context.Request.GetCacheValidationStatus();
             if (cacheValidationStatus != CacheValidationStatus.None)
             {
-                var timedETag = await CacheDirectiveProvider.QueryAsync(context);
+                var timedETag = await cacheDirectiveProvider.QueryAsync(context);
                 cacheCowHeader.QueryMadeAndSuccessful = timedETag != null;
                 cacheValidated = ApplyCacheValidation(timedETag, cacheValidationStatus, new ContextUnifier(context));
                 context.Request.Properties.Add(CacheValidatedKey, cacheValidated);
@@ -165,24 +142,28 @@ namespace CacheCow.Server.WebApi
         public async override Task OnActionExecutedAsync(HttpActionExecutedContext context, CancellationToken cancellationToken)
         {
             await base.OnActionExecutedAsync(context, cancellationToken);
+            var cacheabilityValidator = (ICacheabilityValidator) context.ActionContext.ControllerContext.Configuration.DependencyResolver.GetService(typeof(ICacheabilityValidator)) 
+                ?? new DefaultCacheabilityValidator();
+            var cacheDirectiveProvider = context.ActionContext.ControllerContext.Configuration.DependencyResolver.GetCacheDirectiveProvider(ViewModelType);
+
             bool? cacheValidated = context.Request.Properties.ContainsKey(CacheValidatedKey) ?
                 (bool?) context.Request.Properties[CacheValidatedKey] : null;
             var cacheValidationStatus = context.Request.GetCacheValidationStatus();
             var cacheCowHeader = (CacheCowHeader) context.Request.Properties[CacheCowHeaderKey];
-            bool isRequestCacheable = CacheabilityValidator.IsCacheable(context.Request);
+            bool isRequestCacheable = cacheabilityValidator.IsCacheable(context.Request);
 
             if (HttpMethod.Get == context.Request.Method)
             {
-                context.Response.Headers.Add("Vary", string.Join(";", CacheDirectiveProvider.GetVaryHeaders(context)));
-                var cacheControl = CacheDirectiveProvider.GetCacheControl(context, TimeSpan.FromSeconds(this.DefaultExpirySeconds));
-                var isResponseCacheable = CacheabilityValidator.IsCacheable(context.Response);
+                context.Response.Headers.Add("Vary", string.Join(";", cacheDirectiveProvider.GetVaryHeaders(context)));
+                var cacheControl = cacheDirectiveProvider.GetCacheControl(context, TimeSpan.FromSeconds(this.DefaultExpirySeconds));
+                var isResponseCacheable = cacheabilityValidator.IsCacheable(context.Response);
                 if (!cacheControl.NoStore && isResponseCacheable) // _______ is cacheable
                 {
                     var or = context.Response.Content as ObjectContent;
                     TimedEntityTagHeaderValue tet = null;
                     if (or != null && or.Value != null)
                     {
-                        tet = CacheDirectiveProvider.Extract(or.Value);
+                        tet = cacheDirectiveProvider.Extract(or.Value);
                     }
 
                     if (cacheValidated == null  // could not validate
@@ -205,7 +186,7 @@ namespace CacheCow.Server.WebApi
                         context.Response.ApplyTimedETag(tet);
                 }
 
-                if (!isRequestCacheable || !isResponseCacheable)
+                if ((!isRequestCacheable || !isResponseCacheable) && ApplyNoCacheNoStoreForNonCacheableResponse)
                     context.Response.MakeNonCacheable();
                 else
                     context.Response.Headers.Add(HttpHeaderNames.CacheControl, cacheControl.ToString());
@@ -216,23 +197,20 @@ namespace CacheCow.Server.WebApi
 
         }
 
-        public ICacheabilityValidator CacheabilityValidator { get; set; }
-
         /// <summary>
         /// Whether in addition to sending cache directive for cacheable resources, it should send such directives for non-cachable resources
         /// </summary>
         public bool ApplyNoCacheNoStoreForNonCacheableResponse { get; set; }
 
         /// <summary>
-        /// ICacheDirectiveProvider for this instance
-        /// </summary>
-        public ICacheDirectiveProvider CacheDirectiveProvider { get; set; }
-
-        /// <summary>
         /// Gets used to create Cache directives
         /// </summary>
         public int DefaultExpirySeconds { get; set; }
 
-
+        /// <summary>
+        /// Type parameter for ITimedETagQueryProvider&lt;T&gt; and ICacheDirectiveProvider&lt;T&gt;. 
+        /// A decorative parameter for the ease of IoC service location.
+        /// </summary>
+        public Type ViewModelType { get; set; }
     }
 }

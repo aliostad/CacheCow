@@ -14,7 +14,6 @@ using CacheCow.Server;
 using CacheCow.Server.WebApi;
 using System.Web.Http.Dependencies;
 using System.Collections.Concurrent;
-using CacheCow.Server.ETag;
 
 namespace CacheCow.Samples.WebApi.WithQueryAndIoc
 {
@@ -26,9 +25,6 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
             var config = new HttpSelfHostConfiguration(BaseAddress);
             var container = new WindsorContainer();
             ConfigDi(container);
-            CachingRuntime.RegisterFactory((t) => container.Resolve(t),
-                (t1, t2) => container.Register(Component.For(t1).ImplementedBy(t2).LifestyleTransient()));
-
             config.DependencyResolver = new WindsorDependencyResolver(container);
 
             config.Routes.MapHttpRoute(
@@ -55,6 +51,15 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
 
         static void ConfigDi(IWindsorContainer container)
         {
+            CachingRuntime.RegisterDefaultTypes((
+                (t1, t2, isTransient) =>
+                {
+                    if (isTransient)
+                        container.Register(Component.For(t1).ImplementedBy(t2).LifestyleTransient());
+                    else
+                        container.Register(Component.For(t1).ImplementedBy(t2).LifestyleSingleton());
+                }));
+
             container.Register(
                 Component.For<CarController>().ImplementedBy<CarController>()
                     .LifestyleTransient(),
@@ -64,8 +69,7 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
                     .LifestyleSingleton(),
                 Component.For<ITimedETagQueryProvider>().ImplementedBy<TimedETagQueryCarRepository>()
                     .LifestyleSingleton(),
-                Component.For<ICarRepository>().Instance(InMemoryCarRepository.Instance),
-                Component.For<ITimedETagExtractor>().Instance(new GenericIocTimedETagExtractor(container.Resolve))
+                Component.For<ICarRepository>().Instance(InMemoryCarRepository.Instance)
                 );
         }
     }

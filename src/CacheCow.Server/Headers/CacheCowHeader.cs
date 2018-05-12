@@ -7,7 +7,7 @@ namespace CacheCow.Server.Headers
     public class CacheCowHeader
     {
         public const string Name = "x-cachecow-server";
-        private const string Pattern = "validation-applied=(True|False);validation-matched=(True|False);short-circuited=(True|False);query-made-and-successful=(True|False)";
+        private const string Pattern = "validation-applied=(True|False);validation-matched=(True|False);short-circuited=(True|False);query-made=(True|False)";
         private static Regex _regex = new Regex(Pattern);
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace CacheCow.Server.Headers
 
         public override string ToString()
         {
-            return $"validation-applied={ValidationApplied};validation-matched={ValidationMatched};short-circuited={ShortCircuited};query-made-and-successful={QueryMadeAndSuccessful}";
+            return $"validation-applied={ValidationApplied};validation-matched={ValidationMatched};short-circuited={ShortCircuited};query-made={QueryMadeAndSuccessful}";
         }
 
         public static bool TryParse(string value, out CacheCowHeader header)

@@ -25,14 +25,10 @@ namespace CacheCow.Server
 #endif
     }
 
-#if NET452
-#else
     /// <summary>
     /// Main interface for providing Cache headers for a resource.
     /// </summary>
-    public interface ICacheDirectiveProvider<TViewModel> : ICacheDirectiveProvider, ITimedETagQueryProvider<TViewModel>
+    public interface ICacheDirectiveProvider<TViewModel> : ICacheDirectiveProvider
     {
     }
-
-#endif
 }
