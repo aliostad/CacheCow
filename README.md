@@ -11,6 +11,7 @@ This document covers topics below:
  - [Getting Started - Client](#getting-started---client)
  - [Getting Started - ASP.NET Core MVC](#getting-started---aspnet-mvc-core)
  - [Getting Started - ASP.NET Web API](#getting-started---aspnet-web-api)
+ - [Running Samples]()
  - [CacheCow.Server Advanced Options](#cachecowserver-advanced-options)
  - [Dependency Injection scenarios in ASP.NET MVC Core](#dependency-injection-scenarios-on-aspnet-core)
  - [Dependency Injection scnearios in ASP.NET Web API](#dependency-injection-scenarios-on-aspnet-web-api)
@@ -130,6 +131,29 @@ public class MyController : ApiController
 }
 ```
 Here we have set the expiry to 5 minutes. This covers the basic scenario, browse the samples for the advanced and efficient use cases.
+
+## Running Samples
+CacheCow project contains 3 sample projects that demonstrate how to use both client and server libraries. The samples are exactly similar in functionality, shared by `CacheCow.Samples.Common` project. Server is an API hosting functionality for adding, modifying and querying cars. it a command-line interface with 6 options to choose from:
+
+ 0. To return all cars
+ 1. To return the last car
+ 2. To add a new car
+ 3. To update the *last* car
+ 4. To delete the *last* car
+ 5. To delete the *first* car
+
+After choosing options 0 and 1, application  prints the value of the CacheCow header from both client and the server. These values will denote the caching actions taken and their result. 
+
+### CacheCow.Samples.MvcCore
+You can run this sample on Windows, Mac and Linux and requires .NET Core +2.0. Essentially in your shell of your choice `cd` to the `CacheCow.Samples.MvcCore` folder and type:
+``` bash
+dotnet run
+```
+### CacheCow.Samples.WebApi
+This is a simple Web API example that displays out-of-the-box features for Web API. This sample is in .NET 4.52 and you can build and run as a console app on Windows.
+
+### CacheCow.Samples.WebApi.WithQueryAndIoc
+This is an advanced Web API example that displays advanced features of server-side CacheCow. This sample is in .NET 4.52 and you can build and run as a console app on Windows.
 
 ## CacheCow.Server advanced options
 
