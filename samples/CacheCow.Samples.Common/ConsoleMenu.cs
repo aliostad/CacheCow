@@ -30,41 +30,55 @@ namespace CacheCow.Samples.Common
     - Press 1 to get the last item
     - Press 2 to create a new car and add to repo
     - Press 3 to update the last item (updates last modified)
-    - Press 4 to delete the last item
-    - Press 5 to delete the first item
-    - Press 6 to toggle on/off verbose header dump
+    - Press 4 to update the last item outside API (updates last modified)
+    - Press 5 to delete the last item
+    - Press 6 to delete the first item
+    - Press 7 to toggle on/off verbose header dump
     - Press x to exit
 "
 );
-                var key = Console.ReadKey(true);
-                switch (key.KeyChar)
+                try
                 {
-                    case 'x':
-                        return;
-                    case '0':
-                        await ListAll();
-                        break;
-                    case '2':
-                        await CreateNew();
-                        break;
-                    case '3':
-                        await UpdateLast();
-                        break;
-                    case '4':
-                        await DeleteLast();
-                        break;
-                    case '1':
-                        await GetLast();
-                        break;
-                    case '5':
-                        await DeleteFirst();
-                        break;
-                    case '6':
-                        Toggle();
-                        break;
-                    default:
-                        // nothing
-                        break;
+                    var key = Console.ReadKey(true);
+                    switch (key.KeyChar)
+                    {
+                        case 'x':
+                            return;
+                        case '0':
+                            await ListAll();
+                            break;
+                        case '2':
+                            await CreateNew();
+                            break;
+                        case '3':
+                            await UpdateLast();
+                            break;
+                        case '4':
+                            await UpdateLastOutsideApi();
+                            break;
+                        case '5':
+                            await DeleteLast();
+                            break;
+                        case '1':
+                            await GetLast();
+                            break;
+                        case '6':
+                            await DeleteFirst();
+                            break;
+                        case '7':
+                            Toggle();
+                            break;
+                        default:
+                            // nothing
+                            break;
+                    }
+                }
+                catch(Exception e)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.BackgroundColor = ConsoleColor.White;
+                    Console.WriteLine(e.ToString());
+                    Console.ResetColor();
                 }
             }
         }
@@ -123,6 +137,7 @@ namespace CacheCow.Samples.Common
         public async Task CreateNew()
         {
             var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Post, "/api/car"));
+            WriteCacheCowHeader(response);
             await response.WhatEnsureSuccessShouldHaveBeen();
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine($"Location header: {response.Headers.Location}");
@@ -138,8 +153,25 @@ namespace CacheCow.Samples.Common
             if (id.HasValue)
             {
                 var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Put, $"/api/car/{id.Value}"));
+                WriteCacheCowHeader(response);
                 await response.WhatEnsureSuccessShouldHaveBeen();
                 DumpHeaders(response);
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("Repo is empty");
+                Console.WriteLine();
+                Console.ResetColor();
+            }
+        }
+
+        public async Task UpdateLastOutsideApi()
+        {
+            var id = InMemoryCarRepository.Instance.GetLastId();
+            if (id.HasValue)
+            {
+                InMemoryCarRepository.Instance.UpdateCar(id.Value);
             }
             else
             {
@@ -156,6 +188,7 @@ namespace CacheCow.Samples.Common
             if (id.HasValue)
             {
                 var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, $"/api/car/{id.Value}"));
+                WriteCacheCowHeader(response);
                 await response.WhatEnsureSuccessShouldHaveBeen();
                 DumpHeaders(response);
             }
@@ -175,6 +208,7 @@ namespace CacheCow.Samples.Common
             if (id.HasValue)
             {
                 var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, $"/api/car/{id.Value}"));
+                WriteCacheCowHeader(response);
                 await response.WhatEnsureSuccessShouldHaveBeen();
                 DumpHeaders(response);
             }
@@ -214,6 +248,8 @@ namespace CacheCow.Samples.Common
 
         static void WriteCacheCowHeader(HttpResponseMessage response)
         {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($"Status: {response.StatusCode}");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Client: {response.Headers.GetCacheCowHeader()}");
             if (response.Headers.Contains(CacheCow.Server.Headers.CacheCowHeader.Name))

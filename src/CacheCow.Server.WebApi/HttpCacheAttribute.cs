@@ -131,7 +131,7 @@ namespace CacheCow.Server.WebApi
                 if (cacheValidated ?? false)
                 {
                     cacheCowHeader.ShortCircuited = true;
-                    cacheCowHeader.ValidationMatched = true;
+                    cacheCowHeader.ValidationMatched = HttpMethod.Get == context.Request.Method; // NOTE: In GET match result in short-circuit and in PUT the opposite
                     context.Response.Headers.Add(CacheCowHeader.Name, cacheCowHeader.ToString());
                     // the response would have been set and no need to run the rest of the pipeline
                     return;

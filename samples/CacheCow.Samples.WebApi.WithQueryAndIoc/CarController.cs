@@ -53,6 +53,7 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
         }
 
         [HttpPut]
+        [HttpCache(ViewModelType = typeof(Car))]
         public IHttpActionResult PutUpdateCar(int id)
         {
             var updated = _repository.UpdateCar(id);

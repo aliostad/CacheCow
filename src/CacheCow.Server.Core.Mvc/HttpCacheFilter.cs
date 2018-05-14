@@ -41,7 +41,7 @@ namespace CacheCow.Server.Core.Mvc
         /// <param name="context">
         /// </param>
         /// <returns>
-        /// True: applied and the call can exit 
+        /// True: applied and the call can exit (short-circuit)
         /// False: tried to apply but did not match hence the call should continue
         /// null: could not apply (timedEtag was null)
         /// </returns>
@@ -139,7 +139,7 @@ namespace CacheCow.Server.Core.Mvc
                 if (cacheValidated ?? false)
                 {
                     cacheCowHeader.ShortCircuited = true;
-                    cacheCowHeader.ValidationMatched = true;
+                    cacheCowHeader.ValidationMatched = HttpMethods.IsGet(context.HttpContext.Request.Method); // NOTE: In GET match result in short-circuit and in PUT the opposite
                     context.HttpContext.Response.Headers.Add(CacheCowHeader.Name, cacheCowHeader.ToString());
                     // the response would have been set and no need to run the rest of the pipeline
                     return;

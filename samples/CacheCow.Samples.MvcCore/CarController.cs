@@ -43,6 +43,7 @@ namespace CacheCow.Samples.MvcCore
         }
 
         [HttpPut]
+        [HttpCacheFactory(0, ViewModelType = typeof(Car))]
         public IActionResult PutUpdateCar(int id)
         {
             var updated = _repository.UpdateCar(id);
