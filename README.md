@@ -139,10 +139,18 @@ CacheCow project contains 3 sample projects that demonstrate how to use both cli
  1. To return the last car
  2. To add a new car
  3. To update the *last* car
- 4. To delete the *last* car
- 5. To delete the *first* car
+ 4. To update the *last* car - outside API
+ 5. To delete the *last* car
+ 6. To delete the *first* car
 
-After choosing options 0 and 1, application  prints the value of the CacheCow header from both client and the server. These values will denote the caching actions taken and their result. 
+After choosing options 0 and 1, application prints the value of the CacheCow header from both client and the server. These values will denote the caching actions taken and their result. 
+
+You can test and try different scenarios. For example:
+ - 0, 2, 0, 0 to test the impact of creating a new car on the car collection's GET
+ - 2, 2, 0, 0, 6, 0 to test the impact of deleting a car on on the car collection's GET
+ - 2, 2, 1, 1, 3, 1 to test the caching header changes on subsequent requests and after updating an item
+ - 2, 2, 2 to add a few cars and then 1, 4, 3 to see an unsuccessful HTTP PUT validation resulting in status 412
+ 
 
 ### CacheCow.Samples.MvcCore
 You can run this sample on Windows, Mac and Linux and requires .NET Core +2.0. Essentially in your shell of your choice `cd` to the `CacheCow.Samples.MvcCore` folder and type:
