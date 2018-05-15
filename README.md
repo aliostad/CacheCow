@@ -135,21 +135,23 @@ Here we have set the expiry to 5 minutes. This covers the basic scenario, browse
 ## Running Samples
 CacheCow project contains 3 sample projects that demonstrate how to use both client and server libraries. The samples are exactly similar in functionality, shared by `CacheCow.Samples.Common` project. Server is an API hosting functionality for adding, modifying and querying cars. it a command-line interface with 6 options to choose from:
 
- 0. To return all cars
- 1. To return the last car
- 2. To add a new car
- 3. To update the *last* car
- 4. To update the *last* car - outside API
- 5. To delete the *last* car
- 6. To delete the *first* car
+ A. To return all cars
+ L. To return the last car (default is JSON)
+ X. To return the last car in XML 
+ C. To add a new car
+ U. To update the *last* car
+ O. To update the *last* car - outside API
+ D. To delete the *last* car
+ F. To delete the *first* car
 
-After choosing options 0 and 1, application prints the value of the CacheCow header from both client and the server. These values will denote the caching actions taken and their result. 
+After choosing options A, L or X application prints the value of the CacheCow header from both client and the server. These values will denote the caching actions taken and their result. 
 
 You can test and try different scenarios. For example:
- - 0, 2, 0, 0 to test the impact of creating a new car on the car collection's GET
- - 2, 2, 0, 0, 6, 0 to test the impact of deleting a car on on the car collection's GET
- - 2, 2, 1, 1, 3, 1 to test the caching header changes on subsequent requests and after updating an item
- - 2, 2, 2 to add a few cars and then 1, 4, 3 to see an unsuccessful HTTP PUT validation resulting in status 412
+ - A, C, A, A to test the impact of creating a new car on the car collection's GET
+ - C, C, A, A, F, A to test the impact of deleting a car on on the car collection's GET
+ - C, C, L, L, U, L to test the caching header changes on subsequent requests and after updating an item
+ - C, L, L, X, U, L, X to see that the representations of the same resource (in JSON and XML) get cached separately but invalidated together (after the update)
+ - C, C, C to add a few cars and then L, O, U to see an unsuccessful HTTP PUT validation resulting in status 412
  
 
 ### CacheCow.Samples.MvcCore
