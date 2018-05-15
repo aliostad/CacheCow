@@ -146,6 +146,8 @@ CacheCow project contains 3 sample projects that demonstrate how to use both cli
  - V. To toggle on/off **verbose** output of headers
  - Q. to **quit**
 
+![Samples screenshot](https://raw.githubusercontent.com/aliostad/CacheCow/master/media/samples.png)
+
 After choosing options A, L or X application prints the value of the CacheCow header from both client and the server. These values will denote the caching actions taken and their result. 
 
 You can test and try different scenarios. For example:
