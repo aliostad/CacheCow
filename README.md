@@ -11,6 +11,7 @@ This document covers topics below:
  - [Getting Started - Client](#getting-started---client)
  - [Getting Started - ASP.NET Core MVC](#getting-started---aspnet-mvc-core)
  - [Getting Started - ASP.NET Web API](#getting-started---aspnet-web-api)
+ - [CacheCow Header](#cachecow-header)
  - [Running Samples](#running-samples)
  - [CacheCow.Server Advanced Options](#cachecowserver-advanced-options)
  - [Dependency Injection scenarios in ASP.NET MVC Core](#dependency-injection-scenarios-on-aspnet-core)
@@ -131,6 +132,25 @@ public class MyController : ApiController
 }
 ```
 Here we have set the expiry to 5 minutes. This covers the basic scenario, browse the samples for the advanced and efficient use cases.
+
+## CacheCow Header
+CacheCow.Client and CacheCow.Server variants include *diagnostic* headers (`x-cachecow-client` and `x-cachecow-server`) to inform you of the actions taken and their results. They are useful in debugging and in case you would like to log to to understand cache hit ratios.
+
+### CacheCow.Client Header
+The header name is `x-cachecow-client` and can optionally contain extensions below (values separated by semicolon) depending on the scenario:
+ - Version of the CacheCow.Client
+ - `was-stale`: whether the stored representation was stale
+ - `did-not-exist`: the requested representation did not exist in the cache
+ - `not-cacheable`: the request or response were not cacheable (due to status, various headers and directives)
+ - `cache-validation-applied`: CacheCow attempted the HTTP call (GET or PUT) with cache validation
+ - `retrieved-from-cache`: whether the representation ultimately came from the cache or the one sent by the server
+ 
+### CacheCow.Server Header
+The header name is `x-cachecow-server` and contains extensions below (values separated by semicolon):
+ - `validation-applied`: whether validation was attempted
+ - `validation-matched`: validation attempted and the conditions met (resulting in 304 for GET and 2xx for PUT)
+ - `short-circuited`: the request was short-circuited and did not hit deeper API layers (with status 304 or 412)
+ - `query-made`: `ITimedETagQueryProvider` made a query to the back-end stores 
 
 ## Running Samples
 CacheCow project contains 3 sample projects that demonstrate how to use both client and server libraries. The samples are exactly similar in functionality, shared by `CacheCow.Samples.Common` project. Server is an API hosting functionality for adding, modifying and querying cars. it a command-line interface with 6 options to choose from:
