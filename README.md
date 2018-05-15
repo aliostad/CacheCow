@@ -143,7 +143,7 @@ CacheCow project contains 3 sample projects that demonstrate how to use both cli
  - O. To update the *last* car - **outside** the API by modifying underlying data so the API does not get to *see* it
  - D. To **delete** the *last* car
  - F. To delete the **first** car
- - V. For toggle on/off **verbose** output of headers
+ - V. To toggle on/off **verbose** output of headers
  - Q. to **quit**
 
 After choosing options A, L or X application prints the value of the CacheCow header from both client and the server. These values will denote the caching actions taken and their result. 
