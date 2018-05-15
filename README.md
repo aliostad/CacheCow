@@ -135,14 +135,16 @@ Here we have set the expiry to 5 minutes. This covers the basic scenario, browse
 ## Running Samples
 CacheCow project contains 3 sample projects that demonstrate how to use both client and server libraries. The samples are exactly similar in functionality, shared by `CacheCow.Samples.Common` project. Server is an API hosting functionality for adding, modifying and querying cars. it a command-line interface with 6 options to choose from:
 
- - A. To return all cars
- - L. To return the last car (default is JSON)
- - X. To return the last car in XML 
- - C. To add a new car
- - U. To update the *last* car
- - O. To update the *last* car - outside API
- - D. To delete the *last* car
- - F. To delete the *first* car
+ - A. To return **all** cars
+ - L. To return the **last** car (default is JSON)
+ - X. To return the last car in **XML** 
+ - C. To **create** a new car
+ - U. To **update** the *last* car
+ - O. To update the *last* car - **outside** the API by modifying underlying data so the API does not get to *see* it
+ - D. To **delete** the *last* car
+ - F. To delete the **first** car
+ - V. For toggle on/off **verbose** output of headers
+ - Q. to **quit**
 
 After choosing options A, L or X application prints the value of the CacheCow header from both client and the server. These values will denote the caching actions taken and their result. 
 
