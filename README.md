@@ -134,7 +134,7 @@ public class MyController : ApiController
 Here we have set the expiry to 5 minutes. This covers the basic scenario, browse the samples for the advanced and efficient use cases.
 
 ## CacheCow Header
-CacheCow.Client and CacheCow.Server variants include *diagnostic* headers (`x-cachecow-client` and `x-cachecow-server`) to inform you of the actions taken and their results. They are useful in debugging and in case you would like to log to to understand cache hit ratios.
+CacheCow.Client and CacheCow.Server variants include *diagnostic* headers (`x-cachecow-client` and `x-cachecow-server`) to inform you of the actions taken and their results. They are useful in debugging and in case you would like to log them to understand cache hit ratios.
 
 ### CacheCow.Client Header
 The header name is `x-cachecow-client` and can optionally contain extensions below (values separated by semicolon) depending on the scenario:
