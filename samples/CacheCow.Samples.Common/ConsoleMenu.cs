@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using CacheCow.Client.Headers;
 using CacheCow.Common.Helpers;
+using System.Net.Http.Headers;
 
 namespace CacheCow.Samples.Common
 {
@@ -26,15 +27,16 @@ namespace CacheCow.Samples.Common
             {
                 Console.WriteLine(
 @"CacheCow Cars Samples - (ASP.NET Core MVC and HttpClient)
-    - Press 0 to list all cars
-    - Press 1 to get the last item
-    - Press 2 to create a new car and add to repo
-    - Press 3 to update the last item (updates last modified)
-    - Press 4 to update the last item outside API (updates last modified)
-    - Press 5 to delete the last item
-    - Press 6 to delete the first item
-    - Press 7 to toggle on/off verbose header dump
-    - Press x to exit
+    - Press A to list all cars
+    - Press L to get the last item (default which is JSON)
+    - Press X to get the last item in XML
+    - Press C to create a new car and add to repo
+    - Press U to update the last item (updates last modified)
+    - Press O to update the last item outside API (updates last modified)
+    - Press D to delete the last item
+    - Press F to delete the first item
+    - Press V to toggle on/off verbose header dump
+    - Press Q to exit
 "
 );
                 try
@@ -42,34 +44,48 @@ namespace CacheCow.Samples.Common
                     var key = Console.ReadKey(true);
                     switch (key.KeyChar)
                     {
-                        case 'x':
+                        case 'q':
+                        case 'Q':
                             return;
-                        case '0':
+                        case 'a':
+                        case 'A':
                             await ListAll();
                             break;
-                        case '2':
+                        case 'C':
+                        case 'c':
                             await CreateNew();
                             break;
-                        case '3':
+                        case 'U':
+                        case 'u':
                             await UpdateLast();
                             break;
-                        case '4':
+                        case 'O':
+                        case 'o':
                             await UpdateLastOutsideApi();
                             break;
-                        case '5':
+                        case 'D':
+                        case 'd':
                             await DeleteLast();
                             break;
-                        case '1':
+                        case 'L':
+                        case 'l':
                             await GetLast();
                             break;
-                        case '6':
+                        case 'X':
+                        case 'x':
+                            await GetLastInXml();
+                            break;
+                        case 'F':
+                        case 'f':
                             await DeleteFirst();
                             break;
-                        case '7':
+                        case 'V':
+                        case 'v':
                             Toggle();
                             break;
                         default:
                             // nothing
+                            Console.WriteLine("Invalid option: " + key.KeyChar);
                             break;
                     }
                 }
@@ -243,7 +259,31 @@ namespace CacheCow.Samples.Common
                 Console.WriteLine();
                 Console.ResetColor();
             }
-
+        }
+        public async Task GetLastInXml()
+        {
+            var id = InMemoryCarRepository.Instance.GetLastId();
+            if (id.HasValue)
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"/api/car/{id.Value}");
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+                var response = await _client.SendAsync(request);
+                await response.WhatEnsureSuccessShouldHaveBeen();
+                WriteCacheCowHeader(response);
+                Console.ForegroundColor = ConsoleColor.White;
+                var c = await response.Content.ReadAsAsync<Car>();
+                Console.WriteLine($"| {c.Id}\t| {c.NumberPlate}\t| {c.Year}\t| {c.LastModified} |");
+                Console.WriteLine();
+                Console.ResetColor();
+                DumpHeaders(response);
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("Repo is empty");
+                Console.WriteLine();
+                Console.ResetColor();
+            }
         }
 
         static void WriteCacheCowHeader(HttpResponseMessage response)
