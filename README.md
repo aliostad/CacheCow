@@ -76,7 +76,7 @@ Console.WriteLine(responseFromCache.Headers.GetCacheCowHeader().ToString()); // 
 ```
 As you can see, second time round the resource came from the cache and the request did not even hit the network.
 
-> NOTE: In-Memory storage is OK for test scenarios or cases where the load is limited. In many cases you would choose to use Redis storage or you can implement your own if you need to. Feel free to discuss opening an issue before sending a PR.
+> NOTE: In-Memory storage is OK for test scenarios or cases where the load is limited. In many cases you would choose to use Redis storage or you can implement your own if you need to. If you would need an alternative storage not yet supported, feel free to discuss by opening an issue before sending a PR.
 
 ## Getting started - ASP.NET MVC Core
 From CacheCow 2.0, ASP.NET MVC Core scenarios are supported. Server-side CacheCow has been implemented as a [Resource Filter](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/filters?view=aspnetcore-2.1#resource-filters).
