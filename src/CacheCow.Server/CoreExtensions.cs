@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NET452
+#else
+using System;
 using System.Collections.Generic;
 using System.Text;
 using CacheCow.Common;
@@ -6,7 +8,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Headers;
 
-namespace CacheCow.Server.Core.Mvc
+namespace CacheCow.Server
 {
     /// <summary>
     /// Extensions for ASP.NET Core
@@ -94,3 +96,4 @@ namespace CacheCow.Server.Core.Mvc
         }
     }
 }
+#endif

@@ -13,6 +13,7 @@ using Xunit;
 using CacheCow.Client.Headers;
 using CacheCow.Client;
 using CacheCow.Server.Headers;
+using Microsoft.AspNetCore.Http;
 
 namespace CacheCow.Server.Core.Mvc.Tests
 {
@@ -92,7 +93,7 @@ namespace CacheCow.Server.Core.Mvc.Tests
         {
         }
 
-        public Task<TimedEntityTagHeaderValue> QueryAsync(ResourceExecutingContext context)
+        public Task<TimedEntityTagHeaderValue> QueryAsync(HttpContext context)
         {
             return null; // forces to use hasing
         }
@@ -106,10 +107,10 @@ namespace CacheCow.Server.Core.Mvc.Tests
         {
         }
 
-        public async Task<TimedEntityTagHeaderValue> QueryAsync(ResourceExecutingContext context)
+        public async Task<TimedEntityTagHeaderValue> QueryAsync(HttpContext context)
         {
-            if (context.HttpContext.Request.Headers.ContainsKey(HeaderName))
-                return new TimedEntityTagHeaderValue(context.HttpContext.Request.Headers[HeaderName]);
+            if (context.Request.Headers.ContainsKey(HeaderName))
+                return new TimedEntityTagHeaderValue(context.Request.Headers[HeaderName]);
             return null;
         }
 

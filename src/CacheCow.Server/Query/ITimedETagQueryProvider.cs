@@ -27,7 +27,7 @@ namespace CacheCow.Server
 #if NET452
         Task<TimedEntityTagHeaderValue> QueryAsync(HttpActionContext context);
 #else
-        Task<TimedEntityTagHeaderValue> QueryAsync(ResourceExecutingContext context);
+        Task<TimedEntityTagHeaderValue> QueryAsync(HttpContext context);
 #endif
     }
 

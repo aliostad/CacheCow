@@ -1,7 +1,9 @@
 ﻿using CacheCow.Samples.Common;
 using CacheCow.Server;
 using CacheCow.Server.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +25,12 @@ namespace CacheCow.Samples.MvcCore
             // nothing
         }
 
-        public Task<TimedEntityTagHeaderValue> QueryAsync(ResourceExecutingContext context)
+        public Task<TimedEntityTagHeaderValue> QueryAsync(HttpContext context)
         {
             int? id = null;
-            if (context.RouteData.Values.ContainsKey("id"))
-                id = Convert.ToInt32(context.RouteData.Values["id"]);
+            var routeData = context.GetRouteData();
+            if (routeData.Values.ContainsKey("id"))
+                id = Convert.ToInt32(routeData.Values["id"]);
             
             if(id.HasValue) // Get one car
             {

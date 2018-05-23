@@ -33,7 +33,7 @@ namespace CacheCow.Server
 #if NET452
         public Task<TimedEntityTagHeaderValue> QueryAsync(HttpActionContext context)
 #else
-        public Task<TimedEntityTagHeaderValue> QueryAsync(ResourceExecutingContext context)
+        public Task<TimedEntityTagHeaderValue> QueryAsync(HttpContext context)
 #endif
         {
             return _queryProvider.QueryAsync(context);
