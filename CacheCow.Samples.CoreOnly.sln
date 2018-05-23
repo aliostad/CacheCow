@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Server", "src\Cach
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Server.WebApi", "src\CacheCow.Server.WebApi\CacheCow.Server.WebApi.csproj", "{7B371E13-96BF-4F3D-A3A5-EC3E6BD9D2CD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Samples.Carter", "samples\CacheCow.Samples.Carter\CacheCow.Samples.Carter.csproj", "{F5FEAD82-2FF9-4A32-BC5E-3F8DBD171E24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{7B371E13-96BF-4F3D-A3A5-EC3E6BD9D2CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B371E13-96BF-4F3D-A3A5-EC3E6BD9D2CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B371E13-96BF-4F3D-A3A5-EC3E6BD9D2CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5FEAD82-2FF9-4A32-BC5E-3F8DBD171E24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5FEAD82-2FF9-4A32-BC5E-3F8DBD171E24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5FEAD82-2FF9-4A32-BC5E-3F8DBD171E24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5FEAD82-2FF9-4A32-BC5E-3F8DBD171E24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +73,7 @@ Global
 		{7750962C-BA57-49F0-AD66-7ACC85A2BDF2} = {37A9D060-F7CD-4FDE-8BE3-28C2AF1F21BD}
 		{0ABF2C1E-5A02-40DD-83CE-45F1827ADF79} = {8F731FE7-74D7-4733-B402-249352235A33}
 		{7B371E13-96BF-4F3D-A3A5-EC3E6BD9D2CD} = {8F731FE7-74D7-4733-B402-249352235A33}
+		{F5FEAD82-2FF9-4A32-BC5E-3F8DBD171E24} = {37A9D060-F7CD-4FDE-8BE3-28C2AF1F21BD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E7779A1-9A5D-4809-B8DF-D31B56406DFF}
