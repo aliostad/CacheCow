@@ -194,7 +194,7 @@ dotnet run
 This is a simple Web API example that displays out-of-the-box features for Web API. This sample is in .NET 4.52 and you can build and run as a console app on Windows.
 
 ### CacheCow.Samples.WebApi.WithQueryAndIoc
-This is an advanced Web API example that displays advanced features of server-side CacheCow. This sample is in .NET 4.52 and you can build and run as a console app on Windows.
+This is an advanced Web API example that displays advanced features of server-side CacheCow, especially IoC. This sample is in .NET 4.52 and you can build and run as a console app on Windows.
 
 ### CacheCow.Samples.Carter
 This sample is for a typical Carter implementation. You can run this sample on Windows, Mac and Linux and requires .NET Core +2.0. Essentially in your shell of your choice `cd` to the `CacheCow.Samples.Carter` folder and type:
