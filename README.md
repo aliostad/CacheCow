@@ -13,6 +13,8 @@ This document covers topics below:
    - [Getting Started - ASP.NET Core MVC](#getting-started---aspnet-mvc-core)
    - [Getting Started - ASP.NET Web API](#getting-started---aspnet-web-api)
  - [CacheCow Header](#cachecow-header)
+   - [CacheCow.Client Header](#cachecowclient-header)
+   - [CacheCow.Server Header](#cachecowserver-header)
  - [Running Samples](#running-samples)
  - [CacheCow.Server Advanced Options](#cachecowserver-advanced-options)
  - [Dependency Injection scenarios in ASP.NET MVC Core](#dependency-injection-scenarios-on-aspnet-core)
