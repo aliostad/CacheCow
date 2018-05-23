@@ -2,15 +2,16 @@
 
 CacheCow
 ========
-An implementation of HTTP Caching in .NET Core and 4.52+ for HttpClient, ASP.NET Web API and ASP.NET MVC Core.
+An implementation of HTTP Caching in .NET Core and 4.52+ for HttpClient, ASP.NET Web API, ASP.NET MVC Core and [Carter](https://github.com/CarterCommunity/Carter/blob/master/README.md).
 
 This document covers topics below:
 
  - [Breaking changes in Version 2.0.0](#note-breaking-changes-in-version-200)
  - [Concepts and definitions](#concepts-and-definitions)
- - [Getting Started - Client](#getting-started---client)
- - [Getting Started - ASP.NET Core MVC](#getting-started---aspnet-mvc-core)
- - [Getting Started - ASP.NET Web API](#getting-started---aspnet-web-api)
+ - Getting started:
+   - [Getting Started - Client](#getting-started---client)
+   - [Getting Started - ASP.NET Core MVC](#getting-started---aspnet-mvc-core)
+   - [Getting Started - ASP.NET Web API](#getting-started---aspnet-web-api)
  - [CacheCow Header](#cachecow-header)
  - [Running Samples](#running-samples)
  - [CacheCow.Server Advanced Options](#cachecowserver-advanced-options)
@@ -91,7 +92,7 @@ From CacheCow 2.0, ASP.NET MVC Core scenarios are supported. Server-side CacheCo
 public virtual void ConfigureServices(IServiceCollection services)
 {
     ... // usual startup code
-    services.AddHttpCaching(); // add HTTP Caching
+    services.AddHttpCachingMvc(); // add HTTP Caching for Core MVC
 }
 ```
 
@@ -188,6 +189,12 @@ This is a simple Web API example that displays out-of-the-box features for Web A
 
 ### CacheCow.Samples.WebApi.WithQueryAndIoc
 This is an advanced Web API example that displays advanced features of server-side CacheCow. This sample is in .NET 4.52 and you can build and run as a console app on Windows.
+
+### CacheCow.Samples.Carter
+This sample is for a typical Carter implementation. You can run this sample on Windows, Mac and Linux and requires .NET Core +2.0. Essentially in your shell of your choice `cd` to the `CacheCow.Samples.Carter` folder and type:
+``` bash
+dotnet run
+```
 
 ## CacheCow.Server advanced options
 
