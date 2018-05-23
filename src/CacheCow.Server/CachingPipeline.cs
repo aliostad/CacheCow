@@ -16,7 +16,7 @@ namespace CacheCow.Server
     /// <summary>
     /// The underlying class for implementing caching as two steps
     /// </summary>
-    public class CachingPipeline
+    public class CachingPipeline : ICachingPipeline
     {
         private ICacheabilityValidator _validator;
         private readonly ICacheDirectiveProvider _cacheDirectiveProvider;
@@ -162,12 +162,9 @@ namespace CacheCow.Server
         /// <summary>
         /// Applies after the controller assigned a result to the action
         /// </summary>
-        /// <typeparam name="T">action result type - can be anything</typeparam>
         /// <param name="context">HttpContext</param>
-        /// <param name="result">action result</param>
-        /// <returns>The result passed in for convenience</returns>
-        public T After<T>(HttpContext context, T result)
-            where T: class
+        /// <param name="viewModel">action result</param>
+        public void After(HttpContext context, object viewModel)
         {
             var ms = context.Response.Body as MemoryStream;
             bool mustReflush = ms != null && ms.Length > 0;
@@ -183,9 +180,9 @@ namespace CacheCow.Server
                     if (!cacheControl.NoStore && isResponseCacheable) // _______ is cacheable
                     {
                         TimedEntityTagHeaderValue tet = null;
-                        if (result != null)
+                        if (viewModel != null)
                         {
-                            tet = _cacheDirectiveProvider.Extract(result);
+                            tet = _cacheDirectiveProvider.Extract(viewModel);
                         }
 
                         if (_cacheValidated == null  // could not validate
@@ -200,7 +197,7 @@ namespace CacheCow.Server
                             {
                                 _cacheCowHeader.ValidationMatched = true;
                                 context.Response.Headers.Add(CacheCowHeader.Name, _cacheCowHeader.ToString());
-                                return result;
+                                return;
                             }
                         }
 
@@ -226,7 +223,13 @@ namespace CacheCow.Server
                 }
             }
 
-            return result;
+        }
+    }
+
+    public class CachingPipeline<TViewModel> : CachingPipeline, ICachingPipeline<TViewModel>
+    {
+        public CachingPipeline(ICacheabilityValidator validator, ICacheDirectiveProvider<TViewModel> cacheDirectiveProvider) : base(validator, cacheDirectiveProvider)
+        {
         }
     }
 }

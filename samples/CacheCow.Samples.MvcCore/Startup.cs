@@ -25,7 +25,7 @@ namespace CacheCow.Samples.MvcCore
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().AddWebApiConventions();
-            services.AddHttpCaching();
+            services.AddHttpCachingMvc();
             services.AddQueryProviderForViewModel<Car, TimedETagQueryCarRepository>(false);
             services.AddQueryProviderForViewModel<IEnumerable<Car>, TimedETagQueryCarRepository>(false);
             services.AddSingleton<ICarRepository>(InMemoryCarRepository.Instance);

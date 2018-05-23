@@ -74,8 +74,8 @@ namespace CacheCow.Server.Core.Mvc.Tests
         public override void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddHttpCaching();
-            services.AddExtractorForViewModel<IEnumerable<TestViewModel>, TestViewModelCollectionExtractor>();
+            services.AddHttpCachingMvc();
+            services.AddExtractorForViewModelMvc<IEnumerable<TestViewModel>, TestViewModelCollectionExtractor>();
         }
 
     }

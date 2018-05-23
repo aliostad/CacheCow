@@ -55,7 +55,7 @@ namespace CacheCow.Server.Core.Mvc.Tests
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddHttpCaching();
+            services.AddHttpCachingMvc();
         }
 
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env)

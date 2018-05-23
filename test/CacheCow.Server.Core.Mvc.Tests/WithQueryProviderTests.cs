@@ -134,9 +134,9 @@ namespace CacheCow.Server.Core.Mvc.Tests
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddHttpCaching();
-            services.AddQueryProviderForViewModel<TestViewModel, TestViewModelQueryProvider>();
-            services.AddQueryProviderForViewModel<IEnumerable<TestViewModel>, TestViewModelCollectionQueryProvider>();
+            services.AddHttpCachingMvc();
+            services.AddQueryProviderForViewModelMvc<TestViewModel, TestViewModelQueryProvider>();
+            services.AddQueryProviderForViewModelMvc<IEnumerable<TestViewModel>, TestViewModelCollectionQueryProvider>();
         }
 
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env)
