@@ -26,8 +26,8 @@ namespace CacheCow.Samples.MvcCore
         {
             services.AddMvc().AddWebApiConventions();
             services.AddHttpCachingMvc();
-            services.AddQueryProviderForViewModel<Car, TimedETagQueryCarRepository>(false);
-            services.AddQueryProviderForViewModel<IEnumerable<Car>, TimedETagQueryCarRepository>(false);
+            services.AddQueryProviderForViewModelMvc<Car, TimedETagQueryCarRepository>(false);
+            services.AddQueryProviderForViewModelMvc<IEnumerable<Car>, TimedETagQueryCarRepository>(false);
             services.AddSingleton<ICarRepository>(InMemoryCarRepository.Instance);
             services.AddSingleton<ITimedETagExtractor<IEnumerable<Car>>, CarCollectionETagExtractor>();
             services.AddSingleton<ITimedETagExtractor<Car>, CarETagExtractor>();
