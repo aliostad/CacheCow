@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
+		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp2.0</TargetFrameworks>		
 		<Summary>Client constructs for HTTP Caching</Summary>
 		<AssemblyName>CacheCow.Client.Tests</AssemblyName>
 		<PackageId>CacheCow.Client.Tests</PackageId>

@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp2.0</TargetFrameworks>		
 		<Summary>Server constructs for HTTP Caching in ASP.NET Core MVC</Summary>
 		<AssemblyName>CacheCow.Server.Core.Mvc</AssemblyName>
 		<PackageId>CacheCow.Server.Core.Mvc</PackageId>
