@@ -1,0 +1,91 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B1901128-F84A-46CE-B8FD-E863465F94C2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{141CEBF7-F872-4181-8B16-1E0FAE517D59}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Common", "src\CacheCow.Common\CacheCow.Common.csproj", "{88E170E4-B857-42FE-963C-0505502B548C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Client", "src\CacheCow.Client\CacheCow.Client.csproj", "{943325CB-7189-42FE-9DA4-E513DB3E0E87}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Tests", "test\CacheCow.Tests\CacheCow.Tests.csproj", "{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{943325CB-7189-42FE-9DA4-E513DB3E0E87} = {943325CB-7189-42FE-9DA4-E513DB3E0E87}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Client.RedisCacheStore", "src\CacheCow.Client.RedisCacheStore\CacheCow.Client.RedisCacheStore.csproj", "{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Client.RedisCacheStore.Tests", "test\CacheCow.Client.RedisCacheStore.Tests\CacheCow.Client.RedisCacheStore.Tests.csproj", "{53E2C779-A780-41B2-A55B-0E4156C5AD7F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Client.Tests", "test\CacheCow.Client.Tests\CacheCow.Client.Tests.csproj", "{1ADB6175-95B9-4BB9-AF56-B4291196554C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Server.Core.Mvc", "src\CacheCow.Server.Core.Mvc\CacheCow.Server.Core.Mvc.csproj", "{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Server.Core.Mvc.Tests", "test\CacheCow.Server.Core.Mvc.Tests\CacheCow.Server.Core.Mvc.Tests.csproj", "{C949DA07-DDD7-441E-BE48-F95A49E97CCD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Server", "src\CacheCow.Server\CacheCow.Server.csproj", "{DA077137-70D7-4CD4-B817-E852AFCAB30B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88E170E4-B857-42FE-963C-0505502B548C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88E170E4-B857-42FE-963C-0505502B548C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88E170E4-B857-42FE-963C-0505502B548C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88E170E4-B857-42FE-963C-0505502B548C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{943325CB-7189-42FE-9DA4-E513DB3E0E87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{943325CB-7189-42FE-9DA4-E513DB3E0E87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{943325CB-7189-42FE-9DA4-E513DB3E0E87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{943325CB-7189-42FE-9DA4-E513DB3E0E87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1ADB6175-95B9-4BB9-AF56-B4291196554C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C949DA07-DDD7-441E-BE48-F95A49E97CCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C949DA07-DDD7-441E-BE48-F95A49E97CCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C949DA07-DDD7-441E-BE48-F95A49E97CCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C949DA07-DDD7-441E-BE48-F95A49E97CCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA077137-70D7-4CD4-B817-E852AFCAB30B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA077137-70D7-4CD4-B817-E852AFCAB30B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA077137-70D7-4CD4-B817-E852AFCAB30B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA077137-70D7-4CD4-B817-E852AFCAB30B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{88E170E4-B857-42FE-963C-0505502B548C} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
+		{943325CB-7189-42FE-9DA4-E513DB3E0E87} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
+		{AA8B71E2-1E28-457E-B4E0-7D493CBE69D3} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
+		{7BBF2034-AB1B-454C-9BC5-04BEBD6A0D88} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
+		{53E2C779-A780-41B2-A55B-0E4156C5AD7F} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
+		{1ADB6175-95B9-4BB9-AF56-B4291196554C} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
+		{A004A4B5-CC92-4FFF-BC23-8AF6D1FB25AB} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
+		{C949DA07-DDD7-441E-BE48-F95A49E97CCD} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
+		{DA077137-70D7-4CD4-B817-E852AFCAB30B} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4EFCA3E6-84FB-4520-8C47-62D010919E88}
+	EndGlobalSection
+EndGlobal
