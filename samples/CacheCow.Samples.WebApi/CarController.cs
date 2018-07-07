@@ -34,6 +34,7 @@ namespace CacheCow.Samples.WebApi
         }
 
         [HttpDelete]
+        [HttpCache(DefaultExpirySeconds = 0)]
         public IHttpActionResult Delete(int id)
         {
             _repository.DeleteCar(id);
@@ -48,6 +49,7 @@ namespace CacheCow.Samples.WebApi
         }
 
         [HttpPut]
+        [HttpCache(DefaultExpirySeconds = 0)]
         public IHttpActionResult PutUpdateCar(int id)
         {
             var updated = _repository.UpdateCar(id);

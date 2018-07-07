@@ -21,12 +21,12 @@ namespace CacheCow.Server.WebApi
                     return CacheValidationStatus.GetIfNoneMatch;
             }
 
-            if (HttpMethod.Post == request.Method)
+            if (HttpMethod.Put == request.Method || HttpMethod.Delete == request.Method || "PATCH" == request.Method.Method.ToUpper())
             {
                 if (request.Headers.IfUnmodifiedSince.HasValue)
-                    return CacheValidationStatus.PutIfUnModifiedSince;
+                    return CacheValidationStatus.PutPatchDeleteIfUnModifiedSince;
                 if (request.Headers.IfMatch != null && request.Headers.IfMatch.Count > 0)
-                    return CacheValidationStatus.PutIfMatch;
+                    return CacheValidationStatus.PutPatchDeleteIfMatch;
             }
 
             return CacheValidationStatus.None;

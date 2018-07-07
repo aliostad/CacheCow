@@ -39,6 +39,7 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
         }
 
         [HttpDelete]
+        [HttpCache(ViewModelType = typeof(Car))]
         public IHttpActionResult Delete(int id)
         {
             _repository.DeleteCar(id);

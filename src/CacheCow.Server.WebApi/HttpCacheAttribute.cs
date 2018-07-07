@@ -75,7 +75,7 @@ namespace CacheCow.Server.WebApi
                         else
                             return false;
                     }
-                case CacheValidationStatus.PutIfMatch:
+                case CacheValidationStatus.PutPatchDeleteIfMatch:
                     if (timedEtag.ETag == null)
                         return false;
                     else
@@ -88,7 +88,7 @@ namespace CacheCow.Server.WebApi
                             return true;
                         }
                     }
-                case CacheValidationStatus.PutIfUnModifiedSince:
+                case CacheValidationStatus.PutPatchDeleteIfUnModifiedSince:
                     if (timedEtag.LastModified == null)
                         return false;
                     else

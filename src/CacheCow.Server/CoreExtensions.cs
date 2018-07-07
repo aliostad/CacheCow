@@ -38,12 +38,12 @@ namespace CacheCow.Server
                     return CacheValidationStatus.GetIfNoneMatch;
             }
             
-            if(HttpMethods.IsPut(request.Method))
+            if(HttpMethods.IsPut(request.Method) || HttpMethods.IsDelete(request.Method) || HttpMethods.IsPatch(request.Method))
             {
                 if (typedHeaders.IfUnmodifiedSince.HasValue)
-                    return CacheValidationStatus.PutIfUnModifiedSince;
+                    return CacheValidationStatus.PutPatchDeleteIfUnModifiedSince;
                 if (typedHeaders.IfMatch != null && typedHeaders.IfMatch.Count > 0)
-                    return CacheValidationStatus.PutIfMatch;
+                    return CacheValidationStatus.PutPatchDeleteIfMatch;
             }
 
             return CacheValidationStatus.None;

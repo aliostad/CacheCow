@@ -12,7 +12,7 @@ namespace CacheCow.Common
         None = 0,
         GetIfModifiedSince = 1,
         GetIfNoneMatch = 2,
-        PutIfUnModifiedSince = 3,
-        PutIfMatch = 4
+        PutPatchDeleteIfUnModifiedSince = 3,
+        PutPatchDeleteIfMatch = 4
     }
 }

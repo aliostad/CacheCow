@@ -29,6 +29,7 @@ namespace CacheCow.Samples.MvcCore
         }
 
         [HttpDelete]
+        [HttpCacheFactory(0, ViewModelType = typeof(Car))]
         public IActionResult Delete(int id)
         {
             _repository.DeleteCar(id);

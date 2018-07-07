@@ -48,7 +48,7 @@ namespace CacheCow.Client
         public CachingHandler(ICacheStore cacheStore, IVaryHeaderStore varyHeaderStore)
         {
             _cacheStore = cacheStore;
-            UseConditionalPut = true;
+            UseConditionalPutPatchDelete = true;
             MustRevalidateByDefault = true;
             VaryHeaderStore = varyHeaderStore;
             DefaultVaryHeaders = new string[] { "Accept" };
@@ -118,7 +118,7 @@ namespace CacheCow.Client
             _ignoreRequestRules = (request) =>
             {
 
-                if (!request.Method.IsIn(HttpMethod.Get, HttpMethod.Put))
+                if (request.Method.IsCacheIgnorable())
                     return true;
 
                 // client can tell CachingHandler not to do caching for a particular request
@@ -158,10 +158,10 @@ namespace CacheCow.Client
 
         /// <summary>
         /// Whether to use cache's ETag or Last-Modified
-        /// to make conditional PUT according to RFC2616 13.3
+        /// to make conditional PUT/PATCH/DELETE according to RFC2616 13.3
         /// If no cache available on the resource, no conditional is used
         /// </summary>
-        public bool UseConditionalPut { get; set; }
+        public bool UseConditionalPutPatchDelete { get; set; }
 
         /// <summary>
         /// true by default;
@@ -296,11 +296,11 @@ namespace CacheCow.Client
                 TraceLevel.Verbose, request.RequestUri, validationResultForCachedResponse);
 
 
-            // PUT validation
-            if (request.Method == HttpMethod.Put && validationResultForCachedResponse.IsIn(
+            // PUT/PATCH/DELETE validation
+            if (request.Method.IsPutPatchOrDelete() && validationResultForCachedResponse.IsIn(
                  ResponseValidationResult.OK, ResponseValidationResult.MustRevalidate))
             {
-                ApplyPutValidationHeaders(request, cacheCowHeader, cachedResponse);
+                ApplyPutPatchDeleteValidationHeaders(request, cacheCowHeader, cachedResponse);
                 return await base.SendAsync(request, cancellationToken); // EXIT !! _____________________________
             }
 
@@ -422,11 +422,11 @@ namespace CacheCow.Client
 
         }
 
-        private void ApplyPutValidationHeaders(HttpRequestMessage request, CacheCowHeader cacheCowHeader,
+        private void ApplyPutPatchDeleteValidationHeaders(HttpRequestMessage request, CacheCowHeader cacheCowHeader,
             HttpResponseMessage cachedResponse)
         {
             // add headers for a cache validation. First check ETag since is better 
-            if (UseConditionalPut)
+            if (UseConditionalPutPatchDelete)
             {
                 cacheCowHeader.CacheValidationApplied = true;
                 if (cachedResponse.Headers.ETag != null)
