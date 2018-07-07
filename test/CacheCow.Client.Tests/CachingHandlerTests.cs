@@ -436,7 +436,53 @@ namespace CacheCow.Client.Tests
 
 		}
 
-      
+        [Fact]
+        public void Delete_Validate_Etag()
+        {
+            // setup 
+            var request = new HttpRequestMessage(HttpMethod.Delete, DummyUrl);
+            var responseFromCache = GetOkMessage(true);
+            responseFromCache.Headers.ETag = new EntityTagHeaderValue(ETagValue);
+            var responseFromServer = new HttpResponseMessage(HttpStatusCode.NotModified);
+            _messageHandler.Response = responseFromServer;
+            _cacheStore.Setup(x => x.GetValueAsync(It.IsAny<CacheKey>())).ReturnsAsync(responseFromCache);
+
+            // run
+            var task = _client.SendAsync(request);
+            var responseReturned = task.Result;
+
+            // verify
+            Assert.Equal(ETagValue, request.Headers.IfMatch.First().Tag);
+            Assert.Equal(responseFromServer, responseReturned);
+
+        }
+
+        [Fact]
+        public void Delete_Validate_Expires()
+        {
+            // setup 
+            var request = new HttpRequestMessage(HttpMethod.Delete, DummyUrl);
+            var lastModified = DateTimeOffset.UtcNow.AddHours(-1);
+            lastModified = lastModified.AddMilliseconds(1000 - lastModified.Millisecond);
+            var responseFromCache = GetOkMessage(true);
+            responseFromCache.Content.Headers.LastModified = lastModified;
+            var responseFromServer = GetOkMessage();
+            _messageHandler.Response = responseFromServer;
+            _cacheStore.Setup(x => x.GetValueAsync(It.IsAny<CacheKey>())).ReturnsAsync(responseFromCache);
+
+
+
+            // run
+            var task = _client.SendAsync(request);
+            var responseReturned = task.Result;
+
+            // verify
+            Assert.Equal(lastModified.ToString(), request.Headers.IfUnmodifiedSince.Value.ToString());
+            Assert.Equal(responseFromServer, responseReturned);
+
+        }
+
+
         [Fact]
 	    public void DoesNotDisposeCacheStoreIfPassedToIt()
         {
