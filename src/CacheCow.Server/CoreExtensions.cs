@@ -125,7 +125,7 @@ namespace CacheCow.Server
         }
 
         public static void AddDirectiveProviderForViewModel<TViewModel, TCacheDirectiveProvider>(this IServiceCollection services, bool transient = true)
-    where TCacheDirectiveProvider : class, ICacheDirectiveProvider<TViewModel>
+            where TCacheDirectiveProvider : class, ICacheDirectiveProvider<TViewModel>
         {
             services.AddServiceWithLifeTime<ICacheDirectiveProvider<TViewModel>, TCacheDirectiveProvider>(transient);
             services.AddServiceWithLifeTime<ITimedETagQueryProvider<TViewModel>, NullQueryProvider<TViewModel>>(transient);
@@ -152,12 +152,23 @@ namespace CacheCow.Server
             services.AddTransient<ICachingPipeline<TViewModel>, CachingPipeline<TViewModel>>();
         }
 
+        public static void AddQueryProviderAndExtractorForViewModel<TViewModel, TQueryProvider, TExtractor>(this IServiceCollection services, bool transient = true)
+            where TQueryProvider : class, ITimedETagQueryProvider<TViewModel>
+            where TExtractor : class, ITimedETagExtractor<TViewModel>
+        {
+            services.AddServiceWithLifeTime<ICacheDirectiveProvider<TViewModel>, DefaultCacheDirectiveProvider<TViewModel>>(transient);
+            services.AddServiceWithLifeTime<ITimedETagQueryProvider<TViewModel>, TQueryProvider>(transient);
+            services.AddServiceWithLifeTime<ITimedETagExtractor<TViewModel>, TExtractor>(transient);
+            services.AddTransient<ICachingPipeline<TViewModel>, CachingPipeline<TViewModel>>();
+        }
+
+
         public static void AddExtractorForViewModel<TViewModel, TExtractor>(this IServiceCollection services, bool transient = true)
             where TExtractor : class, ITimedETagExtractor<TViewModel>
         {
             services.AddServiceWithLifeTime<ICacheDirectiveProvider<TViewModel>, DefaultCacheDirectiveProvider<TViewModel>>(transient);
             services.AddServiceWithLifeTime<ITimedETagQueryProvider<TViewModel>, NullQueryProvider<TViewModel>>(transient);
-            services.AddServiceWithLifeTime<ITimedETagExtractor<TViewModel>, DefaultTimedETagExtractor<TViewModel>>(transient);
+            services.AddServiceWithLifeTime<ITimedETagExtractor<TViewModel>, TExtractor>(transient);
             services.AddTransient<ICachingPipeline<TViewModel>, CachingPipeline<TViewModel>>();
         }
 

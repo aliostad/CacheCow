@@ -23,7 +23,7 @@ namespace CacheCow.Server.Core.Mvc
         }
 
         public static void AddDirectiveProviderForViewModelMvc<TViewModel, TCacheDirectiveProvider>(this IServiceCollection services, bool transient = true)
-where TCacheDirectiveProvider : class, ICacheDirectiveProvider<TViewModel>
+            where TCacheDirectiveProvider : class, ICacheDirectiveProvider<TViewModel>
         {
             services.AddDirectiveProviderForViewModel<TViewModel, TCacheDirectiveProvider>(transient);
             services.AddServiceWithLifeTime<HttpCacheFilter<TViewModel>>(transient);
@@ -41,6 +41,14 @@ where TCacheDirectiveProvider : class, ICacheDirectiveProvider<TViewModel>
             where TQueryProvider : class, ITimedETagQueryProvider<TViewModel>
         {
             services.AddQueryProviderForViewModel<TViewModel, TQueryProvider>(transient);
+            services.AddServiceWithLifeTime<HttpCacheFilter<TViewModel>>(transient);
+        }
+
+        public static void AddQueryProviderAndExtractorForViewModelMvc<TViewModel, TQueryProvider, TExtractor>(this IServiceCollection services, bool transient = true)
+            where TQueryProvider : class, ITimedETagQueryProvider<TViewModel>
+            where TExtractor : class, ITimedETagExtractor<TViewModel>
+        {
+            services.AddQueryProviderAndExtractorForViewModel<TViewModel, TQueryProvider, TExtractor>(transient);
             services.AddServiceWithLifeTime<HttpCacheFilter<TViewModel>>(transient);
         }
 
