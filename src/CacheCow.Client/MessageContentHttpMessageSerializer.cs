@@ -40,7 +40,7 @@ namespace CacheCow.Client
                 TraceWriter.WriteLine("SerializeAsync - before load",
                     TraceLevel.Verbose);
                 if(_bufferContent)
-                    await response.Content.LoadIntoBufferAsync();
+                    await response.Content.LoadIntoBufferAsync().ConfigureAwait(false);
                 TraceWriter.WriteLine("SerializeAsync - after load", TraceLevel.Verbose);               
             }
             else
@@ -59,11 +59,11 @@ namespace CacheCow.Client
         {
             if (request.Content != null && _bufferContent)
             {
-                await request.Content.LoadIntoBufferAsync();
+                await request.Content.LoadIntoBufferAsync().ConfigureAwait(false);
             }
 
             var httpMessageContent = new HttpMessageContent(request);
-            var buffer = await httpMessageContent.ReadAsByteArrayAsync();
+            var buffer = await httpMessageContent.ReadAsByteArrayAsync().ConfigureAwait(false);
             stream.Write(buffer, 0, buffer.Length);            
         }
 
@@ -74,9 +74,9 @@ namespace CacheCow.Client
             response.Content.Headers.Add("Content-Type", "application/http;msgtype=response");
             TraceWriter.WriteLine("before ReadAsHttpResponseMessageAsync",
                     TraceLevel.Verbose);
-            var responseMessage = await response.Content.ReadAsHttpResponseMessageAsync();
+            var responseMessage = await response.Content.ReadAsHttpResponseMessageAsync().ConfigureAwait(false);
             if (responseMessage.Content != null && _bufferContent)
-                await responseMessage.Content.LoadIntoBufferAsync(); 
+                await responseMessage.Content.LoadIntoBufferAsync().ConfigureAwait(false); 
             return responseMessage;
         }
 
@@ -85,9 +85,9 @@ namespace CacheCow.Client
             var request = new HttpRequestMessage();
             request.Content = new StreamContent(stream);
             request.Content.Headers.Add("Content-Type", "application/http;msgtype=request");
-            var requestMessage = await request.Content.ReadAsHttpRequestMessageAsync();
+            var requestMessage = await request.Content.ReadAsHttpRequestMessageAsync().ConfigureAwait(false);
             if (requestMessage.Content != null && _bufferContent)
-                await requestMessage.Content.LoadIntoBufferAsync();
+                await requestMessage.Content.LoadIntoBufferAsync().ConfigureAwait(false);
             return requestMessage;
         }
     }

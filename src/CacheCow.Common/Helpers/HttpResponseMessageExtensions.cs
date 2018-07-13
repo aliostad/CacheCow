@@ -38,7 +38,7 @@ namespace CacheCow.Common.Helpers
                 }
                 else
                 {
-                    var error = await response.Content.ReadAsStringAsync();
+                    var error = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     throw new HttpRequestException($"Status: {response.StatusCode}\r\n Error: {error}");
                 }
             }

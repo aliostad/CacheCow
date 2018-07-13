@@ -260,7 +260,7 @@ namespace CacheCow.Client
 
             // check if needs to be ignored
             if (_ignoreRequestRules(request))
-                return await base.SendAsync(request, cancellationToken); // EXIT !! _________________
+                return await base.SendAsync(request, cancellationToken).ConfigureAwait(false); // EXIT !! _________________
 
             IEnumerable<string> varyHeaders;
             if (!VaryHeaderStore.TryGetValue(uri, out varyHeaders))
@@ -280,7 +280,7 @@ namespace CacheCow.Client
 
             TraceWriter.WriteLine("{0} - Before TryGetValue", TraceLevel.Verbose, request.RequestUri.ToString());
 
-            cachedResponse = await _cacheStore.GetValueAsync(cacheKey);
+            cachedResponse = await _cacheStore.GetValueAsync(cacheKey).ConfigureAwait(false);
             cacheCowHeader.DidNotExist = cachedResponse == null;
             TraceWriter.WriteLine("{0} - After TryGetValue: DidNotExist => {1}", TraceLevel.Verbose, request.RequestUri.ToString(), cacheCowHeader.DidNotExist);
 
@@ -301,7 +301,7 @@ namespace CacheCow.Client
                  ResponseValidationResult.OK, ResponseValidationResult.MustRevalidate))
             {
                 ApplyPutPatchDeleteValidationHeaders(request, cacheCowHeader, cachedResponse);
-                return await base.SendAsync(request, cancellationToken); // EXIT !! _____________________________
+                return await base.SendAsync(request, cancellationToken).ConfigureAwait(false); // EXIT !! _____________________________
             }
 
             // here onward is only GET only. See if cache OK and if it is then return
@@ -335,7 +335,7 @@ namespace CacheCow.Client
 
             // _______________________________ RESPONSE only GET  ___________________________________________
 
-            var serverResponse = await base.SendAsync(request, cancellationToken);
+            var serverResponse = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             // HERE IS LATE FOR APPLYING EXCEPTION POLICY !!!
 
@@ -357,7 +357,7 @@ namespace CacheCow.Client
                 TraceWriter.WriteLine("{0} - NotModified",
                     TraceLevel.Verbose, request.RequestUri.ToString());
 
-                await UpdateCachedResponseAsync(cacheKey, cachedResponse, serverResponse, _cacheStore);
+                await UpdateCachedResponseAsync(cacheKey, cachedResponse, serverResponse, _cacheStore).ConfigureAwait(false);
                 ConsumeAndDisposeResponse(serverResponse);
                 return cachedResponse.AddCacheCowHeader(cacheCowHeader).CopyOtherCacheCowHeaders(serverResponse); // EXIT !! _______________
             }
@@ -397,7 +397,7 @@ namespace CacheCow.Client
 
                     // store the cache
                     CheckForCacheCowHeader(serverResponse);
-                    await _cacheStore.AddOrUpdateAsync(cacheKey, serverResponse);
+                    await _cacheStore.AddOrUpdateAsync(cacheKey, serverResponse).ConfigureAwait(false);
 
                     TraceWriter.WriteLine("{0} - After AddOrUpdate", TraceLevel.Verbose, request.RequestUri.ToString());
 
@@ -463,7 +463,7 @@ namespace CacheCow.Client
 
             cachedResponse.Headers.Date = DateTimeOffset.UtcNow; // very important
             CheckForCacheCowHeader(cachedResponse);
-            await store.AddOrUpdateAsync(cacheKey, cachedResponse);
+            await store.AddOrUpdateAsync(cacheKey, cachedResponse).ConfigureAwait(false);
         }
 
         private static void CheckForCacheCowHeader(HttpResponseMessage responseMessage)

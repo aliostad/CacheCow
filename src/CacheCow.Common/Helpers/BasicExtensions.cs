@@ -29,7 +29,7 @@ namespace CacheCow.Common.Helpers
             return async () =>
             {
                 foreach (var action in actions)
-                    await action();
+                    await action().ConfigureAwait(false);
             };
         }
 

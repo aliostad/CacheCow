@@ -90,7 +90,7 @@ namespace CacheCow.Client.RedisCacheStore
         {
             try
             {
-                return await DoGetValueAsync(key);
+                return await DoGetValueAsync(key).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -107,12 +107,12 @@ namespace CacheCow.Client.RedisCacheStore
             HttpResponseMessage result = null;
             string entryKey = key.HashBase64;
 
-            if (!await _database.KeyExistsAsync(entryKey))
+            if (!await _database.KeyExistsAsync(entryKey).ConfigureAwait(false))
                 return null;
 
-            byte[] value = await _database.StringGetAsync(entryKey);
+            byte[] value = await _database.StringGetAsync(entryKey).ConfigureAwait(false);
             var memoryStream = new MemoryStream(value);
-            var r = await _serializer.DeserializeToResponseAsync(memoryStream);
+            var r = await _serializer.DeserializeToResponseAsync(memoryStream).ConfigureAwait(false);
 
             return r;
         }
@@ -122,7 +122,7 @@ namespace CacheCow.Client.RedisCacheStore
         {
             try
             {
-                await DoAddOrUpdateAsync(key, response);
+                await DoAddOrUpdateAsync(key, response).ConfigureAwait(false);
             }
             catch(Exception e)
             {
@@ -136,7 +136,7 @@ namespace CacheCow.Client.RedisCacheStore
 	    private async Task<bool> DoAddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
 	    {
             var memoryStream = new MemoryStream();
-            await _serializer.SerializeAsync(response, memoryStream);
+            await _serializer.SerializeAsync(response, memoryStream).ConfigureAwait(false);
             memoryStream.Position = 0;
             var data = memoryStream.ToArray();
             var expiry = response.GetExpiry() ?? DateTimeOffset.UtcNow.AddDays(1);
@@ -148,7 +148,7 @@ namespace CacheCow.Client.RedisCacheStore
                 expiry = minExpiry;
             }
 
-            await _database.StringSetAsync(key.HashBase64, data, expiry.Subtract(DateTimeOffset.UtcNow));
+            await _database.StringSetAsync(key.HashBase64, data, expiry.Subtract(DateTimeOffset.UtcNow)).ConfigureAwait(false);
             return true;
         }
 
@@ -157,7 +157,7 @@ namespace CacheCow.Client.RedisCacheStore
         {
             try
             {
-                return await DoTryRemoveAsync(key);
+                return await DoTryRemoveAsync(key).ConfigureAwait(false);
             }
             catch (Exception e)
             {
