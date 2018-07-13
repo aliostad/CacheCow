@@ -54,7 +54,7 @@ namespace CacheCow.Client
 	        if (result == null)
 	            return null;
 
-	        return (await _messageSerializer.DeserializeToResponseAsync(new MemoryStream((byte[]) result)));
+	        return await _messageSerializer.DeserializeToResponseAsync(new MemoryStream((byte[]) result)).ConfigureAwait(false);
 	    }
 
 	    public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
@@ -63,7 +63,7 @@ namespace CacheCow.Client
             var req = response.RequestMessage;
             response.RequestMessage = null;
             var memoryStream = new MemoryStream();
-	        await _messageSerializer.SerializeAsync(response, memoryStream);
+	        await _messageSerializer.SerializeAsync(response, memoryStream).ConfigureAwait(false);
             response.RequestMessage = req;
             var suggestedExpiry = response.GetExpiry() ?? DateTimeOffset.UtcNow.Add(_minExpiry);
             var minExpiry = DateTimeOffset.UtcNow.Add(_minExpiry);
