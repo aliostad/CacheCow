@@ -46,7 +46,7 @@ namespace CacheCow.Server.Core.Mvc
 
             if(filter == null)
             {
-                throw new InvalidOperationException("Could not resolve the filter or its dependencies. If you have defined ViewModelType, make sure at least one generic registerations are done using ConfigurationExtensions.");
+                throw new InvalidOperationException("Could not resolve the filter or its dependencies. If you have defined ViewModelType, make sure that at least one generic registration is done using ConfigurationExtensions.");
             }
 
             filter.ConfiguredExpiry = _expirySeconds.HasValue
