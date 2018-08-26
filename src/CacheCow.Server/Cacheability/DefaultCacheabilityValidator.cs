@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using CacheCow.Common;
 #if NET452
 using System.Net.Http;
 using System.Net;
@@ -49,12 +49,12 @@ namespace CacheCow.Server
                 return false;
 
             // pragma no-cache
-            if (request.Headers.Any(x => x.Key.Equals("Pragma", StringComparison.InvariantCultureIgnoreCase)) &&
-                request.Headers["Pragma"].Any(x => x.Contains("no-cache")))
+            if (request.Headers.Any(x => x.Key.Equals(HttpHeaderNames.Pragma, StringComparison.InvariantCultureIgnoreCase)) &&
+                request.Headers[HttpHeaderNames.Pragma].Any(x => x.Contains("no-cache")))
                 return false;
 
-            if (request.Headers.Any(x => x.Key.Equals("Cache-Control", StringComparison.InvariantCultureIgnoreCase)) &&
-                request.Headers["Cache-Control"].Any(x => x.Contains("no-store")))
+            if (request.Headers.Any(x => x.Key.Equals(HttpHeaderNames.CacheControl, StringComparison.InvariantCultureIgnoreCase)) &&
+                request.Headers[HttpHeaderNames.CacheControl].Any(x => x.Contains("no-store")))
                 return false;
 
             return true;

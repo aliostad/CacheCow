@@ -1,7 +1,5 @@
 ﻿using CacheCow.Common;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
@@ -154,7 +152,7 @@ namespace CacheCow.Server.WebApi
 
             if (HttpMethod.Get == context.Request.Method)
             {
-                context.Response.Headers.Add("Vary", string.Join(";", cacheDirectiveProvider.GetVaryHeaders(context)));
+                context.Response.Headers.Add(HttpHeaderNames.Vary, string.Join(";", cacheDirectiveProvider.GetVaryHeaders(context)));
                 var cacheControl = cacheDirectiveProvider.GetCacheControl(context, TimeSpan.FromSeconds(this.DefaultExpirySeconds));
                 var isResponseCacheable = cacheabilityValidator.IsCacheable(context.Response);
                 if (!cacheControl.NoStore && isResponseCacheable) // _______ is cacheable

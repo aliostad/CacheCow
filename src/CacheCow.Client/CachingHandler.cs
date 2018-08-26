@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Security.Principal;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CacheCow.Client.Headers;
@@ -51,7 +49,7 @@ namespace CacheCow.Client
             UseConditionalPutPatchDelete = true;
             MustRevalidateByDefault = true;
             VaryHeaderStore = varyHeaderStore;
-            DefaultVaryHeaders = new string[] { "Accept" };
+            DefaultVaryHeaders = new string[] { HttpHeaderNames.Accept };
             ResponseValidator = (response) =>
             {
                 // 13.4
