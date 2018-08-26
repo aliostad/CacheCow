@@ -24,7 +24,7 @@ namespace CacheCow.Server
                 return false;
 
             // auth
-            if (request.Headers.Any(x => x.Key.Equals("Authorization", StringComparison.InvariantCultureIgnoreCase)))
+            if (request.Headers.Any(x => x.Key.Equals(HttpHeaderNames.Authorization, StringComparison.InvariantCultureIgnoreCase)))
                 return false;
 
             // pragma no-cache
@@ -45,7 +45,7 @@ namespace CacheCow.Server
                 return false;
 
             // auth
-            if (request.Headers.Any(x => x.Key.Equals("Authorization", StringComparison.InvariantCultureIgnoreCase)))
+            if (request.Headers.Any(x => x.Key.Equals(HttpHeaderNames.Authorization, StringComparison.InvariantCultureIgnoreCase)))
                 return false;
 
             // pragma no-cache
