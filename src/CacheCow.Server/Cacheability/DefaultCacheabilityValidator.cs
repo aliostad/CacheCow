@@ -73,7 +73,7 @@ namespace CacheCow.Server
                 return false;
 
             // cookie
-            if (response.Headers.Any(x => x.Key.Equals("set-cookie", StringComparison.InvariantCultureIgnoreCase)))
+            if (response.Headers.Any(x => x.Key.Equals(HttpHeaderNames.SetCookie, StringComparison.InvariantCultureIgnoreCase)))
                 return false;
 
             return true;
@@ -86,7 +86,7 @@ namespace CacheCow.Server
                 return false;
 
             // cookie
-            if (response.Headers.Any(x => x.Key.Equals("set-cookie", StringComparison.InvariantCultureIgnoreCase)))
+            if (response.Headers.Any(x => x.Key.Equals(HttpHeaderNames.SetCookie, StringComparison.InvariantCultureIgnoreCase)))
                 return false;
 
             return true;

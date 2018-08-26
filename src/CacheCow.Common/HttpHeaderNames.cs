@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CacheCow.Common
+﻿namespace CacheCow.Common
 {
 	public class HttpHeaderNames
 	{
@@ -19,5 +14,6 @@ namespace CacheCow.Common
 		public const string Vary = "Vary";
 		public const string Pragma = "Pragma";
 		public const string Expires = "Expires";
+        public const string SetCookie = "Set-Cookie";
 	}
 }
