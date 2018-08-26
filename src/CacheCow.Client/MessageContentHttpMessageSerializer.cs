@@ -71,7 +71,7 @@ namespace CacheCow.Client
         {
             var response = new HttpResponseMessage();
             response.Content = new StreamContent(stream);
-            response.Content.Headers.Add("Content-Type", "application/http;msgtype=response");
+            response.Content.Headers.Add(HttpHeaderNames.ContentType, "application/http;msgtype=response");
             TraceWriter.WriteLine("before ReadAsHttpResponseMessageAsync",
                     TraceLevel.Verbose);
             var responseMessage = await response.Content.ReadAsHttpResponseMessageAsync().ConfigureAwait(false);
@@ -84,7 +84,7 @@ namespace CacheCow.Client
         {
             var request = new HttpRequestMessage();
             request.Content = new StreamContent(stream);
-            request.Content.Headers.Add("Content-Type", "application/http;msgtype=request");
+            request.Content.Headers.Add(HttpHeaderNames.ContentType, "application/http;msgtype=request");
             var requestMessage = await request.Content.ReadAsHttpRequestMessageAsync().ConfigureAwait(false);
             if (requestMessage.Content != null && _bufferContent)
                 await requestMessage.Content.LoadIntoBufferAsync().ConfigureAwait(false);
