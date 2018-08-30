@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
+using CacheCow.Common;
 #if NET452
 using System.Web.Http.Filters;
 using System.Web.Http.Controllers;
 #else
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
 #endif
 
 namespace CacheCow.Server
@@ -51,7 +50,7 @@ namespace CacheCow.Server
         public IEnumerable<string> GetVaryHeaders(HttpContext context)
 #endif
         {
-            return new[] { "Accept" };
+            return new[] { HttpHeaderNames.Accept };
         }
 
 #if NET452

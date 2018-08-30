@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
-using CacheCow.Client;
 using CacheCow.Client.Headers;
+using CacheCow.Common;
 using Xunit;
 
 namespace CacheCow.Client.Tests
 {
-	
-	public class IntegrationTests
+
+    public class IntegrationTests
 	{
 		[Fact]
 		public async Task Test_GoogleImage_WorksOnFirstSecondRequestNotThird()
@@ -24,7 +17,7 @@ namespace CacheCow.Client.Tests
 												{
 													InnerHandler = new HttpClientHandler()
 												});
-            httpClient.DefaultRequestHeaders.Add("Accept", "image/png");
+            httpClient.DefaultRequestHeaders.Add(HttpHeaderNames.Accept, "image/png");
 			
 			var httpResponseMessage = await httpClient.GetAsync(Url);
 			var httpResponseMessage2 = await httpClient.GetAsync(Url);
