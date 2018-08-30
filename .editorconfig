@@ -10,9 +10,10 @@ indent_style = space
 
 # Code files
 [*.{cs,csx,vb,vbx}]
-indent_size          = 4
-insert_final_newline = true
-charset              = utf-8-bom
+indent_size              = 4
+insert_final_newline     = true
+charset                  = utf-8-bom
+trim_trailing_whitespace = true
 
 ###############################
 # .NET Coding Conventions     #
