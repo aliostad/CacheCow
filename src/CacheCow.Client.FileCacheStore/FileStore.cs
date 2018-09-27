@@ -14,6 +14,9 @@ namespace CacheCow.Client.FileCacheStore
     {
         private readonly MessageContentHttpMessageSerializer _serializer = new MessageContentHttpMessageSerializer();
 
+        /// <summary>
+        /// The directory location of the cache
+        /// </summary>
         private readonly string _cacheRoot;
 
         /// <summary>
@@ -23,17 +26,29 @@ namespace CacheCow.Client.FileCacheStore
         public TimeSpan MinExpiry { get; set; }
 
         private static readonly List<string> ForbiddenDirectories =
-            new List<string>(){"/", "", ".", ".."};
+            new List<string>()
+            {
+                "/",
+                "",
+                ".",
+                ".."
+            };
 
-
-        /// <inheritdoc />
+        /// <summary>
+        /// Create a new Cachestore within the given directory. Responses will be saved in this directory.
+        /// The directory should not be "/", ".", "" or null.
+        /// Note that _all_ contents of this directory can be cleared.
+        /// </summary>
+        /// <param name="cacheRoot">The directory containing the cache</param>
+        /// <exception cref="ArgumentException">When the passed directory is "/", ".", ".." or ""</exception>
         public FileStore(string cacheRoot)
         {
-
             if (cacheRoot is null || ForbiddenDirectories.Contains(cacheRoot))
             {
-                throw new ArgumentException("The given cachedirectory is null or invalid. Do give an explicit caching directory, not empty, '/' or '.'. This will prevent accidents when cleaning the cache");
+                throw new ArgumentException(
+                    "The given cachedirectory is null or invalid. Do give an explicit caching directory, not empty, '/' or '.'. This will prevent accidents when cleaning the cache");
             }
+
             _cacheRoot = cacheRoot;
             if (!Directory.Exists(_cacheRoot))
             {
