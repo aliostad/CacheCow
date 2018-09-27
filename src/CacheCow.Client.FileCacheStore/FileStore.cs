@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CacheCow.Common;
@@ -22,10 +22,18 @@ namespace CacheCow.Client.FileCacheStore
         /// </summary>
         public TimeSpan MinExpiry { get; set; }
 
+        private static readonly List<string> ForbiddenDirectories =
+            new List<string>(){"/", "", ".", ".."};
+
 
         /// <inheritdoc />
         public FileStore(string cacheRoot)
         {
+
+            if (cacheRoot is null || ForbiddenDirectories.Contains(cacheRoot))
+            {
+                throw new ArgumentException("The given cachedirectory is null or invalid. Do give an explicit caching directory, not empty, '/' or '.'. This will prevent accidents when cleaning the cache");
+            }
             _cacheRoot = cacheRoot;
             if (!Directory.Exists(_cacheRoot))
             {
@@ -41,18 +49,19 @@ namespace CacheCow.Client.FileCacheStore
                 return null;
             }
 
-            var fs = File.OpenRead(_pathFor(key));
-            var resp = await _serializer.DeserializeToResponseAsync(fs);
-            fs.Close();
-            return resp;
+            using (var fs = File.OpenRead(_pathFor(key)))
+            {
+                return await _serializer.DeserializeToResponseAsync(fs);
+            }
         }
 
         /// <inheritdoc />
         public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
         {
-            var fs = File.OpenWrite(_pathFor(key));
-            await _serializer.SerializeAsync(response, fs);
-            fs.Close();
+            using (var fs = File.OpenWrite(_pathFor(key)))
+            {
+                await _serializer.SerializeAsync(response, fs);
+            }
         }
 
         /// <inheritdoc />
@@ -77,14 +86,14 @@ namespace CacheCow.Client.FileCacheStore
         {
             foreach (var f in Directory.GetFiles(_cacheRoot))
             {
-               File.Delete(f);
+                File.Delete(f);
             }
         }
 
 
         private string _pathFor(CacheKey key)
         {
-            // Who the fuck thought using '/' in a Base64-encoding was a good idea?
+            // Base64 might return "/" as character. This breaks files; so we replace the '/' with '!'
             return _cacheRoot + "/" + key.HashBase64.Replace('/', '!');
         }
 
@@ -101,7 +110,7 @@ namespace CacheCow.Client.FileCacheStore
         /// <returns>True if no files are in the current cache</returns>
         public bool IsEmpty()
         {
-            return Directory.GetFiles(_cacheRoot).Length==0;
+            return Directory.GetFiles(_cacheRoot).Length == 0;
         }
     }
 }
