@@ -42,7 +42,6 @@ namespace CacheCow.Server.WebApi
 
         internal static ICacheDirectiveProvider GetCacheDirectiveProvider(this IDependencyResolver resolver, Type viewModelType)
         {
-          
             Func<ICacheDirectiveProvider> defaultFactory = () => new DefaultCacheDirectiveProvider(new DefaultTimedETagExtractor(
                     new JsonSerialiser(), new Sha1Hasher()), new NullQueryProvider());
 

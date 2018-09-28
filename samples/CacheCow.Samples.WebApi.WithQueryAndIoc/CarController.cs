@@ -21,7 +21,7 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
         }
 
         [HttpGet]
-        [HttpCache(DefaultExpirySeconds = 0, ViewModelType = typeof(Car))]
+        [HttpCache(DefaultExpirySeconds = 0)]
         public IHttpActionResult Get(int id)
         {
             var car = _repository.GetCar(id);
@@ -31,7 +31,7 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
         }
 
         [HttpGet]
-        [HttpCache(DefaultExpirySeconds = 0, ViewModelType = typeof(IEnumerable<Car>))]
+        [HttpCache(DefaultExpirySeconds = 0)]
         public IEnumerable<Car> GetAll()
         {
             var cars = _repository.ListCars();
@@ -54,7 +54,7 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
         }
 
         [HttpPut]
-        [HttpCache(ViewModelType = typeof(Car))]
+        [HttpCache]
         public IHttpActionResult PutUpdateCar(int id)
         {
             var updated = _repository.UpdateCar(id);
