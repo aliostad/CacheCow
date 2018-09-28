@@ -1,7 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
+		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp2.0</TargetFrameworks>		
+		<Summary>Addition file-based store for CacheCow HTTP-caching library</Summary>
+		<AssemblyName>CacheCow.Client.FileStore</AssemblyName>
+		<PackageId>CacheCow.Client.FileStore</PackageId>
+	</PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\CacheCow.Client\CacheCow.Client.csproj" />
   </ItemGroup>
