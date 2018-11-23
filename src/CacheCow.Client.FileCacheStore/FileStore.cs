@@ -46,7 +46,7 @@ namespace CacheCow.Client.FileCacheStore
             if (cacheRoot is null || ForbiddenDirectories.Contains(cacheRoot))
             {
                 throw new ArgumentException(
-                    "The given cachedirectory is null or invalid. Do give an explicit caching directory, not empty, '/' or '.'. This will prevent accidents when cleaning the cache");
+                    "The given caching directory is null or invalid. Do give an explicit caching directory, not empty, '/' or '.'. This will prevent accidents when cleaning the cache");
             }
 
             _cacheRoot = cacheRoot;
@@ -73,6 +73,24 @@ namespace CacheCow.Client.FileCacheStore
         /// <inheritdoc />
         public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
         {
+            /*
+             * TODO Fix this when upstream fixes the issue
+             * So, as it turns out, there is some bug in HttpResponseMessage.
+             * Deserializing does not work well and crashes on the 'Server' header.
+             *
+             * Not so useful thus....
+             *
+             * As a workaround, I throw away the server-header.
+             * Lets be honest, in 99%, we don't really care where it was hosted.
+             *
+             * See issues:
+             * https://github.com/aliostad/CacheCow/issues/213
+             * https://github.com/dotnet/corefx/issues/31918
+             * https://github.com/aspnet/AspNetWebStack/issues/193#issuecomment-418529386
+             */
+
+            response.Headers.Remove("Server");
+
             using (var fs = File.OpenWrite(_pathFor(key)))
             {
                 await _serializer.SerializeAsync(response, fs);
@@ -80,21 +98,17 @@ namespace CacheCow.Client.FileCacheStore
         }
 
         /// <inheritdoc />
-        public Task<bool> TryRemoveAsync(CacheKey key)
+        public async Task<bool> TryRemoveAsync(CacheKey key)
         {
-            return new Task<bool>(() =>
-                {
-                    if (!File.Exists(_pathFor(key)))
+            if (!File.Exists(_pathFor(key)))
+            {
+                return false;
+            }
 
-                    {
-                        return false;
-                    }
-
-                    File.Delete(_pathFor(key));
-                    return true;
-                }
-            );
+            File.Delete(_pathFor(key));
+            return true;
         }
+
 
         /// <inheritdoc />
         public async Task ClearAsync()
@@ -105,13 +119,11 @@ namespace CacheCow.Client.FileCacheStore
             }
         }
 
-
         private string _pathFor(CacheKey key)
         {
             // Base64 might return "/" as character. This breaks files; so we replace the '/' with '!'
             return _cacheRoot + "/" + key.HashBase64.Replace('/', '!');
         }
-
 
         /// <inheritdoc />
         public void Dispose()

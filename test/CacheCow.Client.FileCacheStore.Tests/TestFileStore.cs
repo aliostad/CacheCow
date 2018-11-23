@@ -10,7 +10,6 @@ namespace CacheCow.Client.FileCacheStore.Tests
     /// </summary>
     public class TestFileStore
     {
-
         private readonly ITestOutputHelper _output;
 
         public TestFileStore(ITestOutputHelper output)
@@ -36,9 +35,12 @@ namespace CacheCow.Client.FileCacheStore.Tests
             var client = fs.CreateClient();
             Assert.True(fs.IsEmpty());
             log("Querying...");
-            var response = client.GetAsync(new Uri("https://www.example.org/")).ConfigureAwait(false).GetAwaiter().GetResult();
+            var uri = new Uri("https://www.example.com");
+            var response = client.GetAsync(uri).ConfigureAwait(false).GetAwaiter()
+                .GetResult();
             Assert.False(fs.IsEmpty());
-            var cachedResponse = client.GetAsync(new Uri("https://www.example.org/")).ConfigureAwait(false).GetAwaiter()
+            var cachedResponse = client.GetAsync(uri).ConfigureAwait(false)
+                .GetAwaiter()
                 .GetResult();
 
 
@@ -48,6 +50,24 @@ namespace CacheCow.Client.FileCacheStore.Tests
 
             fs.ClearAsync().ConfigureAwait(false).GetAwaiter().GetResult();
             Assert.True(fs.IsEmpty());
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        [Fact]
+        public void TestLoad404()
+        {
+            var fs = new FileStore("cache");
+            fs.ClearAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            var client = fs.CreateClient();
+
+
+            var response = client.GetAsync(new Uri("https://www.openstreetmap.org/non-existin-page"))
+                .ConfigureAwait(false).GetAwaiter()
+                .GetResult();
+
+            Assert.Equal("NotFound", "" + response.StatusCode);
         }
     }
 }
