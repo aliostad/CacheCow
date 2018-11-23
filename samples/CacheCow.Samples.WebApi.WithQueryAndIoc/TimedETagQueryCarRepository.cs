@@ -9,7 +9,7 @@ using CacheCow.Samples.Common;
 
 namespace CacheCow.Samples.WebApi.WithQueryAndIoc
 {
-    public class TimedETagQueryCarRepository : ITimedETagQueryProvider
+    public class TimedETagQueryCarRepository : ITimedETagQueryProvider, ITimedETagQueryProvider<Car>, ITimedETagQueryProvider<IEnumerable<Car>>
     {
         private readonly ICarRepository _repository;
 

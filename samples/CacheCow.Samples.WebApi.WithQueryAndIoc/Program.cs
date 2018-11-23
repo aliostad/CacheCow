@@ -68,7 +68,7 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
                 Component.For<ITimedETagExtractor<IEnumerable<Car>>>().ImplementedBy<CarCollectionETagExtractor>()
                     .LifestyleSingleton(),
                 Component.For<ITimedETagQueryProvider>().ImplementedBy<TimedETagQueryCarRepository>()
-                    .LifestyleSingleton(),
+                    .LifestyleSingleton().IsDefault(),
                 Component.For<ICarRepository>().Instance(InMemoryCarRepository.Instance)
                 );
         }
