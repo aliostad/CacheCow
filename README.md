@@ -1,3 +1,4 @@
+[![NuGet version](https://img.shields.io/nuget/v/CacheCow.Common.svg)](https://www.nuget.org/packages/CacheCow.Common/)
 [![Build status](https://ci.appveyor.com/api/projects/status/du7alwfjuuce7u04?svg=true)](https://ci.appveyor.com/project/aliostad/cachecow)
 
 CacheCow
