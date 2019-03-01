@@ -21,5 +21,8 @@
 	  <ProjectReference Include="..\..\src\CacheCow.Server.Core.Mvc\CacheCow.Server.Core.Mvc.csproj" />
 	  <ProjectReference Include="..\..\src\CacheCow.Server\CacheCow.Server.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+	</ItemGroup>
 
 </Project>
