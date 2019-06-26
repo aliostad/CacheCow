@@ -33,7 +33,7 @@ namespace CacheCow.Server.WebApi.Tests
         public async Task HasHeaders()
         {
             var i = new HttpMessageInvoker(_server);
-            var response  = await i.SendAsync(new HttpRequestMessage(HttpMethod.Get, new Uri("http://chiz/api/car/42", UriKind.Absolute)), CancellationToken.None);
+            var response  = await i.SendAsync(new HttpRequestMessage(HttpMethod.Get, new Uri("http://chiz/api/car/1", UriKind.Absolute)), CancellationToken.None);
             Assert.True(response.IsSuccessStatusCode);
             var h = response.GetCacheCowHeader();
             Assert.NotNull(h);
