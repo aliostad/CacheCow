@@ -10,6 +10,9 @@ namespace CacheCow.Server.Core.Mvc.Tests
         [HttpCacheFactory]
         public TestViewModel Get(int id)
         {
+            if (id == 42)
+                throw new MeaningOfLifeException();
+
             return new TestViewModel()
             {
                 Id = id,
@@ -18,4 +21,10 @@ namespace CacheCow.Server.Core.Mvc.Tests
             };
         }
     }
+
+    public class MeaningOfLifeException : Exception
+    {
+
+    }
+
 }

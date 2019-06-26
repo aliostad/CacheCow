@@ -35,6 +35,12 @@ namespace CacheCow.Server.Core.Mvc.Tests
         }
 
         [Fact]
+        public async Task Issue232_CanHandleExceptionThrownFromTheController()
+        {
+            await Assert.ThrowsAsync<MeaningOfLifeException>(() => _client.GetAsync("/api/test/42"));
+        }
+
+        [Fact]
         public async Task NoETagSinceNoCaching()
         {
             var response = await _client.GetAsync("/api/test/1");
