@@ -150,7 +150,7 @@ namespace CacheCow.Server.WebApi
             var cacheCowHeader = (CacheCowHeader) context.Request.Properties[CacheCowHeaderKey];
             bool isRequestCacheable = cacheabilityValidator.IsCacheable(context.Request);
 
-            if (HttpMethod.Get == context.Request.Method)
+            if (HttpMethod.Get == context.Request.Method && context.Exception == null)
             {
                 context.Response.Headers.Add(HttpHeaderNames.Vary, string.Join(";", cacheDirectiveProvider.GetVaryHeaders(context)));
                 var cacheControl = cacheDirectiveProvider.GetCacheControl(context, TimeSpan.FromSeconds(this.DefaultExpirySeconds));

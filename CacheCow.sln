@@ -35,9 +35,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.FileCacheStore", "src\CacheCow.Client.FileCacheStore\CacheCow.Client.FileCacheStore.csproj", "{7AE96261-713B-42E7-96A2-9837FAF3A26C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Client.FileCacheStore", "src\CacheCow.Client.FileCacheStore\CacheCow.Client.FileCacheStore.csproj", "{7AE96261-713B-42E7-96A2-9837FAF3A26C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Client.FileCacheStore.Tests", "test\CacheCow.Client.FileCacheStore.Tests\CacheCow.Client.FileCacheStore.Tests.csproj", "{987F672D-C556-4682-BDF0-C629DD967926}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheCow.Client.FileCacheStore.Tests", "test\CacheCow.Client.FileCacheStore.Tests\CacheCow.Client.FileCacheStore.Tests.csproj", "{987F672D-C556-4682-BDF0-C629DD967926}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheCow.Server.WebApi.Tests", "test\CacheCow.Server.WebApi.Tests\CacheCow.Server.WebApi.Tests.csproj", "{BFCD9177-AAED-4523-8F49-BBAFCEFD55E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +95,10 @@ Global
 		{987F672D-C556-4682-BDF0-C629DD967926}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{987F672D-C556-4682-BDF0-C629DD967926}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{987F672D-C556-4682-BDF0-C629DD967926}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFCD9177-AAED-4523-8F49-BBAFCEFD55E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFCD9177-AAED-4523-8F49-BBAFCEFD55E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFCD9177-AAED-4523-8F49-BBAFCEFD55E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFCD9177-AAED-4523-8F49-BBAFCEFD55E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -110,6 +116,7 @@ Global
 		{DA077137-70D7-4CD4-B817-E852AFCAB30B} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 		{7AE96261-713B-42E7-96A2-9837FAF3A26C} = {B1901128-F84A-46CE-B8FD-E863465F94C2}
 		{987F672D-C556-4682-BDF0-C629DD967926} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
+		{BFCD9177-AAED-4523-8F49-BBAFCEFD55E3} = {141CEBF7-F872-4181-8B16-1E0FAE517D59}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4EFCA3E6-84FB-4520-8C47-62D010919E88}
