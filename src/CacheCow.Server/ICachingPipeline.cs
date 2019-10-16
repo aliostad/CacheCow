@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace CacheCow.Server
 {
     /// <summary>
-    /// Main abstraction for caching in ASP.NET Core 
+    /// Main abstraction for caching in ASP.NET Core
     /// </summary>
     public interface ICachingPipeline
     {
@@ -30,8 +30,8 @@ namespace CacheCow.Server
         /// <param name="context"></param>
         /// <param name="viewModel"></param>
         /// <returns></returns>
-        void After(HttpContext context, object viewModel);
-        
+        Task After(HttpContext context, object viewModel);
+
         /// <summary>
         /// To be run before the action execution
         /// </summary>

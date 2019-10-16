@@ -164,7 +164,7 @@ namespace CacheCow.Server
         /// </summary>
         /// <param name="context">HttpContext</param>
         /// <param name="viewModel">action result</param>
-        public void After(HttpContext context, object viewModel)
+        public async Task After(HttpContext context, object viewModel)
         {
             var ms = context.Response.Body as MemoryStream;
             bool mustReflush = ms != null && ms.Length > 0;
@@ -219,7 +219,7 @@ namespace CacheCow.Server
                 if (mustReflush)
                 {
                     ms.Position = 0;
-                    ms.CopyTo(context.Response.Body);
+                    await ms.CopyToAsync(context.Response.Body);
                 }
             }
 
