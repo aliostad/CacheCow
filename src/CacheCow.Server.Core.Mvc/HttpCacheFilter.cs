@@ -35,7 +35,7 @@ namespace CacheCow.Server.Core.Mvc
 
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="context"></param>
         /// <param name="next"></param>
@@ -55,7 +55,7 @@ namespace CacheCow.Server.Core.Mvc
 
             var execCtx = await next(); // _______________________________________________________________________________
             var or = execCtx.Result as ObjectResult;
-            pipa.After(context.HttpContext, or == null || or.Value == null ? null : or.Value);
+            await pipa.After(context.HttpContext, or == null || or.Value == null ? null : or.Value);
         }
 
         /// <summary>
