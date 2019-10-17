@@ -13,7 +13,7 @@ using CacheCow.Common;
 
 namespace CacheCow.Client.Tests
 {
-	
+
 	public class SerialisationTests
 	{
 
@@ -48,9 +48,6 @@ namespace CacheCow.Client.Tests
 			var request2 = await serializer.DeserializeToRequestAsync(memoryStream);
 			var result = DeepComparer.Compare(request, request2);
 
-			// !! Ignore this until RTM since this is fixed. See http://aspnetwebstack.codeplex.com/workitem/303
-			//if (result.Count() > 0)
-				//Assert.Fail(string.Join("\r\n", result));
 		}
 
 		[Fact]
@@ -91,7 +88,25 @@ namespace CacheCow.Client.Tests
 				    throw new Exception(string.Join("\r\n", result));
 			}
 		}
-	
+
+#if NET452 || NETCOREAPP2_0
+
+        // Issue raised here https://github.com/dotnet/corefx/issues/31918
+        [Fact]
+        public async Task Issue31918_On_Net_Framework()
+        {
+            var serializer = new MessageContentHttpMessageSerializer();
+            var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Get, new Uri("https://google.com"));
+            var response = await client.SendAsync(request);
+            var ms = new MemoryStream();
+            await serializer.SerializeAsync(response, ms);
+            ms.Position = 0;
+            var r2 = await serializer.DeserializeToResponseAsync(ms);
+            Console.WriteLine(response);
+        }
+
+#endif
 
 	}
 }
