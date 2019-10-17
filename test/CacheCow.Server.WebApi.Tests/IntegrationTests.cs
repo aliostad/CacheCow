@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Results;
 using Xunit;
 using CacheCow.Server.Headers;
 
@@ -49,5 +51,13 @@ namespace CacheCow.Server.WebApi.Tests
             Assert.Contains("MeaningOfLife", error);
         }
 
+        [Fact]
+        public async Task Issue235_CanHandleNoContentMessage()
+        {
+            var i = new HttpMessageInvoker(_server);
+            var req = new HttpRequestMessage(HttpMethod.Get, new Uri("http://chiz/api/car/404", UriKind.Absolute));
+            var resp = await i.SendAsync(req, CancellationToken.None);
+            Assert.Equal(HttpStatusCode.NotFound, resp.StatusCode);
+        }
     }
 }

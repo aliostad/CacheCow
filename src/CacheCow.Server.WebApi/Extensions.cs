@@ -45,7 +45,8 @@ namespace CacheCow.Server.WebApi
                 NoStore = true
             };
 
-            response.Content.Headers.Expires = DateTimeOffset.Now.AddDays(-1);
+            if (response.Content?.Headers != null)
+                response.Content.Headers.Expires = DateTimeOffset.Now.AddDays(-1);
         }
 
         public static void ApplyTimedETag(this HttpResponseMessage response, TimedEntityTagHeaderValue timedETag)

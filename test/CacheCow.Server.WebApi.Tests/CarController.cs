@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -20,16 +22,19 @@ namespace CacheCow.Server.WebApi.Tests
 
             if (id == 999)
                 return new NotFoundResult(this);
+
+            if (id == 404)
+                return new NotFoundResult(Request);
             else
                 return Ok(new {id});
         }
 
-        
+
     }
 
     public class MeaningOfLifeException : Exception
     {
-        
+
     }
 
 }
