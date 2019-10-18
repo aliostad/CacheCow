@@ -15,9 +15,10 @@ using Xunit;
 
 namespace CacheCow.Client.Tests
 {
-	
+
 	public class CachingHandlerTests
 	{
+        const string CacheablePublicResource = "https://code.jquery.com/jquery-3.3.1.slim.min.js";
 		private const string DummyUrl = "http://myserver/api/dummy";
 		private const string ETagValue = "\"abcdef\"";
 		private HttpClient _client;
@@ -86,7 +87,7 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public void Get_OK_But_Not_In_Cache_To_Insert_In_Cache()
 		{
-			// setup 
+			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			var response = GetOkMessage();
 			_messageHandler.Response = response;
@@ -100,7 +101,7 @@ namespace CacheCow.Client.Tests
 			var header = responseReturned.Headers.Single(x=>x.Key == CacheCowHeader.Name);
 			CacheCowHeader cacheCowHeader = null;
 			CacheCowHeader.TryParse(header.Value.First() , out cacheCowHeader);
-			
+
             // verify
 			Assert.NotNull(cacheCowHeader);
 			Assert.Equal(true, cacheCowHeader.DidNotExist);
@@ -111,12 +112,12 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public void Get_Stale_And_In_Cache_To_Get_From_Cache()
 		{
-			// setup 
+			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			var response = GetOkMessage();
 			_messageHandler.Response = response;
 			_cacheStore.Setup(x => x.GetValueAsync(It.IsAny<CacheKey>())).ReturnsAsync(response);
-						
+
 
 			// run
 			var task = _client.SendAsync(request);
@@ -137,7 +138,7 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public void Get_Stale_ApplyValidation_NotModified()
 		{
-			// setup 
+			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			var responseFromCache = GetOkMessage();
 		    var then = DateTimeOffset.UtcNow.AddMilliseconds(-1);
@@ -146,13 +147,13 @@ namespace CacheCow.Client.Tests
             responseFromCache.Content.Headers.LastModified = DateTimeOffset.Now.AddDays(-2);
 			var responseFromServer = GetOkMessage();
             responseFromServer.StatusCode = HttpStatusCode.NotModified;
-		    
+
 			_messageHandler.Response = responseFromServer;
             _cacheStore.Setup(x => x.GetValueAsync(It.IsAny<CacheKey>())).ReturnsAsync(responseFromCache);
             _cacheStore.Setup(x => x.AddOrUpdateAsync(It.IsAny<CacheKey>(), It.Is<HttpResponseMessage>(r => r == responseFromCache)))
                 .Returns(Task.FromResult(false));
 
-			
+
 
 			// run
 			var task = _client.SendAsync(request);
@@ -173,7 +174,7 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public void Get_Must_Revalidate_Etag_NotModified()
 		{
-			// setup 
+			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			var responseFromCache = GetOkMessage(true);
 			responseFromCache.Headers.ETag = new EntityTagHeaderValue(ETagValue);
@@ -202,7 +203,7 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public void Get_Must_Revalidate_Expires_NotModified()
 		{
-			// setup 
+			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			var lastModified = DateTimeOffset.UtcNow.AddHours(-1);
 			lastModified = lastModified.AddMilliseconds(1000 - lastModified.Millisecond);
@@ -216,7 +217,7 @@ namespace CacheCow.Client.Tests
 			_cacheStore.Setup(x => x.AddOrUpdateAsync(It.IsAny<CacheKey>(), It.IsAny<HttpResponseMessage>()))
                 .Returns(Task.FromResult(false));
 
-			
+
 
 			// run
 			var task = _client.SendAsync(request);
@@ -236,7 +237,7 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public void Get_Must_Revalidate_Expires_Modified()
 		{
-			// setup 
+			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			var lastModified = DateTimeOffset.UtcNow.AddHours(-1);
 			lastModified = lastModified.AddMilliseconds(1000 - lastModified.Millisecond);
@@ -268,7 +269,7 @@ namespace CacheCow.Client.Tests
         [Fact]
         public void Get_NoMustRevalidate_Expires_Modified()
         {
-            // setup 
+            // setup
             var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
             var lastModified = DateTimeOffset.UtcNow.AddHours(-1);
             lastModified = lastModified.AddMilliseconds(1000 - lastModified.Millisecond);
@@ -299,7 +300,7 @@ namespace CacheCow.Client.Tests
         [Fact]
         public void Get_NoCache_Expires_ResultsInValidation()
         {
-            // setup 
+            // setup
             var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
             request.Headers.CacheControl = new CacheControlHeaderValue(){NoCache = true};
             var lastModified = DateTimeOffset.UtcNow.AddHours(-1);
@@ -331,7 +332,7 @@ namespace CacheCow.Client.Tests
         [Fact]
         public void Get_NoMustRevalidate_NoMustRevalidateByDefault_Expires_GetFromCache()
         {
-            // setup 
+            // setup
             var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
             var lastModified = DateTimeOffset.UtcNow.AddHours(-1);
             lastModified = lastModified.AddMilliseconds(1000 - lastModified.Millisecond);
@@ -362,9 +363,9 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public void Get_NotModified_With_Stale_Client_Cache_Shall_Update_Date_Header()
 		{
-			// setup 
+			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
-			
+
 			var responseFromCache = GetOkMessage(false);
 			responseFromCache.Headers.Date = DateTimeOffset.UtcNow.AddHours(-1);
 			responseFromCache.Headers.CacheControl.MaxAge = TimeSpan.FromSeconds(10);
@@ -393,7 +394,7 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public void Put_Validate_Etag()
 		{
-			// setup 
+			// setup
 			var request = new HttpRequestMessage(HttpMethod.Put, DummyUrl);
 			var responseFromCache = GetOkMessage(true);
 			responseFromCache.Headers.ETag = new EntityTagHeaderValue(ETagValue);
@@ -414,7 +415,7 @@ namespace CacheCow.Client.Tests
 		[Fact]
 		public void Put_Validate_Expires()
 		{
-			// setup 
+			// setup
 			var request = new HttpRequestMessage(HttpMethod.Put, DummyUrl);
 			var lastModified = DateTimeOffset.UtcNow.AddHours(-1);
 			lastModified = lastModified.AddMilliseconds(1000 - lastModified.Millisecond);
@@ -424,7 +425,7 @@ namespace CacheCow.Client.Tests
 			_messageHandler.Response = responseFromServer;
             _cacheStore.Setup(x => x.GetValueAsync(It.IsAny<CacheKey>())).ReturnsAsync(responseFromCache);
 
-			
+
 
 			// run
 			var task = _client.SendAsync(request);
@@ -439,7 +440,7 @@ namespace CacheCow.Client.Tests
         [Fact]
         public void Delete_Validate_Etag()
         {
-            // setup 
+            // setup
             var request = new HttpRequestMessage(HttpMethod.Delete, DummyUrl);
             var responseFromCache = GetOkMessage(true);
             responseFromCache.Headers.ETag = new EntityTagHeaderValue(ETagValue);
@@ -460,7 +461,7 @@ namespace CacheCow.Client.Tests
         [Fact]
         public void Delete_Validate_Expires()
         {
-            // setup 
+            // setup
             var request = new HttpRequestMessage(HttpMethod.Delete, DummyUrl);
             var lastModified = DateTimeOffset.UtcNow.AddHours(-1);
             lastModified = lastModified.AddMilliseconds(1000 - lastModified.Millisecond);
@@ -516,8 +517,27 @@ namespace CacheCow.Client.Tests
 			return response;
 		}
 
+#if NET452 || NETCOREAPP2_0
+        [Fact]
+        public async Task Issue238_It_cache_even_if_compression_is_on()
+        {
+            var compressionHandler = new HttpClientHandler();
+            if (compressionHandler.SupportsAutomaticDecompression) compressionHandler.AutomaticDecompression = DecompressionMethods.GZip;
 
-	}
+            var pipeline = new CachingHandler()
+            {
+                InnerHandler = compressionHandler
+            };
+
+            var client  = new HttpClient(pipeline);
+            var response = await client.GetAsync(CacheablePublicResource);
+            var responseFromCache = await client.GetAsync(CacheablePublicResource);
+
+            Assert.NotNull(responseFromCache.Headers.GetCacheCowHeader());
+            Assert.True(responseFromCache.Headers.GetCacheCowHeader().RetrievedFromCache);
+        }
+#endif
+    }
 
     public class FaultyCacheStore : ICacheStore
     {
