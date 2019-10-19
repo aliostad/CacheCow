@@ -517,26 +517,58 @@ namespace CacheCow.Client.Tests
 			return response;
 		}
 
-#if NET452 || NETCOREAPP2_0
         [Fact]
         public async Task Issue238_It_cache_even_if_compression_is_on()
         {
             var compressionHandler = new HttpClientHandler();
             if (compressionHandler.SupportsAutomaticDecompression) compressionHandler.AutomaticDecompression = DecompressionMethods.GZip;
 
-            var pipeline = new CachingHandler()
+            var pipeline = new CachingHandler(new DictionaryBasedCache())
             {
-                InnerHandler = compressionHandler
+                InnerHandler = compressionHandler,
+                DefaultVaryHeaders = new [] { "Accept", "Accept-Encoding" }
             };
 
-            var client  = new HttpClient(pipeline);
-            var response = await client.GetAsync(CacheablePublicResource);
-            var responseFromCache = await client.GetAsync(CacheablePublicResource);
+            var client = new HttpClient(pipeline);
+            var request1 = new HttpRequestMessage(HttpMethod.Get, CacheablePublicResource);
+            var request2 = new HttpRequestMessage(HttpMethod.Get, CacheablePublicResource);
+            var response = await client.SendAsync(request1);
+            var responseFromCache = await client.SendAsync(request2);
 
             Assert.NotNull(responseFromCache.Headers.GetCacheCowHeader());
             Assert.True(responseFromCache.Headers.GetCacheCowHeader().RetrievedFromCache);
+
         }
-#endif
+
+        class DictionaryBasedCache : ICacheStore
+        {
+            private Dictionary<string, HttpResponseMessage> _cache = new Dictionary<string, HttpResponseMessage>();
+
+            public void Dispose()
+            {
+                _cache.Clear();
+            }
+
+            public async Task<HttpResponseMessage> GetValueAsync(CacheKey key)
+            {
+                return _cache.ContainsKey(key.HashBase64) ? _cache[key.HashBase64] : null;
+            }
+
+            public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
+            {
+                _cache[key.HashBase64] = response;
+            }
+
+            public async Task<bool> TryRemoveAsync(CacheKey key)
+            {
+                return _cache.Remove(key.HashBase64);
+            }
+
+            public async Task ClearAsync()
+            {
+                _cache.Clear();
+            }
+        }
     }
 
     public class FaultyCacheStore : ICacheStore
