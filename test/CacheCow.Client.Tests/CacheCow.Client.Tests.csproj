@@ -15,7 +15,9 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <EmbeddedResource Include="Data\Request.cs" />
-	  <EmbeddedResource Include="Data\Response.cs" />
+	  <Content Include="Data\Response.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
