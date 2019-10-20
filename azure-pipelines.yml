@@ -3,5 +3,12 @@ pool:
 
 steps:
 - script: build.bat
-  displayName: 'Run build'
+  displayName: 'Run build and tests'
+
+- task: PublishTestResults@2
+  displayName: 'Publish test results'
+  inputs:
+    testResultsFormat: xUnit
+    testResultsFiles: 'test/*/TestResults.trx' 
+    failTaskOnFailedTests: true
 
