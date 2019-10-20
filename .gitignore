@@ -37,3 +37,4 @@ artifacts/
 script.sql
 .idea/
 .vs/
+TestResults/
