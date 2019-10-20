@@ -9,6 +9,6 @@ steps:
   displayName: 'Publish test results'
   inputs:
     testResultsFormat: xUnit
-    testResultsFiles: 'test/*/TestResults.trx' 
+    testResultsFiles: 'test/*/TestResults/*.trx' 
     failTaskOnFailedTests: true
 
