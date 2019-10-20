@@ -8,7 +8,7 @@ steps:
 - task: PublishTestResults@2
   displayName: 'Publish test results'
   inputs:
-    testResultsFormat: xUnit
+    testResultsFormat: VSTest
     testResultsFiles: 'test/*/TestResults/*.trx' 
     failTaskOnFailedTests: true
 
