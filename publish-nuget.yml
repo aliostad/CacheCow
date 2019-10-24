@@ -1,5 +1,5 @@
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'Vs2019-Server2019'
 
 trigger:
   tags:
