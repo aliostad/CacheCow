@@ -1,19 +1,22 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+pool:
+  vmImage: 'windows-latest'
 
 trigger:
-- master
-
-pool:
-  vmImage: 'ubuntu-latest'
+  tags:
+    include:
+    - v*
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- script: build.bat
+  displayName: 'Run build and tests'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: NuGetCommand@2
+  inputs:
+    command: pack
+    packagesToPack: 'src/*/*.csproj'
+
+- task: NuGetCommand@2
+  displayName: 'NuGet push'
+  inputs:
+    command: push
+    allowPackageConflicts: true
