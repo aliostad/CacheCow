@@ -2,6 +2,12 @@ pool:
   vmImage: 'windows-latest'
 
 steps:
+- script: dotnet --list-sdks
+  displayName: 'show sdks available'
+
+- script: dotnet --list-runtimes
+  displayName: 'show runtimes available'
+
 - script: build.bat
   displayName: 'Run build and tests'
 
