@@ -1,7 +1,19 @@
 pool:
-  vmImage: 'Vs2019-Server2019'
-
+  vmImage: 'windows-latest'
+  
 steps:
+- task: UseDotNet@2
+  displayName: Make sure .NET 2.0.x is installed
+  inputs:
+    packageType: runtime
+    version: 2.0.*
+
+- task: UseDotNet@2
+  displayName: Make sure .NET 2.2.x is installed
+  inputs:
+    packageType: runtime
+    version: 2.2.*
+
 - script: dotnet --list-sdks
   displayName: 'show sdks available'
 
