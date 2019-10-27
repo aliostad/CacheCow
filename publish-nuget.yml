@@ -25,7 +25,7 @@ steps:
 - task: NuGetCommand@2
   inputs:
     command: pack
-    packagesToPack: 'src/*/*.csproj'
+    packagesToPack: './src/*/*.csproj'
 
 - task: NuGetCommand@2
   displayName: 'NuGet push'
