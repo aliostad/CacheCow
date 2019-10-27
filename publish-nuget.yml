@@ -19,6 +19,6 @@ steps:
     packageType: runtime
     version: 2.2.*
 
-- script: pack-push.bat
+- script: pack-push.bat $(api_key)
   displayName: 'Pack and push'
 
