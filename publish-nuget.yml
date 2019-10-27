@@ -22,10 +22,13 @@ steps:
 - script: build.bat
   displayName: 'Run build and tests'
 
+- script: build.bat
+  displayName: 'Run build and tests'
+
 - task: NuGetCommand@2
   inputs:
     command: pack
-    packagesToPack: './src/*/*.csproj'
+    packagesToPack: '.\src\*\*.csproj'
 
 - task: NuGetCommand@2
   displayName: 'NuGet push'
