@@ -6,10 +6,6 @@ trigger:
     include:
     - v*
 
-steps:
-- script: build.bat
-  displayName: 'Run build and tests'
-
 - task: UseDotNet@2
   displayName: Make sure .NET 2.0.x is installed
   inputs:
@@ -21,6 +17,10 @@ steps:
   inputs:
     packageType: runtime
     version: 2.2.*
+
+steps:
+- script: build.bat
+  displayName: 'Run build and tests'
 
 - task: NuGetCommand@2
   inputs:
