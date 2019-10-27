@@ -19,11 +19,8 @@ steps:
     packageType: runtime
     version: 2.2.*
 
-- script: build.bat
-  displayName: 'Run build and tests'
-
-- script: build.bat
-  displayName: 'Run build and tests'
+- script: dotnet build CacheCow.sln
+  displayName: 'Run the build'
 
 - task: NuGetCommand@2
   inputs:
