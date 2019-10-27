@@ -93,8 +93,8 @@ namespace CacheCow.Client.Tests
 				    throw new Exception(string.Join("\r\n", result));
 			}
 		}
-
-#if NET452 || NETCOREAPP2_0
+        // temporarily remove this test || NETCOREAPP2_0
+#if NET452
 
         // Issue raised here https://github.com/dotnet/corefx/issues/31918
         [Fact]
