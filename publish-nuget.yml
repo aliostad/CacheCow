@@ -19,16 +19,6 @@ steps:
     packageType: runtime
     version: 2.2.*
 
-- script: dotnet build CacheCow.sln
-  displayName: 'Run the build'
+- script: pack-push.bat
+  displayName: 'Pack and push'
 
-- task: NuGetCommand@2
-  inputs:
-    command: pack
-    packagesToPack: '.\src\*\*.csproj'
-
-- task: NuGetCommand@2
-  displayName: 'NuGet push'
-  inputs:
-    command: push
-    allowPackageConflicts: true
