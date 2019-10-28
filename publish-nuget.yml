@@ -7,17 +7,9 @@ trigger:
     - v*
 
 steps:
-- task: UseDotNet@2
-  displayName: Make sure .NET 2.0.x is installed
-  inputs:
-    packageType: runtime
-    version: 2.0.*
 
-- task: UseDotNet@2
-  displayName: Make sure .NET 2.2.x is installed
-  inputs:
-    packageType: runtime
-    version: 2.2.*
+- script: echo $(api_key)
+  displayName: 'Pack and pushx'
 
 - script: pack-push.bat $(api_key)
   displayName: 'Pack and push'
