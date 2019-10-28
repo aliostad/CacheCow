@@ -1,6 +1,6 @@
 del /F /Q .\artifacts\*.*
 dotnet pack CacheCow.sln -o .\artifacts -c Release
 if "%1" == "" (
-	dotnet nuget push "artifacts\*.nupkg" -s nuget.org -n )
+	dotnet nuget push "artifacts\*.nupkg" -s nuget.org --no-symbols )
 if NOT "%1" == ""  (
-	dotnet nuget push "artifacts\*.nupkg" -s nuget.org -n -k "%1" )
+	dotnet nuget push "artifacts\*.nupkg" -s nuget.org --no-symbols --api-key "%1" )
