@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
-using CacheCow.Client.RedisCacheStore.Helper;
 using CacheCow.Common;
 using CacheCow.Common.Helpers;
-using System.Threading;
 using System.Threading.Tasks;
 using StackExchange.Redis;
 
@@ -23,12 +16,17 @@ namespace CacheCow.Client.RedisCacheStore
 	{
         private ConnectionMultiplexer _connection;
         private IDatabase _database;
-		private bool _dispose;
 		private MessageContentHttpMessageSerializer _serializer = new MessageContentHttpMessageSerializer();
 	    private bool _throwExceptions;
         private static TimeSpan DefaultMinLifeTime = TimeSpan.FromHours(6);
 
-	    public RedisStore(string connectionString, 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedisStore"/> class.
+        /// </summary>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="databaseId">The database identifier.</param>
+        /// <param name="throwExceptions">if set to <c>true</c> the store will throw exceptions.</param>
+        public RedisStore(string connectionString, 
             int databaseId = 0,
             bool throwExceptions = true)
 	    {
@@ -47,6 +45,12 @@ namespace CacheCow.Client.RedisCacheStore
 	        }	        
 	    }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedisStore"/> class.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="databaseId">The database identifier.</param>
+        /// <param name="throwExceptions">if set to <c>true</c> the store will throw exceptions.</param>
         public RedisStore(ConnectionMultiplexer connection, 
             int databaseId = 0,
             bool throwExceptions = true)
@@ -54,6 +58,11 @@ namespace CacheCow.Client.RedisCacheStore
             Init(connection, databaseId, throwExceptions);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedisStore"/> class.
+        /// </summary>
+        /// <param name="database">The database.</param>
+        /// <param name="throwExceptions">if set to <c>true</c> the store will throw exceptions.</param>
         public RedisStore(IDatabase database,
             bool throwExceptions = true)
         {
@@ -79,13 +88,23 @@ namespace CacheCow.Client.RedisCacheStore
             get; set;
         }
 
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
 		{
-			if (_connection != null && _dispose)
+			if (_connection != null)
 				_connection.Dispose();
 		}
 
-        // has to have async for the purpose of exception handling
+        /// <summary>
+        /// Gets the cached HTTP-Response from this storage
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns>
+        /// The ResponseMessage if the key was found; null otherwise
+        /// </returns>
+        /// <remarks>has to have async for the purpose of exception handling</remarks>
         public async Task<HttpResponseMessage> GetValueAsync(CacheKey key)
         {
             try
@@ -104,7 +123,6 @@ namespace CacheCow.Client.RedisCacheStore
 
 	    private async Task<HttpResponseMessage> DoGetValueAsync(CacheKey key)
 	    {
-            HttpResponseMessage result = null;
             string entryKey = key.HashBase64;
 
             if (!await _database.KeyExistsAsync(entryKey).ConfigureAwait(false))
@@ -117,7 +135,12 @@ namespace CacheCow.Client.RedisCacheStore
             return r;
         }
 
-        // has to have async for the purpose of exception handling
+        /// <summary>
+        /// Adds the given response to the chachestore. If the key is already present, the old value is overwrittn
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="response"></param>
+        /// <remarks>has to have async for the purpose of exception handling</remarks>
         public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
         {
             try
@@ -152,7 +175,14 @@ namespace CacheCow.Client.RedisCacheStore
             return true;
         }
 
-        // has to have async for the purpose of exception handling
+        /// <summary>
+        /// (Tries to) remove the cached response correspondig with this key from the cache.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns>
+        /// True if deletion was successfull, False if not (e.g. the key was not in the store to begin with)
+        /// </returns>
+        /// <remarks>has to have async for the purpose of exception handling</remarks>
         public async Task<bool> TryRemoveAsync(CacheKey key)
         {
             try
@@ -174,6 +204,11 @@ namespace CacheCow.Client.RedisCacheStore
             return _database.KeyDeleteAsync(key.HashBase64);
         }
 
+        /// <summary>
+        /// Nuke the cache
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException">Currently not supported by StackExchange.Redis. Use redis-cli.exe</exception>
         public Task ClearAsync()
         {
             throw new NotSupportedException("Currently not supported by StackExchange.Redis. Use redis-cli.exe"); 
