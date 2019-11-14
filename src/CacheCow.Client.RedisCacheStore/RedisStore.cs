@@ -136,7 +136,7 @@ namespace CacheCow.Client.RedisCacheStore
         }
 
         /// <summary>
-        /// Adds the given response to the chachestore. If the key is already present, the old value is overwrittn
+        /// Adds the given response to the cachestore. If the key is already present, the old value is overwritten
         /// </summary>
         /// <param name="key"></param>
         /// <param name="response"></param>
@@ -176,7 +176,7 @@ namespace CacheCow.Client.RedisCacheStore
         }
 
         /// <summary>
-        /// (Tries to) remove the cached response correspondig with this key from the cache.
+        /// (Tries to) remove the cached response corresponding with this key from the cache.
         /// </summary>
         /// <param name="key"></param>
         /// <returns>
