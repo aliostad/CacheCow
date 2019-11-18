@@ -27,7 +27,7 @@ namespace CacheCow.Client.RedisCacheStore
         /// <param name="connectionString">The connection string.</param>
         /// <param name="databaseId">The database identifier.</param>
         /// <param name="throwExceptions">if set to <c>true</c> the store will throw exceptions.</param>
-        public RedisStore(string connectionString, 
+        public RedisStore(string connectionString,
             int databaseId = 0,
             bool throwExceptions = true)
 	    {
@@ -43,7 +43,7 @@ namespace CacheCow.Client.RedisCacheStore
 	                throw;
                 else
                     Trace.WriteLine(e.ToString());
-	        }	        
+	        }
 	    }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace CacheCow.Client.RedisCacheStore
         /// <param name="connection">The connection.</param>
         /// <param name="databaseId">The database identifier.</param>
         /// <param name="throwExceptions">if set to <c>true</c> the store will throw exceptions.</param>
-        public RedisStore(ConnectionMultiplexer connection, 
+        public RedisStore(ConnectionMultiplexer connection,
             int databaseId = 0,
             bool throwExceptions = true)
         {
@@ -71,11 +71,12 @@ namespace CacheCow.Client.RedisCacheStore
             _throwExceptions = throwExceptions;
         }
 
-        private void Init(ConnectionMultiplexer connection, 
+        private void Init(ConnectionMultiplexer connection,
             int databaseId = 0,
             bool throwExceptions = true)
         {
             _connection = connection;
+            _dispose = false;
             _database = _connection.GetDatabase(databaseId);
             _throwExceptions = throwExceptions;
         }
@@ -212,7 +213,7 @@ namespace CacheCow.Client.RedisCacheStore
         /// <exception cref="NotSupportedException">Currently not supported by StackExchange.Redis. Use redis-cli.exe</exception>
         public Task ClearAsync()
         {
-            throw new NotSupportedException("Currently not supported by StackExchange.Redis. Use redis-cli.exe"); 
+            throw new NotSupportedException("Currently not supported by StackExchange.Redis. Use redis-cli.exe");
         }
 	}
 }

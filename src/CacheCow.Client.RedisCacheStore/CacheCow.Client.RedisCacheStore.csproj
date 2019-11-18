@@ -5,13 +5,11 @@
 		<Summary>Redis Storage for HTTP Client Caching</Summary>
 		<AssemblyName>CacheCow.Client.RedisCacheStore</AssemblyName>
 		<PackageId>CacheCow.Client.RedisCacheStore</PackageId>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>2.5.7</Version>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
 		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.5" />
-		<PackageReference Include="StackExchange.Redis" Version="2.0.495" />		
+		<PackageReference Include="StackExchange.Redis" Version="2.0.601" />		
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\CacheCow.Client\CacheCow.Client.csproj" />
