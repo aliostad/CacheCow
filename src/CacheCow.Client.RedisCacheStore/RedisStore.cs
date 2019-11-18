@@ -16,6 +16,7 @@ namespace CacheCow.Client.RedisCacheStore
 	{
         private ConnectionMultiplexer _connection;
         private IDatabase _database;
+        private bool _dispose;
 		private MessageContentHttpMessageSerializer _serializer = new MessageContentHttpMessageSerializer();
 	    private bool _throwExceptions;
         private static TimeSpan DefaultMinLifeTime = TimeSpan.FromHours(6);
@@ -93,7 +94,7 @@ namespace CacheCow.Client.RedisCacheStore
         /// </summary>
         public void Dispose()
 		{
-			if (_connection != null)
+			if (_connection != null && _dispose)
 				_connection.Dispose();
 		}
 
