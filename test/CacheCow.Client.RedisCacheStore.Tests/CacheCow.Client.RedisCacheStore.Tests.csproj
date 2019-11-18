@@ -1,10 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netcoreapp2.0;net452</TargetFrameworks>
+		<TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
 		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp2.0</TargetFrameworks>		
 		<Summary>Client constructs for HTTP Caching</Summary>
 		<AssemblyName>CacheCow.Client.RedisCacheStore.Tests</AssemblyName>
 		<PackageId>CacheCow.Client.RedisCacheStore.Tests</PackageId>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
+	  <DocumentationFile />
 	</PropertyGroup>
 	<ItemGroup>
 	  <Compile Include="..\Common\DummyMessageHandler.cs" Link="DummyMessageHandler.cs" />
@@ -21,7 +24,7 @@
 		<ProjectReference Include="..\..\src\CacheCow.Client\CacheCow.Client.csproj" />	
 		<ProjectReference Include="..\..\src\CacheCow.Client.RedisCacheStore\CacheCow.Client.RedisCacheStore.csproj" />	
 	</ItemGroup>	
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
 		<Reference Include="System" />
 	</ItemGroup>	
 </Project>
