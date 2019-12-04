@@ -19,7 +19,7 @@ namespace CacheCow.Samples.MvcCore
         }
 
         [HttpGet]
-        [HttpCacheFactory(0, ViewModelType = typeof(IEnumerable<Car>))]
+        [HttpCacheFactory(1, ViewModelType = typeof(IEnumerable<Car>))]
         public IEnumerable<Car> List()
         {
             var cars = _repository.ListCars();
