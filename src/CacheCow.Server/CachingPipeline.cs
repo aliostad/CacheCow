@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using CacheCow.Common;
 using CacheCow.Server.Headers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Net.Http.Headers;
 
 namespace CacheCow.Server
@@ -25,6 +26,7 @@ namespace CacheCow.Server
         bool _isRequestCacheable = false;
         bool? _cacheValidated = null;
         private CacheCowHeader _cacheCowHeader;
+        private readonly bool _doNotEmitHeader = false;
 
         public CachingPipeline(ICacheabilityValidator validator,
             ICacheDirectiveProvider cacheDirectiveProvider)
@@ -32,6 +34,18 @@ namespace CacheCow.Server
             _validator = validator;
             _cacheDirectiveProvider = cacheDirectiveProvider;
         }
+
+        public CachingPipeline(ICacheabilityValidator validator,
+            ICacheDirectiveProvider cacheDirectiveProvider,
+            IConfiguration configuration)
+        {
+            _validator = validator;
+            _cacheDirectiveProvider = cacheDirectiveProvider;
+            var val = configuration[ConfigurationKeys.DoNotEmitCacheCowHeader];
+            bool.TryParse(val, out _doNotEmitHeader);
+        }
+
+
 
         /// <summary>
         /// Needs to run before action runs
@@ -54,7 +68,8 @@ namespace CacheCow.Server
                 {
                     _cacheCowHeader.ShortCircuited = true;
                     _cacheCowHeader.ValidationMatched = HttpMethods.IsGet(context.Request.Method); // NOTE: In GET match result in short-circuit and in PUT the opposite
-                    context.Response.Headers.Add(CacheCowHeader.Name, _cacheCowHeader.ToString());
+                    if (! _doNotEmitHeader)
+                        context.Response.Headers.Add(CacheCowHeader.Name, _cacheCowHeader.ToString());
                     // the response would have been set and no need to run the rest of the pipeline
                     return false;
                 }
@@ -196,7 +211,8 @@ namespace CacheCow.Server
                             if (_cacheValidated ?? false)
                             {
                                 _cacheCowHeader.ValidationMatched = true;
-                                context.Response.Headers.Add(CacheCowHeader.Name, _cacheCowHeader.ToString());
+                                if (! _doNotEmitHeader)
+                                    context.Response.Headers.Add(CacheCowHeader.Name, _cacheCowHeader.ToString());
                                 return;
                             }
                         }
@@ -209,8 +225,8 @@ namespace CacheCow.Server
                         context.Response.MakeNonCacheable();
                     else
                         context.Response.Headers[HttpHeaderNames.CacheControl] = cacheControl.ToString();
-
-                    context.Response.Headers.Add(CacheCowHeader.Name, _cacheCowHeader.ToString());
+                    if (! _doNotEmitHeader)
+                        context.Response.Headers.Add(CacheCowHeader.Name, _cacheCowHeader.ToString());
                 }
 
             }

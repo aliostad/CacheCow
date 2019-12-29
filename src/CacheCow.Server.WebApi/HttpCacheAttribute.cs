@@ -18,11 +18,15 @@ namespace CacheCow.Server.WebApi
     {
         private const string CacheValidatedKey = "###__cache_validated__###";
         private const string CacheCowHeaderKey = "###__cachecow_header__###";
+        private bool _doNotEmitHeader = false;
+        private IConfigurationValueProvider _configValueProvider = new ConfigurationValueProvider();
 
         public HttpCacheAttribute()
         {
             ApplyNoCacheNoStoreForNonCacheableResponse = true;
             CachingRuntime.OnHttpCacheCreated(new HttpCacheCreatedEventArgs(this));
+            var val = _configValueProvider.GetValue(ConfigurationKeys.DoNotEmitCacheCowHeader);
+            bool.TryParse(val, out _doNotEmitHeader);
         }
 
         /// <summary>
@@ -33,7 +37,7 @@ namespace CacheCow.Server.WebApi
         /// <param name="context">
         /// </param>
         /// <returns>
-        /// True: applied and the call can exit 
+        /// True: applied and the call can exit
         /// False: tried to apply but did not match hence the call should continue
         /// null: could not apply (timedEtag was null)
         /// </returns>
@@ -130,7 +134,8 @@ namespace CacheCow.Server.WebApi
                 {
                     cacheCowHeader.ShortCircuited = true;
                     cacheCowHeader.ValidationMatched = HttpMethod.Get == context.Request.Method; // NOTE: In GET match result in short-circuit and in PUT the opposite
-                    context.Response.Headers.Add(CacheCowHeader.Name, cacheCowHeader.ToString());
+                    if (!_doNotEmitHeader)
+                        context.Response.Headers.Add(CacheCowHeader.Name, cacheCowHeader.ToString());
                     // the response would have been set and no need to run the rest of the pipeline
                     return;
                 }
@@ -140,7 +145,7 @@ namespace CacheCow.Server.WebApi
         public async override Task OnActionExecutedAsync(HttpActionExecutedContext context, CancellationToken cancellationToken)
         {
             await base.OnActionExecutedAsync(context, cancellationToken);
-            var cacheabilityValidator = (ICacheabilityValidator) context.ActionContext.ControllerContext.Configuration.DependencyResolver.GetService(typeof(ICacheabilityValidator)) 
+            var cacheabilityValidator = (ICacheabilityValidator) context.ActionContext.ControllerContext.Configuration.DependencyResolver.GetService(typeof(ICacheabilityValidator))
                 ?? new DefaultCacheabilityValidator();
             var cacheDirectiveProvider = context.ActionContext.ControllerContext.Configuration.DependencyResolver.GetCacheDirectiveProvider(ViewModelType);
 
@@ -206,7 +211,7 @@ namespace CacheCow.Server.WebApi
         public int DefaultExpirySeconds { get; set; }
 
         /// <summary>
-        /// Type parameter for ITimedETagQueryProvider&lt;T&gt; and ICacheDirectiveProvider&lt;T&gt;. 
+        /// Type parameter for ITimedETagQueryProvider&lt;T&gt; and ICacheDirectiveProvider&lt;T&gt;.
         /// A decorative parameter for the ease of IoC service location.
         /// </summary>
         public Type ViewModelType { get; set; }

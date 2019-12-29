@@ -182,6 +182,10 @@ namespace CacheCow.Client
         /// </summary>
         public Action<HttpResponseMessage> ResponseStoragePreparationRules { get; set; }
 
+        /// <summary>
+        /// If set to true, it does not emit CacheCowHeader
+        /// </summary>
+        public bool DoNotEmitCacheCowHeader { get; set; } = false;
 
         /// <summary>
         /// Ignores all exceptions. Set it to ExceptionHandler
@@ -308,7 +312,9 @@ namespace CacheCow.Client
             if (validationResultForCachedResponse == ResponseValidationResult.OK)
             {
                 cacheCowHeader.RetrievedFromCache = true;
-                return cachedResponse.AddCacheCowHeader(cacheCowHeader); // EXIT !! ____________________________
+                if (!DoNotEmitCacheCowHeader)
+                    cachedResponse.AddCacheCowHeader(cacheCowHeader);
+                return cachedResponse; // EXIT !! ____________________________
             }
 
             // if stale
@@ -319,7 +325,9 @@ namespace CacheCow.Client
                 if (isFreshOrStaleAcceptable.HasValue && isFreshOrStaleAcceptable.Value) // similar to OK
                 {
                     // TODO: CONSUME AND RELEASE Response !!!
-                    return cachedResponse.AddCacheCowHeader(cacheCowHeader);
+                    if (! DoNotEmitCacheCowHeader)
+                        cachedResponse.AddCacheCowHeader(cacheCowHeader);
+                    return cachedResponse;
                     // EXIT !! ____________________________
                 }
                 else
@@ -359,7 +367,10 @@ namespace CacheCow.Client
 
                 await UpdateCachedResponseAsync(cacheKey, cachedResponse, serverResponse, _cacheStore).ConfigureAwait(false);
                 ConsumeAndDisposeResponse(serverResponse);
-                return cachedResponse.AddCacheCowHeader(cacheCowHeader).CopyOtherCacheCowHeaders(serverResponse); // EXIT !! _______________
+                if (! DoNotEmitCacheCowHeader)
+                    cachedResponse.AddCacheCowHeader(cacheCowHeader).CopyOtherCacheCowHeaders(serverResponse);
+                return cachedResponse;
+                // EXIT !! _______________
             }
 
             var validationResult = ResponseValidator(serverResponse);
@@ -418,8 +429,10 @@ namespace CacheCow.Client
             TraceWriter.WriteLine("{0} - Before returning response",
                 TraceLevel.Verbose, request.RequestUri.ToString());
 
-            return serverResponse.AddCacheCowHeader(cacheCowHeader);
+            if (! DoNotEmitCacheCowHeader)
+                serverResponse.AddCacheCowHeader(cacheCowHeader);
 
+            return serverResponse;
         }
 
         private void ApplyPutPatchDeleteValidationHeaders(HttpRequestMessage request, CacheCowHeader cacheCowHeader,

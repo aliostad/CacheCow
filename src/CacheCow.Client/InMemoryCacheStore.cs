@@ -22,12 +22,7 @@ namespace CacheCow.Client
 	{
         private const string CacheStoreEntryName = "###InMemoryCacheStore_###";
 	    private static TimeSpan MinCacheExpiry = TimeSpan.FromHours(6);
-
-#if NET452
-        private MemoryCache _responseCache = new MemoryCache(CacheStoreEntryName);  
-#else
-        private MemoryCache _responseCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));       
-#endif
+        private MemoryCache _responseCache;
 
         private MessageContentHttpMessageSerializer _messageSerializer = new MessageContentHttpMessageSerializer(true);
 	    private readonly TimeSpan _minExpiry;
@@ -35,20 +30,32 @@ namespace CacheCow.Client
 	    public InMemoryCacheStore()
             : this(MinCacheExpiry)
         {
-            
+
         }
 
-        public InMemoryCacheStore(TimeSpan minExpiry)
+        public InMemoryCacheStore(TimeSpan minExpiry) :
+#if NET452
+            this(minExpiry, new MemoryCache(CacheStoreEntryName))
+#else
+            this(minExpiry, new MemoryCache(Options.Create(new MemoryCacheOptions())))
+#endif
+        {
+        }
+
+        public InMemoryCacheStore(TimeSpan minExpiry, MemoryCache cache)
         {
             _minExpiry = minExpiry;
+            _responseCache = cache;
         }
 
-	    public void Dispose()
+        /// <inheritdoc />
+        public void Dispose()
 	    {
 	        _responseCache.Dispose();
 	    }
 
-	    public async Task<HttpResponseMessage> GetValueAsync(CacheKey key)
+        /// <inheritdoc />
+        public async Task<HttpResponseMessage> GetValueAsync(CacheKey key)
 	    {
             var result = _responseCache.Get(key.HashBase64);
 	        if (result == null)
@@ -57,7 +64,8 @@ namespace CacheCow.Client
 	        return await _messageSerializer.DeserializeToResponseAsync(new MemoryStream((byte[]) result)).ConfigureAwait(false);
 	    }
 
-	    public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
+        /// <inheritdoc />
+        public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
 	    {
             // removing reference to request so that the request can get GCed
             var req = response.RequestMessage;
@@ -71,7 +79,8 @@ namespace CacheCow.Client
             _responseCache.Set(key.HashBase64, memoryStream.ToArray(), optimalExpiry);
 	    }
 
-	    public Task<bool> TryRemoveAsync(CacheKey key)
+        /// <inheritdoc />
+        public Task<bool> TryRemoveAsync(CacheKey key)
 	    {
 #if NET452
             return Task.FromResult(_responseCache.Remove(key.HashBase64) != null);
@@ -81,13 +90,15 @@ namespace CacheCow.Client
 #endif
         }
 
-	    public Task ClearAsync()
+        /// <inheritdoc />
+        public Task ClearAsync()
 	    {
             _responseCache.Dispose();
 #if NET452
-            _responseCache = new MemoryCache(CacheStoreEntryName);  
+            _responseCache = new MemoryCache(CacheStoreEntryName);
 #else
-            _responseCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));       
+            // WARNING: !! If you have passed one, then this one will not have the options
+            _responseCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 #endif
 	        return Task.FromResult(0);
 	    }
