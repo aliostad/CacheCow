@@ -18,16 +18,20 @@ using Microsoft.Extensions.Options;
 
 namespace CacheCow.Client
 {
-	public class InMemoryCacheStore : ICacheStore
-	{
+    public class InMemoryCacheStore : ICacheStore
+    {
         private const string CacheStoreEntryName = "###InMemoryCacheStore_###";
-	    private static TimeSpan MinCacheExpiry = TimeSpan.FromHours(6);
+        private static TimeSpan MinCacheExpiry = TimeSpan.FromHours(6);
         private MemoryCache _responseCache;
 
         private MessageContentHttpMessageSerializer _messageSerializer = new MessageContentHttpMessageSerializer(true);
-	    private readonly TimeSpan _minExpiry;
+        private readonly TimeSpan _minExpiry;
 
-	    public InMemoryCacheStore()
+#if NET452
+#else
+        private readonly IOptions<MemoryCacheOptions> _options;
+#endif
+        public InMemoryCacheStore()
             : this(MinCacheExpiry)
         {
 
@@ -37,18 +41,33 @@ namespace CacheCow.Client
 #if NET452
             this(minExpiry, new MemoryCache(CacheStoreEntryName))
 #else
-            this(minExpiry, new MemoryCache(Options.Create(new MemoryCacheOptions())))
+            this(minExpiry, Options.Create(new MemoryCacheOptions()))
 #endif
         {
         }
 
-        public InMemoryCacheStore(TimeSpan minExpiry, MemoryCache cache)
+        private InMemoryCacheStore(TimeSpan minExpiry, MemoryCache cache)
         {
             _minExpiry = minExpiry;
             _responseCache = cache;
         }
 
-        /// <inheritdoc />
+#if NET452
+#else
+        /// <summary>
+        /// To control cache options
+        /// </summary>
+        /// <param name="minExpiry">expiry</param>
+        /// <param name="options">options</param>
+        public InMemoryCacheStore(TimeSpan minExpiry, IOptions<MemoryCacheOptions> options) :
+            this(minExpiry, new MemoryCache(options))
+        {
+            _options = options;
+        }
+#endif
+
+
+    /// <inheritdoc />
         public void Dispose()
 	    {
 	        _responseCache.Dispose();
@@ -97,8 +116,7 @@ namespace CacheCow.Client
 #if NET452
             _responseCache = new MemoryCache(CacheStoreEntryName);
 #else
-            // WARNING: !! If you have passed one, then this one will not have the options
-            _responseCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+            _responseCache = new MemoryCache(_options);
 #endif
 	        return Task.FromResult(0);
 	    }
