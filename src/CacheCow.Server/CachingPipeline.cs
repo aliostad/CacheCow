@@ -28,12 +28,14 @@ namespace CacheCow.Server
         private CacheCowHeader _cacheCowHeader;
         private readonly bool _doNotEmitHeader = false;
 
+        /*
         public CachingPipeline(ICacheabilityValidator validator,
             ICacheDirectiveProvider cacheDirectiveProvider)
         {
             _validator = validator;
             _cacheDirectiveProvider = cacheDirectiveProvider;
         }
+        */
 
         public CachingPipeline(ICacheabilityValidator validator,
             ICacheDirectiveProvider cacheDirectiveProvider,
@@ -244,7 +246,9 @@ namespace CacheCow.Server
 
     public class CachingPipeline<TViewModel> : CachingPipeline, ICachingPipeline<TViewModel>
     {
-        public CachingPipeline(ICacheabilityValidator validator, ICacheDirectiveProvider<TViewModel> cacheDirectiveProvider) : base(validator, cacheDirectiveProvider)
+        public CachingPipeline(ICacheabilityValidator validator,
+            ICacheDirectiveProvider<TViewModel> cacheDirectiveProvider,
+            IConfiguration configuration) : base(validator, cacheDirectiveProvider, configuration)
         {
         }
     }

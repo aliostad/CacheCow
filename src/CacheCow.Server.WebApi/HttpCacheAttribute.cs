@@ -180,7 +180,8 @@ namespace CacheCow.Server.WebApi
                         if (cacheValidated ?? false)
                         {
                             cacheCowHeader.ValidationMatched = true;
-                            context.Response.Headers.Add(CacheCowHeader.Name, cacheCowHeader.ToString());
+                            if (!_doNotEmitHeader)
+                                context.Response.Headers.Add(CacheCowHeader.Name, cacheCowHeader.ToString());
                             return;
                         }
                     }
@@ -194,7 +195,8 @@ namespace CacheCow.Server.WebApi
                 else
                     context.Response.Headers.Add(HttpHeaderNames.CacheControl, cacheControl.ToString());
 
-                context.Response.Headers.Add(CacheCowHeader.Name, cacheCowHeader.ToString());
+                if (! _doNotEmitHeader)
+                    context.Response.Headers.Add(CacheCowHeader.Name, cacheCowHeader.ToString());
             }
 
 

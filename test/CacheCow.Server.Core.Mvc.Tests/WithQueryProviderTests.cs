@@ -14,6 +14,7 @@ using CacheCow.Client.Headers;
 using CacheCow.Client;
 using CacheCow.Server.Headers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 
 namespace CacheCow.Server.Core.Mvc.Tests
 {
@@ -54,6 +55,10 @@ namespace CacheCow.Server.Core.Mvc.Tests
         [Fact]
         public async Task ETagsAreTheSameForCollection()
         {
+            _server = new TestServer(new WebHostBuilder()
+                .UseStartup<WithQueryProviderStartup>());
+            _client = _server.CreateClient();
+
             var response = await _client.GetAsync("/api/withquery");
             var response2 = await _client.GetAsync("/api/withquery");
             Assert.NotNull(response.Headers.ETag);
@@ -61,6 +66,26 @@ namespace CacheCow.Server.Core.Mvc.Tests
             Assert.NotNull(response2.Headers.ETag);
             Assert.NotNull(response2.Headers.ETag.Tag);
             Assert.Equal(response.Headers.ETag.Tag, response2.Headers.ETag.Tag);
+        }
+
+        [Fact]
+        public async Task NoHeaderWhenISayNoHeader()
+        {
+            _server = new TestServer(new WebHostBuilder()
+                .UseStartup<WithQueryProviderStartup>()
+                .ConfigureAppConfiguration((ctx, cfg) =>
+                {
+                    cfg.AddInMemoryCollection(
+                    new Dictionary<string, string>
+                    {
+                        {"do_not_emit_cachecow_header", "true"}
+                    });
+                })
+            );
+            _client = _server.CreateClient();
+
+            var response = await _client.GetAsync("/api/withquery");
+            Assert.False(response.Headers.Contains("x-cachecow-server"));
         }
 
         [Fact]
@@ -101,7 +126,7 @@ namespace CacheCow.Server.Core.Mvc.Tests
 
     public class TestViewModelCollectionQueryProvider : ITimedETagQueryProvider<IEnumerable<TestViewModel>>
     {
-        
+
         public const string HeaderName = "x-test-etag";
         public void Dispose()
         {

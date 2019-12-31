@@ -521,12 +521,12 @@ namespace CacheCow.Client.Tests
         public async Task Issue238_It_cache_even_if_compression_is_on()
         {
             var compressionHandler = new HttpClientHandler();
-            if (compressionHandler.SupportsAutomaticDecompression) compressionHandler.AutomaticDecompression = DecompressionMethods.GZip;
+            if (compressionHandler.SupportsAutomaticDecompression)
+                compressionHandler.AutomaticDecompression = DecompressionMethods.GZip;
 
             var pipeline = new CachingHandler(new DictionaryBasedCache())
             {
-                InnerHandler = compressionHandler,
-                DefaultVaryHeaders = new [] { "Accept", "Accept-Encoding" }
+                InnerHandler = compressionHandler, DefaultVaryHeaders = new[] {"Accept", "Accept-Encoding"}
             };
 
             var client = new HttpClient(pipeline);
