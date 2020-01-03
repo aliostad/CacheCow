@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Threading.Tasks;
 using CacheCow.Client.Headers;
 using Xunit;
 using Xunit.Abstractions;
@@ -10,6 +11,8 @@ namespace CacheCow.Client.FileCacheStore.Tests
     /// </summary>
     public class TestFileStore
     {
+        private const string CacheableResource1 = "https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js";
+
         private readonly ITestOutputHelper _output;
 
         public TestFileStore(ITestOutputHelper output)
@@ -27,28 +30,25 @@ namespace CacheCow.Client.FileCacheStore.Tests
         /// Test caching
         /// </summary>
         [Fact]
-        public void TestDisk()
+        public async Task TestDisk()
         {
             var fs = new FileStore("cache");
-            fs.ClearAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            await fs.ClearAsync();
 
             var client = fs.CreateClient();
             Assert.True(fs.IsEmpty());
             log("Querying...");
-            var uri = new Uri("https://www.example.com");
-            var response = client.GetAsync(uri).ConfigureAwait(false).GetAwaiter()
-                .GetResult();
+            var uri = new Uri(CacheableResource1);
+            var response = await client.GetAsync(uri);
             Assert.False(fs.IsEmpty());
-            var cachedResponse = client.GetAsync(uri).ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult();
+            var cachedResponse = await client.GetAsync(uri);
 
 
             Assert.True(response.Headers.GetCacheCowHeader().ToString().Contains("did-not-exist=true"));
             var cacheHeader = cachedResponse.Headers.GetCacheCowHeader().ToString();
             Assert.True(cacheHeader.Contains("did-not-exist=false;retrieved-from-cache=true"));
 
-            fs.ClearAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            await fs.ClearAsync();
             Assert.True(fs.IsEmpty());
         }
 

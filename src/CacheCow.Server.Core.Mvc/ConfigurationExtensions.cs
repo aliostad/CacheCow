@@ -22,6 +22,19 @@ namespace CacheCow.Server.Core.Mvc
             services.AddTransient<HttpCacheFilter>();
         }
 
+        /// <summary>
+        /// Adds default implementation of various interfaces with 
+        /// </summary>
+        /// <param name="services">services</param>
+        /// <param name="optionsBuilder">builds the options</param>
+        public static void AddHttpCachingMvc(this IServiceCollection services, Action<HttpCachingOptions> optionsBuilder)
+        {
+            services.AddHttpCachingMvc();
+            services.Configure<HttpCachingOptions>(optionsBuilder);
+        }
+
+
+
         public static void AddDirectiveProviderForViewModelMvc<TViewModel, TCacheDirectiveProvider>(this IServiceCollection services, bool transient = true)
             where TCacheDirectiveProvider : class, ICacheDirectiveProvider<TViewModel>
         {

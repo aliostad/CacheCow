@@ -13,6 +13,7 @@ using System.IO;
 using Microsoft.Net.Http.Headers;
 using CacheCow.Server.Headers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace CacheCow.Server.Core.Mvc
 {
@@ -23,16 +24,17 @@ namespace CacheCow.Server.Core.Mvc
     public class HttpCacheFilter : IAsyncResourceFilter
     {
         private ICacheabilityValidator _validator;
-        private readonly IConfiguration _configuration;
+        private readonly HttpCachingOptions _options;
         private const string StreamName = "##__travesty_that_I_have_to_do_this__##";
 
         public HttpCacheFilter(ICacheabilityValidator validator,
-            ICacheDirectiveProvider cacheDirectiveProvider, IConfiguration configuration)
+            ICacheDirectiveProvider cacheDirectiveProvider, IOptions<HttpCachingOptions> options)
         {
             _validator = validator;
-            _configuration = configuration;
+
             CacheDirectiveProvider = cacheDirectiveProvider;
             ApplyNoCacheNoStoreForNonCacheableResponse = true;
+            _options = options.Value;
         }
 
 
@@ -44,7 +46,7 @@ namespace CacheCow.Server.Core.Mvc
         /// <returns></returns>
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
         {
-            var pipa = new CachingPipeline(_validator, CacheDirectiveProvider, _configuration)
+            var pipa = new CachingPipeline(_validator, CacheDirectiveProvider, _options)
             {
                 ApplyNoCacheNoStoreForNonCacheableResponse = ApplyNoCacheNoStoreForNonCacheableResponse,
                 ConfiguredExpiry = ConfiguredExpiry
@@ -85,8 +87,8 @@ namespace CacheCow.Server.Core.Mvc
     {
         public HttpCacheFilter(ICacheabilityValidator validator,
             ICacheDirectiveProvider<T> cacheDirectiveProvider,
-            IConfiguration configuration) :
-            base(validator, cacheDirectiveProvider, configuration)
+            IOptions<HttpCachingOptions> options) :
+            base(validator, cacheDirectiveProvider, options)
         {
         }
     }

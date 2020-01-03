@@ -72,19 +72,21 @@ namespace CacheCow.Client.Tests
         public void TestMemoryLeak()
         {
             var memorySize64 = Process.GetCurrentProcess().PrivateMemorySize64;
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < 20000; i++)
             {
                 var store = new CachingHandler();
                 //Thread.Sleep(1);
                 store.Dispose();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                if (Process.GetCurrentProcess().PrivateMemorySize64 - memorySize64 > 2 * 1024 * 1024)
-                    throw new Exception("Memory leak");
             }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            if (Process.GetCurrentProcess().PrivateMemorySize64 - memorySize64 > 10 * 1024 * 1024)
+                throw new Exception("Memory leak");
         }
 
-		[Fact]
+        [Fact]
 		public void Get_OK_But_Not_In_Cache_To_Insert_In_Cache()
 		{
 			// setup

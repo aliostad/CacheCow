@@ -1,20 +1,18 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using CacheCow.Client.Headers;
 using CacheCow.Client;
 using CacheCow.Server.Headers;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Net.Http.Headers;
+using CacheCow.Common;
 
 namespace CacheCow.Server.Core.Mvc.Tests
 {
@@ -69,18 +67,22 @@ namespace CacheCow.Server.Core.Mvc.Tests
         }
 
         [Fact]
-        public async Task NoHeaderWhenISayNoHeader()
+        public async Task NoHeaderWhenISayNoHeaderUsingConfiguration()
         {
             _server = new TestServer(new WebHostBuilder()
-                .UseStartup<WithQueryProviderStartup>()
-                .ConfigureAppConfiguration((ctx, cfg) =>
-                {
-                    cfg.AddInMemoryCollection(
-                    new Dictionary<string, string>
-                    {
-                        {"do_not_emit_cachecow_header", "true"}
-                    });
-                })
+                .UseStartup<WithQueryProviderStartupWithNoHeaderConfiguration>()
+            );
+            _client = _server.CreateClient();
+
+            var response = await _client.GetAsync("/api/withquery");
+            Assert.False(response.Headers.Contains("x-cachecow-server"));
+        }
+
+        [Fact]
+        public async Task NoHeaderWhenISayNoHeaderUsingOptions()
+        {
+            _server = new TestServer(new WebHostBuilder()
+                .UseStartup<WithQueryProviderStartupWithNoHeaderOptions>()
             );
             _client = _server.CreateClient();
 
@@ -146,14 +148,9 @@ namespace CacheCow.Server.Core.Mvc.Tests
 
     }
 
+
     public class WithQueryProviderStartup
     {
-        public WithQueryProviderStartup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public virtual void ConfigureServices(IServiceCollection services)
@@ -180,5 +177,33 @@ namespace CacheCow.Server.Core.Mvc.Tests
             });
         }
 
+    }
+
+    public class WithQueryProviderStartupWithNoHeaderConfiguration : WithQueryProviderStartup
+    {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            base.ConfigureServices(services);
+            var configBuilder = new ConfigurationBuilder();
+            configBuilder.AddInMemoryCollection(
+                    new Dictionary<string, string>
+                    {
+                        {ConfigurationKeys.DoNotEmitCacheCowHeader, "true"}
+                    });
+
+            services.Configure<HttpCachingOptions>(configBuilder.Build());
+        }
+    }
+
+    public class WithQueryProviderStartupWithNoHeaderOptions : WithQueryProviderStartup
+    {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            services.AddOptions();
+            services.AddMvc();
+            services.AddHttpCachingMvc(options => options.DoNotEmitCacheCowHeader = true);
+            services.AddQueryProviderForViewModelMvc<TestViewModel, TestViewModelQueryProvider>();
+            services.AddQueryProviderForViewModelMvc<IEnumerable<TestViewModel>, TestViewModelCollectionQueryProvider>();
+        }
     }
 }

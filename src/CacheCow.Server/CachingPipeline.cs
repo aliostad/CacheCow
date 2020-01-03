@@ -28,26 +28,16 @@ namespace CacheCow.Server
         private CacheCowHeader _cacheCowHeader;
         private readonly bool _doNotEmitHeader = false;
 
-        /*
-        public CachingPipeline(ICacheabilityValidator validator,
-            ICacheDirectiveProvider cacheDirectiveProvider)
-        {
-            _validator = validator;
-            _cacheDirectiveProvider = cacheDirectiveProvider;
-        }
-        */
-
         public CachingPipeline(ICacheabilityValidator validator,
             ICacheDirectiveProvider cacheDirectiveProvider,
-            IConfiguration configuration)
+            HttpCachingOptions options)
         {
             _validator = validator;
             _cacheDirectiveProvider = cacheDirectiveProvider;
-            var val = configuration[ConfigurationKeys.DoNotEmitCacheCowHeader];
-            bool.TryParse(val, out _doNotEmitHeader);
+            _doNotEmitHeader = options.DoNotEmitCacheCowHeader;
         }
 
-
+       
 
         /// <summary>
         /// Needs to run before action runs
@@ -248,7 +238,7 @@ namespace CacheCow.Server
     {
         public CachingPipeline(ICacheabilityValidator validator,
             ICacheDirectiveProvider<TViewModel> cacheDirectiveProvider,
-            IConfiguration configuration) : base(validator, cacheDirectiveProvider, configuration)
+            HttpCachingOptions options) : base(validator, cacheDirectiveProvider, options)
         {
         }
     }
