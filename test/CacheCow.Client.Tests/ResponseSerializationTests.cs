@@ -18,7 +18,7 @@ namespace CacheCow.Client.Tests
 		public async Task IntegrationTest_Deserialize()
 		{
             var httpClient = new HttpClient();
-            var httpResponseMessage = await httpClient.GetAsync("http://bbc.com");
+            var httpResponseMessage = await httpClient.GetAsync(IntegrationTests.Url);
             Console.WriteLine(httpResponseMessage.Headers.ToString());
             var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
             var fileStream = new FileStream("msg.bin", FileMode.Create);
@@ -34,7 +34,7 @@ namespace CacheCow.Client.Tests
 		public async Task IntegrationTest_Serialize_Deserialize()
 		{
 			var httpClient = new HttpClient();
-			var httpResponseMessage = await httpClient.GetAsync("http://bbc.com");
+			var httpResponseMessage = await httpClient.GetAsync(IntegrationTests.Url);
 			var contentLength = httpResponseMessage.Content.Headers.ContentLength; // access to make sure is populated http://aspnetwebstack.codeplex.com/discussions/388196
 			var memoryStream = new MemoryStream();
 			var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
