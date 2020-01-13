@@ -18,18 +18,20 @@ namespace CacheCow.Server.Core.Mvc
         /// <param name="services">services</param>
         public static void AddHttpCachingMvc(this IServiceCollection services)
         {
-            services.AddHttpCaching();
-            services.AddTransient<HttpCacheFilter>();
+
+            AddHttpCachingMvc(services, (o) => {} // default which does nada
+                );
         }
 
         /// <summary>
-        /// Adds default implementation of various interfaces with 
+        /// Adds default implementation of various interfaces with
         /// </summary>
         /// <param name="services">services</param>
         /// <param name="optionsBuilder">builds the options</param>
         public static void AddHttpCachingMvc(this IServiceCollection services, Action<HttpCachingOptions> optionsBuilder)
         {
-            services.AddHttpCachingMvc();
+            services.AddHttpCaching();
+            services.AddTransient<HttpCacheFilter>();
             services.Configure<HttpCachingOptions>(optionsBuilder);
         }
 
