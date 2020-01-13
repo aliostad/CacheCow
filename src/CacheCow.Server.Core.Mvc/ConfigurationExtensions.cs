@@ -31,6 +31,7 @@ namespace CacheCow.Server.Core.Mvc
         public static void AddHttpCachingMvc(this IServiceCollection services, Action<HttpCachingOptions> optionsBuilder)
         {
             services.AddHttpCaching();
+            services.AddSingleton<HttpCachingOptions>();
             services.AddTransient<HttpCacheFilter>();
             services.Configure<HttpCachingOptions>(optionsBuilder);
         }
