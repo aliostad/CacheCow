@@ -9,7 +9,7 @@ namespace CacheCow.Client.Tests
 
     public class IntegrationTests
 	{
-        const string Url = "https://ssl.gstatic.com/gb/images/j_e6a6aca6.png";
+        public const string Url = "https://ssl.gstatic.com/gb/images/j_e6a6aca6.png";
 
 		[Fact]
 		public async Task Test_GoogleImage_WorksOnFirstSecondRequestNotThird()
