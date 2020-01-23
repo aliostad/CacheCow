@@ -1,21 +1,33 @@
 pool:
   vmImage: 'windows-latest'
-  
-steps:
 
-- script: dotnet --list-sdks
-  displayName: 'show sdks available'
+jobs: 
+ - job: build
+    steps:
+    - script: dotnet --list-sdks
+      displayName: 'show sdks available'
 
-- script: dotnet --list-runtimes
-  displayName: 'show runtimes available'
+    - script: dotnet --list-runtimes
+      displayName: 'show runtimes available'
 
-- script: build.bat
-  displayName: 'Run build and tests'
+    - script: build.bat
+      displayName: 'Run build and tests'
 
-- task: PublishTestResults@2
-  displayName: 'Publish test results'
-  inputs:
-    testResultsFormat: VSTest
-    testResultsFiles: 'test/*/TestResults/*.trx' 
-    failTaskOnFailedTests: true
+    - task: PublishTestResults@2
+      displayName: 'Publish test results'
+      inputs:
+        testResultsFormat: VSTest
+        testResultsFiles: 'test/*/TestResults/*.trx' 
+        failTaskOnFailedTests: true
 
+ - job: publish
+    trigger:
+      tags:
+        include:
+        - v*
+    steps:
+    - script: echo $(nuget_api_key)
+      displayName: 'Pack and pushx'
+
+    - script: pack-push.bat $(nuget_api_key)
+      displayName: 'Pack and push'
