@@ -22,10 +22,6 @@ jobs:
  -  job: publish
     pool:
       vmImage: 'windows-latest'
-    trigger:
-      tags:
-        include:
-        - v*
     steps:
     - script: echo $(nuget_api_key)
       displayName: 'Pack and pushx'
