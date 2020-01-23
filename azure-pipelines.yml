@@ -2,7 +2,7 @@ pool:
   vmImage: 'windows-latest'
 
 jobs: 
- - job: build
+- job: build
     steps:
     - script: dotnet --list-sdks
       displayName: 'show sdks available'
@@ -20,7 +20,7 @@ jobs:
         testResultsFiles: 'test/*/TestResults/*.trx' 
         failTaskOnFailedTests: true
 
- - job: publish
+- job: publish
     trigger:
       tags:
         include:
