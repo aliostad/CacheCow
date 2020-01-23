@@ -1,5 +1,5 @@
 jobs: 
-- job: build
+ -  job: build
     pool:
       vmImage: 'windows-latest'
     steps:
@@ -19,7 +19,7 @@ jobs:
         testResultsFiles: 'test/*/TestResults/*.trx' 
         failTaskOnFailedTests: true
 
-- job: publish
+ -  job: publish
     pool:
       vmImage: 'windows-latest'
     trigger:
