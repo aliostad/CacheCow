@@ -1,14 +1,8 @@
 jobs: 
- -  job: build
+ -  job: build on windows
     pool:
       vmImage: 'windows-latest'
     steps:
-    - script: dotnet --list-sdks
-      displayName: 'show sdks available'
-
-    - script: dotnet --list-runtimes
-      displayName: 'show runtimes available'
-
     - script: build.bat
       displayName: 'Run build and tests'
 
@@ -18,15 +12,16 @@ jobs:
         testResultsFormat: VSTest
         testResultsFiles: 'test/*/TestResults/*.trx' 
         failTaskOnFailedTests: true
-
- -  job: publish
+ -  job: build on linux
     pool:
-      vmImage: 'windows-latest'
-    variables:
-    - group: nuget_publish
+      vmImage: 'linux-latest'
     steps:
-    - script: echo $(nuget_api_key)
-      displayName: 'Pack and pushx'
+    - script: build.sh
+      displayName: 'Run build and tests'
 
-    - script: pack-push.bat $(nuget_api_key)
-      displayName: 'Pack and push'
+    - task: PublishTestResults@2
+      displayName: 'Publish test results'
+      inputs:
+        testResultsFormat: VSTest
+        testResultsFiles: 'test/*/TestResults/*.trx' 
+        failTaskOnFailedTests: true
