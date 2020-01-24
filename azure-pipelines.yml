@@ -20,6 +20,11 @@ jobs:
       displayName: 'Use .NET Core sdk'
       inputs:
         packageType: sdk
+        version: 2.0.3
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk'
+      inputs:
+        packageType: sdk
         version: 3.1.100
     - script: ./build.sh
       displayName: 'Run build and tests'
