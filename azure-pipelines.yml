@@ -1,5 +1,5 @@
 jobs: 
- -  job: build on windows
+ -  job: build_windows
     pool:
       vmImage: 'windows-latest'
     steps:
@@ -12,9 +12,9 @@ jobs:
         testResultsFormat: VSTest
         testResultsFiles: 'test/*/TestResults/*.trx' 
         failTaskOnFailedTests: true
- -  job: build on linux
+ -  job: build_linux
     pool:
-      vmImage: 'linux-latest'
+      vmImage: 'ubuntu-16.04'
     steps:
     - script: build.sh
       displayName: 'Run build and tests'
