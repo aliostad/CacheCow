@@ -1,3 +1,5 @@
-dotnet restore CacheCow.CoreOnly.sln
-dotnet test CacheCow.CoreOnly.sln -f netcoreapp2.0
-dotnet test CacheCow.CoreOnly.sln -f netcoreapp3.0
+dotnet build CacheCow.CoreOnly.sln
+dotnet test ./test/CacheCow.Tests/CacheCow.Tests.csproj -l trx
+dotnet test ./test/CacheCow.Client.Tests/CacheCow.Client.Tests.csproj -l trx
+dotnet test ./test/CacheCow.Server.Core.Mvc.Tests/CacheCow.Server.Core.Mvc.Tests.csproj -l trx
+dotnet test ./test/CacheCow.Client.RedisCacheStore.Tests/CacheCow.Client.RedisCacheStore.Tests.csproj -l trx
