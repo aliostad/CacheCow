@@ -1,6 +1,5 @@
 pool:
   vmImage: 'windows-latest'
-
 trigger:
   tags:
     include:
