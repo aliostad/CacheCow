@@ -1,21 +1,37 @@
-pool:
-  vmImage: 'windows-latest'
-  
-steps:
+jobs: 
+ -  job: build_windows
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - script: build.bat
+      displayName: 'Run build and tests'
 
-- script: dotnet --list-sdks
-  displayName: 'show sdks available'
+    - task: PublishTestResults@2
+      displayName: 'Publish test results'
+      inputs:
+        testResultsFormat: VSTest
+        testResultsFiles: 'test/*/TestResults/*.trx' 
+        failTaskOnFailedTests: true
+ -  job: build_linux
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk'
+      inputs:
+        packageType: sdk
+        version: 2.0.3
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk'
+      inputs:
+        packageType: sdk
+        version: 3.1.100
+    - script: ./build.sh
+      displayName: 'Run build and tests'
 
-- script: dotnet --list-runtimes
-  displayName: 'show runtimes available'
-
-- script: build.bat
-  displayName: 'Run build and tests'
-
-- task: PublishTestResults@2
-  displayName: 'Publish test results'
-  inputs:
-    testResultsFormat: VSTest
-    testResultsFiles: 'test/*/TestResults/*.trx' 
-    failTaskOnFailedTests: true
-
+    - task: PublishTestResults@2
+      displayName: 'Publish test results'
+      inputs:
+        testResultsFormat: VSTest
+        testResultsFiles: 'test/*/TestResults/*.trx' 
+        failTaskOnFailedTests: true

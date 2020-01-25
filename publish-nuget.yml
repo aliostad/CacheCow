@@ -1,16 +1,12 @@
 pool:
   vmImage: 'windows-latest'
-
 trigger:
   tags:
     include:
     - v*
-
+variables:
+- group: nuget_publish
 steps:
-
-- script: echo $(api_key)
-  displayName: 'Pack and pushx'
-
-- script: pack-push.bat $(api_key)
+- script: pack-push.bat $(nuget_api_key)
   displayName: 'Pack and push'
 
