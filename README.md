@@ -23,7 +23,8 @@ This document covers topics below:
    - [CacheCow.Samples.Carter](#cachecowsamplescarter)   
  - [CacheCow.Server Advanced Options](#cachecowserver-advanced-options)
  - [Dependency Injection scenarios in ASP.NET MVC Core](#dependency-injection-scenarios-on-aspnet-core)
- - [Dependency Injection scnearios in ASP.NET Web API](#dependency-injection-scenarios-on-aspnet-web-api)
+ - [Configuration options with ASP.NET Core](#configuration-options-with-with-aspnet-core)
+ - [Dependency Injection scenarios in ASP.NET Web API](#dependency-injection-scenarios-on-aspnet-web-api)
  - [Migrating projects using older CacheCow.Server](#migrating-older-cachecowserver-projects-to-the-new-cachecowservercoremvc-or-cachecowserverwebapi)
 
 
@@ -239,6 +240,42 @@ public class CarController : Controller
 This will help CacheCow to know that it should look for `ITimedETagExtractor<Car>` and you would create an implementation for `ITimedETagExtractor<Car>` and register it on your DI container. 
 
 The same applies to `ITimedETagQueryProvider<T>`, essentially: 1) define `ViewModelType` on filter 2) implement generic interfaces 3) register them in your container
+
+## Configuration options with ASP.NET Core
+CacheCow uses Options Pattern to allow consumers to configure a few options at the time of using `AddHttpCachingMvc`. Currently you can control whether to emit CacheCow diagnostic header (for now default is `true`) and also whether respect configuration:
+
+``` csharp
+services.AddHttpCachingMvc(options =>
+{
+    options.EnableConfiguration = true; // default is false
+    options.DoNotEmitCacheCowHeader = false; // default is true
+});
+
+```
+
+If you enable configuration (using `EnableConfiguration = true`), CacheCow will try to read expiry values from .NET Core's `IConfiguration`. For example using the appsettings.json below, you can override the settings defined in the attribute:
+
+``` json
+{
+    "CacheCow": 
+    {
+      "Test": 
+      {
+        "Get": 
+        {
+          "Expiry": "00:00:10"
+        }
+      }
+    }
+}
+```
+
+Example below assumes a *controller* of "Test" and *action* of "Get" and it sets the cache expiry to 10 seconds. The value of controller and action are picked up from the route data and the keys need to be defined under "CacheCow" entry.
+
+As per .NET Core configuration, you can override file configuration values with environment variables or command line arguments.
+
+At this point, there is also "Enabled" property that can be set to false to disable CacheCow for a particular controller/action - something that might be handy during development. For example, setting environment variable "CacheCow__Test__Get__Enabled" to "false" will turn off CacheCow functionality on action Get of controller Test.
+
 
 ## Dependency Injection scenarios on ASP.NET Web API 
 You should first register default types in your Web API Dependency Resolver:
