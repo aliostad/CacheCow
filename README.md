@@ -23,7 +23,7 @@ This document covers topics below:
    - [CacheCow.Samples.Carter](#cachecowsamplescarter)   
  - [CacheCow.Server Advanced Options](#cachecowserver-advanced-options)
  - [Dependency Injection scenarios in ASP.NET MVC Core](#dependency-injection-scenarios-on-aspnet-core)
- - [Configuration options with ASP.NET Core](#configuration-options-with-with-aspnet-core)
+ - [Configuration options with ASP.NET Core](#configuration-options-with-aspnet-core)
  - [Dependency Injection scenarios in ASP.NET Web API](#dependency-injection-scenarios-on-aspnet-web-api)
  - [Migrating projects using older CacheCow.Server](#migrating-older-cachecowserver-projects-to-the-new-cachecowservercoremvc-or-cachecowserverwebapi)
 
