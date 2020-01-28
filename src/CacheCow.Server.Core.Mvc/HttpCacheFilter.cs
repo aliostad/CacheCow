@@ -1,17 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using CacheCow.Common;
-using CacheCow.Common.Helpers;
-using CacheCow.Server.Core;
-using Microsoft.AspNetCore.Http;
-using System.Net.Http.Headers;
-using System.IO;
-using Microsoft.Net.Http.Headers;
-using CacheCow.Server.Headers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
@@ -25,18 +15,36 @@ namespace CacheCow.Server.Core.Mvc
     {
         private ICacheabilityValidator _validator;
         private readonly HttpCachingOptions _options;
+        private IConfiguration _config;
         private const string StreamName = "##__travesty_that_I_have_to_do_this__##";
 
         public HttpCacheFilter(ICacheabilityValidator validator,
-            ICacheDirectiveProvider cacheDirectiveProvider, IOptions<HttpCachingOptions> options)
+            ICacheDirectiveProvider cacheDirectiveProvider,
+            IOptions<HttpCachingOptions> options,
+            IConfiguration configuration)
         {
             _validator = validator;
 
             CacheDirectiveProvider = cacheDirectiveProvider;
             ApplyNoCacheNoStoreForNonCacheableResponse = true;
             _options = options.Value;
+            _config = configuration;
         }
 
+        private HttpCacheSettings GetConfigSettings(ResourceExecutingContext context, HttpCacheSettings settings)
+        {
+            const string ControllerKey = "controller";
+            const string ActionKey = "action";
+            if (!context.RouteData.Values.ContainsKey(ControllerKey) ||
+                !context.RouteData.Values.ContainsKey(ActionKey))
+                return settings;
+
+            var key = $"CacheCow:{context.RouteData.Values[ControllerKey]}:{context.RouteData.Values[ActionKey]}";
+            var section = _config.GetSection(key);
+            if (section.Exists())
+                section.Bind(settings);
+            return settings;
+        }
 
         /// <summary>
         ///
@@ -46,10 +54,24 @@ namespace CacheCow.Server.Core.Mvc
         /// <returns></returns>
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
         {
+            var settings = new HttpCacheSettings()
+            {
+                Expiry = ConfiguredExpiry
+            };
+
+            if (_options.EnableConfiguration)
+                settings = GetConfigSettings(context, settings);
+
+            if (!settings.Enabled)
+            {
+                await next();
+                return;
+            }
+
             var pipa = new CachingPipeline(_validator, CacheDirectiveProvider, _options)
             {
                 ApplyNoCacheNoStoreForNonCacheableResponse = ApplyNoCacheNoStoreForNonCacheableResponse,
-                ConfiguredExpiry = ConfiguredExpiry
+                ConfiguredExpiry = settings.Expiry
             };
 
             var carryon = await pipa.Before(context.HttpContext);
@@ -77,6 +99,10 @@ namespace CacheCow.Server.Core.Mvc
         /// </summary>
         public TimeSpan? ConfiguredExpiry { get; set; }
 
+        /// <summary>
+        /// Whether to look to extract values from configuration
+        /// </summary>
+        public bool IsConfigurationEnabled { get; set; }
     }
 
     /// <summary>
@@ -87,8 +113,9 @@ namespace CacheCow.Server.Core.Mvc
     {
         public HttpCacheFilter(ICacheabilityValidator validator,
             ICacheDirectiveProvider<T> cacheDirectiveProvider,
-            IOptions<HttpCachingOptions> options) :
-            base(validator, cacheDirectiveProvider, options)
+            IOptions<HttpCachingOptions> options,
+            IConfiguration configuration) :
+            base(validator, cacheDirectiveProvider, options, configuration)
         {
         }
     }

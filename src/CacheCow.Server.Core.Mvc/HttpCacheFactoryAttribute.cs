@@ -7,12 +7,13 @@ using System.Text;
 namespace CacheCow.Server.Core.Mvc
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class HttpCacheFactoryAttribute : Attribute, IFilterFactory
     {
+        /// <inheritdoc />
         public bool IsReusable => false;
-        private int? _expirySeconds;
+        private readonly int? _expirySeconds;
 
         public HttpCacheFactoryAttribute()
         {
@@ -25,7 +26,7 @@ namespace CacheCow.Server.Core.Mvc
         }
 
         /// <summary>
-        /// Type parameter for ITimedETagQueryProvider&lt;T&gt; and ICacheDirectiveProvider&lt;T&gt;. 
+        /// Type parameter for ITimedETagQueryProvider&lt;T&gt; and ICacheDirectiveProvider&lt;T&gt;.
         /// A decorative parameter for the ease of service location.
         /// </summary>
         public Type ViewModelType { get; set; }

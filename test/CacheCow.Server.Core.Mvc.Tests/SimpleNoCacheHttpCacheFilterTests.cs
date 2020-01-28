@@ -10,6 +10,7 @@ using Xunit;
 using System;
 using CacheCow.Client;
 using System.Net;
+using System.Reflection;
 
 namespace CacheCow.Server.Core.Mvc.Tests
 {
@@ -22,7 +23,16 @@ namespace CacheCow.Server.Core.Mvc.Tests
         public SimpleNoCacheHttpCacheFilterTests()
         {
             _server = new TestServer(new WebHostBuilder()
-                .UseStartup<HttpCacheFilterTestsStartup>());
+                .UseStartup<HttpCacheFilterTestsStartup>()
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    var env = hostingContext.HostingEnvironment;
+
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+                    config.AddEnvironmentVariables();
+                })
+            );
             _client = _server.CreateClient();
         }
 
@@ -35,15 +45,24 @@ namespace CacheCow.Server.Core.Mvc.Tests
         }
 
         [Fact]
+        public async Task ConfigurationOverrides()
+        {
+            var response = await _client.GetAsync("/api/test/1");
+            var viewModel = await response.Content.ReadAsAsync<TestViewModel>();
+            Assert.NotNull(response.Headers.CacheControl);
+            Assert.Equal(TimeSpan.FromSeconds(10), response.Headers.CacheControl.MaxAge);
+        }
+
+        [Fact]
         public async Task Issue232_CanHandleExceptionThrownFromTheController()
         {
             await Assert.ThrowsAsync<MeaningOfLifeException>(() => _client.GetAsync("/api/test/42"));
         }
 
         [Fact]
-        public async Task NoETagSinceNoCaching()
+        public async Task NoETagSinceNoCachingForGetAll()
         {
-            var response = await _client.GetAsync("/api/test/1");
+            var response = await _client.GetAsync("/api/test");
             Assert.Null(response.Headers.ETag);
         }
     }
@@ -61,7 +80,10 @@ namespace CacheCow.Server.Core.Mvc.Tests
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddHttpCachingMvc();
+            services.AddHttpCachingMvc(options =>
+            {
+                options.EnableConfiguration = true;
+            });
         }
 
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -76,7 +98,7 @@ namespace CacheCow.Server.Core.Mvc.Tests
                 routes.MapRoute(
                     name: "api-get",
                     defaults: new { action = "GET" },
-                    template: "api/{controller}/{id:int}");               
+                    template: "api/{controller}/{id:int}");
             });
 
         }

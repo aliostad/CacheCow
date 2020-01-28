@@ -20,6 +20,12 @@ namespace CacheCow.Server.Core.Mvc.Tests
                 LastModified = new DateTimeOffset(2018, 04, 01, 0, 0, 0, TimeSpan.FromHours(1))
             };
         }
+
+        [HttpCacheFactory]
+        public IEnumerable<TestViewModel> GetAll()
+        {
+            return new TestViewModel[0];
+        }
     }
 
     public class MeaningOfLifeException : Exception
