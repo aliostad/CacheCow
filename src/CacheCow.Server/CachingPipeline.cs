@@ -37,7 +37,7 @@ namespace CacheCow.Server
             _doNotEmitHeader = options.DoNotEmitCacheCowHeader;
         }
 
-       
+
 
         /// <summary>
         /// Needs to run before action runs
@@ -203,6 +203,8 @@ namespace CacheCow.Server
                             if (_cacheValidated ?? false)
                             {
                                 _cacheCowHeader.ValidationMatched = true;
+                                mustReflush = false; // issue 241 fix. The body should be empty.
+                                ms.Dispose();
                                 if (! _doNotEmitHeader)
                                     context.Response.Headers.Add(CacheCowHeader.Name, _cacheCowHeader.ToString());
                                 return;

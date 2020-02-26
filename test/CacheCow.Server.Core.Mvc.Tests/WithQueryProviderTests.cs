@@ -175,6 +175,14 @@ namespace CacheCow.Server.Core.Mvc.Tests
                     defaults: new { action = "GET" },
                     template: "api/{controller}/{id:int}");
             });
+
+            app.UseExceptionHandler(new ExceptionHandlerOptions()
+            {
+                ExceptionHandler = (ctx) =>
+                {
+                    return Task.CompletedTask;
+                }
+            });
         }
 
     }
