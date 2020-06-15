@@ -63,10 +63,8 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
             container.Register(
                 Component.For<CarController>().ImplementedBy<CarController>()
                     .LifestyleTransient(),
-                Component.For<ITimedETagExtractor<Car>>().ImplementedBy<CarETagExtractor>()
-                    .LifestyleSingleton(),
-                Component.For<ITimedETagExtractor<IEnumerable<Car>>>().ImplementedBy<CarCollectionETagExtractor>()
-                    .LifestyleSingleton(),
+                Component.For<ITimedETagExtractor>().ImplementedBy<CarAndCollectionETagExtractor>()
+                    .LifestyleSingleton().IsDefault(),
                 Component.For<ITimedETagQueryProvider>().ImplementedBy<TimedETagQueryCarRepository>()
                     .LifestyleSingleton().IsDefault(),
                 Component.For<ICarRepository>().Instance(InMemoryCarRepository.Instance),
