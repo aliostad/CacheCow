@@ -72,8 +72,7 @@ namespace CacheCow.Server
     }
 
 
-#if NET452
-#else
+
     public class DefaultCacheDirectiveProvider<TViewModel> : DefaultCacheDirectiveProvider, ICacheDirectiveProvider<TViewModel>
     {
         public DefaultCacheDirectiveProvider(ITimedETagExtractor<TViewModel> timedETagExtractor,
@@ -81,6 +80,5 @@ namespace CacheCow.Server
         {
         }
     }
-#endif
 
 }
