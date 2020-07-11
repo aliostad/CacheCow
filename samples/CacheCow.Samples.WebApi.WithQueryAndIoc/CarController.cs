@@ -21,7 +21,7 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
         }
 
         [HttpGet]
-        [HttpCache(DefaultExpirySeconds = 0)]
+        [HttpCache(DefaultExpirySeconds = 0, ViewModelType = typeof(Car))]
         public IHttpActionResult Get(int id)
         {
             var car = _repository.GetCar(id);

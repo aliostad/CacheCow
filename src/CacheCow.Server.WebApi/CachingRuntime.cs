@@ -33,6 +33,7 @@ namespace CacheCow.Server.WebApi
             Add<ITimedETagExtractor, DefaultTimedETagExtractor>(registerationStub, true);
             Add<ITimedETagQueryProvider, NullQueryProvider>(registerationStub, false);
             Add<ICacheDirectiveProvider, DefaultCacheDirectiveProvider>(registerationStub, true);
+            registerationStub(typeof(ICacheDirectiveProvider<>), typeof(DefaultCacheDirectiveProvider<>), true);
         }
 
         private static void Add<TI, TC>(Action<Type, Type, bool> registerationStub, bool isTransient)
@@ -54,7 +55,8 @@ namespace CacheCow.Server.WebApi
             var t = typeof(ICacheDirectiveProvider<>);
             var generic = t.MakeGenericType(viewModelType);
 
-            return (ICacheDirectiveProvider) resolver.GetService(generic) ?? defaultFactory();
+            var res = (ICacheDirectiveProvider) resolver.GetService(generic) ?? defaultFactory();
+            return res;
         }
     }
 }

@@ -43,4 +43,39 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
             }
         }
     }
+
+    public class CarTimedETagQueryCarRepository : ITimedETagQueryProvider<Car>
+    {
+        private readonly ICarRepository _repository;
+
+        public CarTimedETagQueryCarRepository(ICarRepository repository)
+        {
+            this._repository = repository;
+        }
+
+        public void Dispose()
+        {
+            // none
+        }
+
+        public Task<TimedEntityTagHeaderValue> QueryAsync(HttpActionContext context)
+        {
+            int? id = null;
+            if (context.RequestContext.RouteData.Values.ContainsKey("id"))
+                id = Convert.ToInt32(context.RequestContext.RouteData.Values["id"]);
+
+            if (id.HasValue) // Get one car
+            {
+                var car = _repository.GetCar(id.Value);
+                if (car != null)
+                    return Task.FromResult(new TimedEntityTagHeaderValue(car.LastModified.ToETagString()));
+                else
+                    return Task.FromResult((TimedEntityTagHeaderValue)null);
+            }
+            else // all cars
+            {
+                throw new InvalidOperationException("Time and space merged.");
+            }
+        }
+    }
 }

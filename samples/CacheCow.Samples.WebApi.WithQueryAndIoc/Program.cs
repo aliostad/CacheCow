@@ -67,6 +67,10 @@ namespace CacheCow.Samples.WebApi.WithQueryAndIoc
                     .LifestyleSingleton().IsDefault(),
                 Component.For<ITimedETagQueryProvider>().ImplementedBy<TimedETagQueryCarRepository>()
                     .LifestyleSingleton().IsDefault(),
+                Component.For<ITimedETagExtractor<Car>>().ImplementedBy<CarETagExtractor>()
+                    .LifestyleSingleton().IsDefault(),
+                Component.For<ITimedETagQueryProvider<Car>>().ImplementedBy<CarTimedETagQueryCarRepository>()
+                    .LifestyleSingleton().IsDefault(),
                 Component.For<ICarRepository>().Instance(InMemoryCarRepository.Instance),
                 Component.For<ISerialiser>().ImplementedBy<IgnoreLoopJsonSerialiser>().IsDefault() // demonstrate how to replace
 
