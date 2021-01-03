@@ -201,10 +201,11 @@ namespace CacheCow.Client
         /// <param name="cachedResponse"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        private bool? IsFreshOrStaleAcceptable(HttpResponseMessage cachedResponse, HttpRequestMessage request)
+        internal static bool? IsFreshOrStaleAcceptable(HttpResponseMessage cachedResponse, HttpRequestMessage request)
         {
 
             TimeSpan staleness = TimeSpan.Zero; // negative = fresh, positive = stale
+            TimeSpan age = TimeSpan.Zero;
 
             if (cachedResponse == null)
                 throw new ArgumentNullException("cachedResponse");
@@ -214,6 +215,9 @@ namespace CacheCow.Client
 
             if (cachedResponse.Content == null)
                 return null;
+
+            if (cachedResponse.Headers.Age.HasValue)
+                age = cachedResponse.Headers.Age.Value;
 
             DateTimeOffset? responseDate = cachedResponse.Headers.Date ?? cachedResponse.Content.Headers.LastModified; // Date should have a value
             if (responseDate == null)
@@ -231,7 +235,7 @@ namespace CacheCow.Client
 
             if (cachedResponse.Headers.CacheControl.MaxAge.HasValue) // Note: this is MaxAge for response
             {
-                staleness = DateTimeOffset.Now.Subtract(responseDate.Value.Add(cachedResponse.Headers.CacheControl.MaxAge.Value));
+                staleness = DateTimeOffset.Now.Subtract(responseDate.Value.Subtract(age).Add(cachedResponse.Headers.CacheControl.MaxAge.Value));
             }
 
             if (request.Headers.CacheControl == null)
@@ -247,7 +251,7 @@ namespace CacheCow.Client
                 return staleness < request.Headers.CacheControl.MaxStaleLimit.Value;
 
             if (request.Headers.CacheControl.MaxAge.HasValue)
-                return responseDate.Value.Add(request.Headers.CacheControl.MaxAge.Value) > DateTimeOffset.Now;
+                return responseDate.Value.Subtract(age).Add(request.Headers.CacheControl.MaxAge.Value) > DateTimeOffset.Now;
 
             return false;
         }
