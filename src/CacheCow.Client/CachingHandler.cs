@@ -70,6 +70,8 @@ namespace CacheCow.Client
                 if (!response.StatusCode.IsIn(_cacheableStatuses))
                     return ResponseValidationResult.NotCacheable;
 
+                // Technically any response is cacheable unless we are told so or some rules
+                // but we DO NOT deem cacheable a response which does not bother to put CacheControl header
                 if (!response.IsSuccessStatusCode || response.Headers.CacheControl == null ||
                     response.Headers.CacheControl.NoStore) //  || response.Headers.CacheControl.NoCache was removed. See issue
                     return ResponseValidationResult.NotCacheable;
@@ -79,6 +81,9 @@ namespace CacheCow.Client
 
                 response.Headers.Date = response.Headers.Date ?? DateTimeOffset.UtcNow; // this also helps in cache creation
                 var dateTimeOffset = response.Headers.Date;
+                var age = TimeSpan.Zero;
+                if (response.Headers.Age.HasValue)
+                    age = response.Headers.Age.Value;
 
                 TraceWriter.WriteLine(
                     String.Format("CachedResponse date was => {0} - compared to UTC.Now => {1}", dateTimeOffset, DateTimeOffset.UtcNow), TraceLevel.Verbose);
@@ -94,19 +99,19 @@ namespace CacheCow.Client
                 if (response.Headers.CacheControl.NoCache)
                     return ResponseValidationResult.MustRevalidate;
 
-                // here we use
-                if (response.Content.Headers.Expires != null &&
-                    response.Content.Headers.Expires < DateTimeOffset.UtcNow)
-                    return response.Headers.CacheControl.ShouldRevalidate(MustRevalidateByDefault)
-                        ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;
-
                 if (response.Headers.CacheControl.MaxAge != null &&
-                    DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.MaxAge.Value))
+                    DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.MaxAge.Value.Subtract(age)))
                     return response.Headers.CacheControl.ShouldRevalidate(MustRevalidateByDefault)
                         ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;
 
                 if (response.Headers.CacheControl.SharedMaxAge != null &&
-                    DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.SharedMaxAge.Value))
+                    DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.SharedMaxAge.Value.Subtract(age)))
+                    return response.Headers.CacheControl.ShouldRevalidate(MustRevalidateByDefault)
+                        ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;
+
+                // moved this down since Expires is < MaxAge
+                if (response.Content.Headers.Expires != null &&
+                    response.Content.Headers.Expires < DateTimeOffset.UtcNow)
                     return response.Headers.CacheControl.ShouldRevalidate(MustRevalidateByDefault)
                         ? ResponseValidationResult.MustRevalidate : ResponseValidationResult.Stale;
 

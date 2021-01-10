@@ -10,7 +10,7 @@ using Xunit;
 
 namespace CacheCow.Client.Tests
 {
-	
+
 	public class ResponseValidatorTests
 	{
         [Theory]
@@ -157,6 +157,29 @@ namespace CacheCow.Client.Tests
 			response.Content = new ByteArrayContent(new byte[256]);
 			Assert.Equal(cachingHandler.ResponseValidator(response), ResponseValidationResult.OK);
 		}
+
+        // issue #257
+        [Fact]
+        public void Test_Age()
+        {
+            var cachingHandler = new CachingHandler()
+            {
+                MustRevalidateByDefault = false
+            };
+
+            var response = new HttpResponseMessage(HttpStatusCode.OK);
+            response.Headers.CacheControl = new CacheControlHeaderValue()
+            {
+                Public = true,
+                MaxAge = TimeSpan.FromSeconds(200),
+                MustRevalidate = false
+            };
+            response.Headers.Age = TimeSpan.FromSeconds(300); // more than MaxAge
+
+            response.Headers.Date = DateTimeOffset.UtcNow;
+            response.Content = new ByteArrayContent(new byte[256]);
+            Assert.Equal(ResponseValidationResult.Stale, cachingHandler.ResponseValidator(response));
+        }
 
 	}
 }
