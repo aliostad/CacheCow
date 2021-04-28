@@ -99,6 +99,10 @@ namespace CacheCow.Client
                 if (response.Headers.CacheControl.NoCache)
                     return ResponseValidationResult.MustRevalidate;
 
+                if (response.RequestMessage?.Headers?.CacheControl != null &&
+                    response.RequestMessage.Headers.CacheControl.NoCache == true)
+                    return ResponseValidationResult.MustRevalidate;
+
                 if (response.Headers.CacheControl.MaxAge != null &&
                     DateTimeOffset.UtcNow > response.Headers.Date.Value.Add(response.Headers.CacheControl.MaxAge.Value.Subtract(age)))
                     return response.Headers.CacheControl.ShouldRevalidate(MustRevalidateByDefault)

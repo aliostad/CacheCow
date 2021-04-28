@@ -269,6 +269,32 @@ namespace CacheCow.Client.Tests
 		}
 
         [Fact]
+        public void Get_Must_Revalidate_NoCache_InRequest()
+        {
+            // setup
+            var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
+            request.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };
+            var responseFromCache = GetOkMessage();
+            var responseFromServer = GetOkMessage();
+            _messageHandler.Response = responseFromServer;
+            _cacheStore.Setup(x => x.GetValueAsync(It.IsAny<CacheKey>())).ReturnsAsync(responseFromCache);
+            _cacheStore.Setup(x => x.AddOrUpdateAsync(It.IsAny<CacheKey>(),
+                  It.Is<HttpResponseMessage>(r => r == responseFromServer))).Returns(Task.FromResult(true));
+
+            // run
+            var task = _client.SendAsync(request);
+            var responseReturned = task.Result;
+            var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
+            CacheCowHeader cacheCowHeader = null;
+            CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
+
+            // verify
+            Assert.NotNull(cacheCowHeader);
+            Assert.Equal(responseFromServer, responseReturned);
+            Assert.Equal(true, cacheCowHeader.CacheValidationApplied);
+        }
+
+        [Fact]
         public void Get_NoMustRevalidate_Expires_Modified()
         {
             // setup
