@@ -131,6 +131,12 @@ namespace CacheCow.Client.RedisCacheStore
                 return null;
 
             byte[] value = await _database.StringGetAsync(entryKey).ConfigureAwait(false);
+
+            // possibility of a race condition, where the object expires between checking if it exists and retrieving it
+            // issue #264 - hard to write a test for it
+            if (value == null)
+                return null;
+
             var memoryStream = new MemoryStream(value);
             var r = await _serializer.DeserializeToResponseAsync(memoryStream).ConfigureAwait(false);
 
