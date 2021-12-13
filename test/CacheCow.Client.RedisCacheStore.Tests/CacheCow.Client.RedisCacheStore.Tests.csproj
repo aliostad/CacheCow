@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netcoreapp2.0;net461;netcoreapp3.0</TargetFrameworks>
-		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp2.0;netcoreapp3.0</TargetFrameworks>		
+		<TargetFrameworks>netcoreapp2.1;net461;netcoreapp3.0;net5.0</TargetFrameworks>
+		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp2.1;netcoreapp3.0;net5.0</TargetFrameworks>		
 		<Summary>Client constructs for HTTP Caching</Summary>
 		<AssemblyName>CacheCow.Client.RedisCacheStore.Tests</AssemblyName>
 		<PackageId>CacheCow.Client.RedisCacheStore.Tests</PackageId>

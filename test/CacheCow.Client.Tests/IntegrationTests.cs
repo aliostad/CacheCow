@@ -28,6 +28,17 @@ namespace CacheCow.Client.Tests
 		}
 
         [Fact]
+        public async Task Simple_Caching_Example_From_Issue263()
+        {
+            var client = ClientExtensions.CreateClient();
+            const string CacheableResource = "https://code.jquery.com/jquery-3.3.1.slim.min.js";
+            var response = await client.GetAsync(CacheableResource);
+            var responseFromCache = await client.GetAsync(CacheableResource);
+            Assert.Equal(true, response.Headers.GetCacheCowHeader().DidNotExist);
+            Assert.Equal(true, responseFromCache.Headers.GetCacheCowHeader().RetrievedFromCache);
+        }
+
+        [Fact]
         public async Task SettingNoHeaderWorks()
         {
             var cachecow = new CachingHandler()

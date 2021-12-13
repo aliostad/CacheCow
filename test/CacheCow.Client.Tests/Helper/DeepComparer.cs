@@ -75,8 +75,13 @@ namespace CacheCow.Client.Tests
 				propCount++;
 			}
 
-			if (propCount == 0)
-				errors.AddError(name, a, b);
+            if (name == ".Properties" || name == ".Options") // this is rubbish
+                return;
+
+            if (propCount == 0)
+            {
+                errors.AddError(name, a, b);
+            }
 
 		}
 

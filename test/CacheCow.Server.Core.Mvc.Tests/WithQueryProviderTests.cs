@@ -155,7 +155,10 @@ namespace CacheCow.Server.Core.Mvc.Tests
         // This method gets called by the runtime. Use this method to add services to the container.
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.EnableEndpointRouting = false;
+            });
             services.AddHttpCachingMvc();
             services.AddQueryProviderForViewModelMvc<TestViewModel, TestViewModelQueryProvider>();
             services.AddQueryProviderForViewModelMvc<IEnumerable<TestViewModel>, TestViewModelCollectionQueryProvider>();
@@ -208,7 +211,10 @@ namespace CacheCow.Server.Core.Mvc.Tests
         public override void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions();
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.EnableEndpointRouting = false;
+            });
             services.AddHttpCachingMvc(options => options.DoNotEmitCacheCowHeader = true);
             services.AddQueryProviderForViewModelMvc<TestViewModel, TestViewModelQueryProvider>();
             services.AddQueryProviderForViewModelMvc<IEnumerable<TestViewModel>, TestViewModelCollectionQueryProvider>();

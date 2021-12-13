@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net452;netcoreapp2.0;netcoreapp2.1;netcoreapp3.0</TargetFrameworks>
-		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp2.0;netcoreapp3.0</TargetFrameworks>		
+		<TargetFrameworks>net452;netcoreapp2.0;netcoreapp2.1;netcoreapp3.0;net5.0</TargetFrameworks>
+		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp2.0;netcoreapp3.0;net5.0</TargetFrameworks>		
 		<Summary>Client constructs for HTTP Caching</Summary>
 		<AssemblyName>CacheCow.Client.Tests</AssemblyName>
 		<PackageId>CacheCow.Client.Tests</PackageId>
@@ -21,7 +21,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
-		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.5" />
+		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
 		<PackageReference Include="xunit" Version="2.3.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
 		<PackageReference Include="Moq" Version="4.8.2" />

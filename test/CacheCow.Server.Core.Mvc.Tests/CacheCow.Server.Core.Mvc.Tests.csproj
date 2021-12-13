@@ -1,17 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
   </PropertyGroup>
-	<ItemGroup>
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+    
+    <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
         <PackageReference Include="microsoft.extensions.configuration.json" Version="3.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.5" />
+		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
 		<PackageReference Include="xunit" Version="2.3.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
 		<PackageReference Include="Moq" Version="4.8.2" />
@@ -22,6 +26,13 @@
         <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.2.0" />
 	</ItemGroup>
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+        <PackageReference Include="xunit" Version="2.3.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+        <PackageReference Include="Moq" Version="4.8.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.12" />
+    </ItemGroup>
+
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\CacheCow.Client\CacheCow.Client.csproj" />
 	  <ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj" />
