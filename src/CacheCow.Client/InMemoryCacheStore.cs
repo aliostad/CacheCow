@@ -67,40 +67,43 @@ namespace CacheCow.Client
 #endif
 
 
-    /// <inheritdoc />
+        /// <inheritdoc />
         public void Dispose()
-	    {
-	        _responseCache.Dispose();
-	    }
+        {
+            _responseCache.Dispose();
+        }
 
         /// <inheritdoc />
         public async Task<HttpResponseMessage> GetValueAsync(CacheKey key)
-	    {
-            var result = _responseCache.Get(key.HashBase64);
-	        if (result == null)
-	            return null;
+        {
+            var result = (byte[])_responseCache.Get(key.HashBase64);
+            if (result == null)
+                return null;
 
-	        return await _messageSerializer.DeserializeToResponseAsync(new MemoryStream((byte[]) result)).ConfigureAwait(false);
-	    }
+            return await _messageSerializer.DeserializeToResponseAsync(new MemoryStream(result)).ConfigureAwait(false);
+        }
 
         /// <inheritdoc />
         public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
-	    {
+        {
             // removing reference to request so that the request can get GCed
+            // UPDATE 2022 - What on earth am I doing it for? I cannot remember.
             var req = response.RequestMessage;
             response.RequestMessage = null;
             var memoryStream = new MemoryStream();
-	        await _messageSerializer.SerializeAsync(response, memoryStream).ConfigureAwait(false);
+            await _messageSerializer.SerializeAsync(response, memoryStream).ConfigureAwait(false);
+            var buffer = memoryStream.ToArray();
+
             response.RequestMessage = req;
             var suggestedExpiry = response.GetExpiry() ?? DateTimeOffset.UtcNow.Add(_minExpiry);
             var minExpiry = DateTimeOffset.UtcNow.Add(_minExpiry);
             var optimalExpiry = (suggestedExpiry > minExpiry) ? suggestedExpiry : minExpiry;
-            _responseCache.Set(key.HashBase64, memoryStream.ToArray(), optimalExpiry);
-	    }
+            _responseCache.Set(key.HashBase64, buffer, optimalExpiry);
+        }
 
         /// <inheritdoc />
         public Task<bool> TryRemoveAsync(CacheKey key)
-	    {
+        {
 #if NET452
             return Task.FromResult(_responseCache.Remove(key.HashBase64) != null);
 #else
@@ -111,14 +114,14 @@ namespace CacheCow.Client
 
         /// <inheritdoc />
         public Task ClearAsync()
-	    {
+        {
             _responseCache.Dispose();
 #if NET452
             _responseCache = new MemoryCache(CacheStoreEntryName);
 #else
             _responseCache = new MemoryCache(_options);
 #endif
-	        return Task.FromResult(0);
-	    }
-	}
+            return Task.FromResult(0);
+        }
+    }
 }

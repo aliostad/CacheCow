@@ -25,11 +25,11 @@ namespace CacheCow.Client
         // 13.4: A response received with a status code of 200, 203, 206, 300, 301 or 410 MAY be stored
         // TODO: Implement caching statuses other than 2xx
         private static HttpStatusCode[] _cacheableStatuses = new HttpStatusCode[]
-		    {
-				HttpStatusCode.OK, HttpStatusCode.NonAuthoritativeInformation,
-       			HttpStatusCode.PartialContent, HttpStatusCode.MultipleChoices,
-				HttpStatusCode.MovedPermanently, HttpStatusCode.Gone
-			};
+        {
+        HttpStatusCode.OK, HttpStatusCode.NonAuthoritativeInformation,
+             HttpStatusCode.PartialContent, HttpStatusCode.MultipleChoices,
+        HttpStatusCode.MovedPermanently, HttpStatusCode.Gone
+      };
 
         public CachingHandler()
             : this(new InMemoryCacheStore())
@@ -338,7 +338,7 @@ namespace CacheCow.Client
                 if (isFreshOrStaleAcceptable.HasValue && isFreshOrStaleAcceptable.Value) // similar to OK
                 {
                     // TODO: CONSUME AND RELEASE Response !!!
-                    if (! DoNotEmitCacheCowHeader)
+                    if (!DoNotEmitCacheCowHeader)
                         cachedResponse.AddCacheCowHeader(cacheCowHeader);
                     return cachedResponse;
                     // EXIT !! ____________________________
@@ -357,6 +357,15 @@ namespace CacheCow.Client
             // _______________________________ RESPONSE only GET  ___________________________________________
 
             var serverResponse = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            if (serverResponse.Content != null)
+            {
+                // these two prevent serialisation without ContentLength which barfs for chunked encoding - issue #267
+                TraceWriter.WriteLine($"Content Size: {serverResponse.Content.Headers.ContentLength}", TraceLevel.Verbose);
+                if (serverResponse.Content.Headers.ContentType == null)
+                {
+                    serverResponse.Content.Headers.Add("Content-Type", "application/octet-stream");
+                }
+            }
 
             // HERE IS LATE FOR APPLYING EXCEPTION POLICY !!!
 
@@ -380,7 +389,7 @@ namespace CacheCow.Client
 
                 await UpdateCachedResponseAsync(cacheKey, cachedResponse, serverResponse, _cacheStore).ConfigureAwait(false);
                 ConsumeAndDisposeResponse(serverResponse);
-                if (! DoNotEmitCacheCowHeader)
+                if (!DoNotEmitCacheCowHeader)
                     cachedResponse.AddCacheCowHeader(cacheCowHeader).CopyOtherCacheCowHeaders(serverResponse);
                 return cachedResponse;
                 // EXIT !! _______________
@@ -442,7 +451,7 @@ namespace CacheCow.Client
             TraceWriter.WriteLine("{0} - Before returning response",
                 TraceLevel.Verbose, request.RequestUri.ToString());
 
-            if (! DoNotEmitCacheCowHeader)
+            if (!DoNotEmitCacheCowHeader)
                 serverResponse.AddCacheCowHeader(cacheCowHeader);
 
             return serverResponse;
@@ -495,7 +504,7 @@ namespace CacheCow.Client
         private static void CheckForCacheCowHeader(HttpResponseMessage responseMessage)
         {
             var header = responseMessage.Headers.GetCacheCowHeader();
-            if (header!=null)
+            if (header != null)
             {
                 TraceWriter.WriteLine("!!WARNING!! response stored with CacheCowHeader!!", TraceLevel.Warning);
             }

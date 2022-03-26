@@ -39,9 +39,12 @@ namespace CacheCow.Client
             {
                 TraceWriter.WriteLine("SerializeAsync - before load",
                     TraceLevel.Verbose);
-                if(_bufferContent)
+                // this will prevent serialisation without ContentLength which barfs for chunked encoding - issue #267
+                var contentLength = response.Content.Headers.ContentLength;
+
+                if (_bufferContent)
                     await response.Content.LoadIntoBufferAsync().ConfigureAwait(false);
-                TraceWriter.WriteLine("SerializeAsync - after load", TraceLevel.Verbose);               
+                TraceWriter.WriteLine("SerializeAsync - after load", TraceLevel.Verbose);
             }
             else
             {
@@ -51,6 +54,7 @@ namespace CacheCow.Client
 
             var httpMessageContent = new HttpMessageContent(response);
             var buffer = await httpMessageContent.ReadAsByteArrayAsync();
+
             TraceWriter.WriteLine("SerializeAsync - after ReadAsByteArrayAsync", TraceLevel.Verbose);
             stream.Write(buffer, 0, buffer.Length);
         }
@@ -64,7 +68,7 @@ namespace CacheCow.Client
 
             var httpMessageContent = new HttpMessageContent(request);
             var buffer = await httpMessageContent.ReadAsByteArrayAsync().ConfigureAwait(false);
-            stream.Write(buffer, 0, buffer.Length);            
+            stream.Write(buffer, 0, buffer.Length);
         }
 
         public async Task<HttpResponseMessage> DeserializeToResponseAsync(Stream stream)
@@ -76,7 +80,13 @@ namespace CacheCow.Client
                     TraceLevel.Verbose);
             var responseMessage = await response.Content.ReadAsHttpResponseMessageAsync().ConfigureAwait(false);
             if (responseMessage.Content != null && _bufferContent)
-                await responseMessage.Content.LoadIntoBufferAsync().ConfigureAwait(false); 
+            {
+                await responseMessage.Content.LoadIntoBufferAsync().ConfigureAwait(false);
+            }
+
+            if (responseMessage.Content == null)
+                TraceWriter.WriteLine("Content is NULL desering from cache", TraceLevel.Warning);
+
             return responseMessage;
         }
 
