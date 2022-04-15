@@ -1,10 +1,10 @@
 <Project>
   <PropertyGroup>
-	<Description>CacheCow is an HTTP Caching Library for .NET</Description>  
+    <Description>CacheCow is an HTTP Caching Library for .NET</Description>
     <Authors>Ali Kheyrollahi</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>2.11.0</Version>
-	<PackageProjectUrl>https://github.com/aliostad/CacheCow/</PackageProjectUrl>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>	
+    <Version>2.11.1</Version>
+    <PackageProjectUrl>https://github.com/aliostad/CacheCow/</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 </Project>

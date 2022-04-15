@@ -9,7 +9,10 @@
 	<ItemGroup>
 	  <Compile Include="..\Common\DummyMessageHandler.cs" Link="DummyMessageHandler.cs" />
 	</ItemGroup>
-	<ItemGroup>
+    <ItemGroup>
+        <Compile Include="..\..\src\common\TraceWriter.cs" Link="TraceWriter.cs" />
+    </ItemGroup>
+    <ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
 		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.5" />
 		<PackageReference Include="xunit" Version="2.3.1" />
