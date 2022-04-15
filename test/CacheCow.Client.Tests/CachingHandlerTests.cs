@@ -568,9 +568,36 @@ namespace CacheCow.Client.Tests
 
         }
 
+        [Theory]
+        [InlineData(CacheablePublicResource, true)]
+        [InlineData("https://datatracker.ietf.org/doc/html/rfc7234", false)]
+        public async Task IncludesRangeHeaderInCacheKey(string url, bool hasVaryHeader)
+        {
+            var cacheStore = new DictionaryBasedCache();
+            var cachingHandler = new CachingHandler(cacheStore) { InnerHandler = new HttpClientHandler() };
+            var client = new HttpClient(cachingHandler);
+
+            var request1 = new HttpRequestMessage(HttpMethod.Get, url)
+            {
+                Headers = { Range = new RangeHeaderValue(from: 0, to: 15) }
+            };
+            var request2 = new HttpRequestMessage(HttpMethod.Get, url)
+            {
+                Headers = { Range = new RangeHeaderValue(from: 16, to: 31) }
+            };
+            var response1 = await client.SendAsync(request1);
+            var response2 = await client.SendAsync(request2);
+
+            Assert.Equal(hasVaryHeader, response1.Headers.Vary.Any());
+            Assert.Equal(hasVaryHeader, response2.Headers.Vary.Any());
+            Assert.Equal(2, cacheStore.Count);
+        }
+
         class DictionaryBasedCache : ICacheStore
         {
             private Dictionary<string, HttpResponseMessage> _cache = new Dictionary<string, HttpResponseMessage>();
+
+            public int Count => _cache.Count;
 
             public void Dispose()
             {

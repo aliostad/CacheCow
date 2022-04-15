@@ -15,6 +15,7 @@
         public const string IfUnmodifiedSince = "If-Unmodified-Since";
         public const string Vary = "Vary";
         public const string Pragma = "Pragma";
+        public const string Range = "Range";
         public const string Expires = "Expires";
         public const string SetCookie = "Set-Cookie";
     }

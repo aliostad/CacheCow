@@ -49,7 +49,7 @@ namespace CacheCow.Client
             UseConditionalPutPatchDelete = true;
             MustRevalidateByDefault = true;
             VaryHeaderStore = varyHeaderStore;
-            DefaultVaryHeaders = new string[] { HttpHeaderNames.Accept };
+            DefaultVaryHeaders = new string[] { HttpHeaderNames.Accept, HttpHeaderNames.Range };
             ResponseValidator = (response) =>
             {
                 // 13.4
@@ -411,9 +411,9 @@ namespace CacheCow.Client
                     // re-create cacheKey with real server accept
 
                     // if there is a vary header, store it
-                    if (serverResponse.Headers.Vary != null)
+                    if (serverResponse.Headers.Vary?.Any() ?? false)
                     {
-                        varyHeaders = serverResponse.Headers.Vary.Select(x => x).ToArray();
+                        varyHeaders = serverResponse.Headers.Vary.Select(x => x).Concat(varyHeaders).Distinct(StringComparer.CurrentCultureIgnoreCase).ToArray();
                         IEnumerable<string> temp;
                         if (!VaryHeaderStore.TryGetValue(uri, out temp))
                         {
