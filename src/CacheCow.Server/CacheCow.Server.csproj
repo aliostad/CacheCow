@@ -17,16 +17,16 @@
 		<ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-        <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.5" />
 	</ItemGroup>		
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
 		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
-        <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
     <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
         <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
 </Project>
