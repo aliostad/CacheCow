@@ -16,7 +16,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.WebApiCompatShim" Version="2.0.3" />
-		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.5" />
+		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
 		<PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.2" />		
 	</ItemGroup>
   

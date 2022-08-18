@@ -10,12 +10,12 @@
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
         <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
         <PackageReference Include="microsoft.extensions.configuration.binder" Version="2.0.2" />
-		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.5" />		
+		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />		
 	</ItemGroup>
     <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
         <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
         <PackageReference Include="microsoft.extensions.configuration.binder" Version="5.0.0" />
-        <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+        <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
     </ItemGroup>
 	
   <ItemGroup>
