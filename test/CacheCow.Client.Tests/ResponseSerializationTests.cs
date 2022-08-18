@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using CacheCow.Client;
@@ -33,6 +34,10 @@ namespace CacheCow.Client.Tests
         [Fact]
         public async Task IntegrationTest_Serialize_Deserialize()
         {
+#if NET452
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+#endif
+
             var httpClient = new HttpClient();
             var httpResponseMessage = await httpClient.GetAsync("https://webhooks.truelayer-sandbox.com/.well-known/jwks");
             var memoryStream = new MemoryStream();

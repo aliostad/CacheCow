@@ -557,6 +557,10 @@ namespace CacheCow.Client.Tests
                 InnerHandler = compressionHandler, DefaultVaryHeaders = new[] {"Accept", "Accept-Encoding"}
             };
 
+#if NET452
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+#endif
+
             var client = new HttpClient(pipeline);
             var request1 = new HttpRequestMessage(HttpMethod.Get, CacheablePublicResource);
             var request2 = new HttpRequestMessage(HttpMethod.Get, CacheablePublicResource);

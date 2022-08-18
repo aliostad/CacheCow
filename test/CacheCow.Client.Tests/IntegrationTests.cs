@@ -5,6 +5,7 @@ using CacheCow.Common;
 using Xunit;
 using System;
 using System.IO;
+using System.Net;
 
 namespace CacheCow.Client.Tests
 {
@@ -32,6 +33,10 @@ namespace CacheCow.Client.Tests
         [Fact]
         public async Task Simple_Caching_Example_From_Issue263()
         {
+#if NET452
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+#endif
+
             var client = ClientExtensions.CreateClient();
             const string CacheableResource = "https://code.jquery.com/jquery-3.3.1.slim.min.js";
             var response = await client.GetAsync(CacheableResource);
@@ -44,6 +49,10 @@ namespace CacheCow.Client.Tests
         [Fact] // Skip if the resource becomes unavailable
         public async Task Simple_Caching_Example_From_Issue267()
         {
+#if NET452
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+#endif
+
             var client = ClientExtensions.CreateClient();
 
             // this one does not have a content-type too and that could be somehow related
