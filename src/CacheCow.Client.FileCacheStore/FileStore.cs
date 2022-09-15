@@ -73,7 +73,7 @@ namespace CacheCow.Client.FileCacheStore
         /// <inheritdoc />
         public async Task AddOrUpdateAsync(CacheKey key, HttpResponseMessage response)
         {
-            using (var fs = File.OpenWrite(_pathFor(key)))
+            using (var fs = File.Open(_pathFor(key), FileMode.Create, FileAccess.Write, FileShare.None))
             {
                 await _serializer.SerializeAsync(response, fs);
             }
