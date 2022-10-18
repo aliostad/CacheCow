@@ -411,7 +411,7 @@ namespace CacheCow.Client
                     // re-create cacheKey with real server accept
 
                     // if there is a vary header, store it
-                    if (serverResponse.Headers.Vary != null)
+                    if (serverResponse.Headers.Vary?.Any() ?? false)
                     {
                         varyHeaders = serverResponse.Headers.Vary.Select(x => x).ToArray();
                         IEnumerable<string> temp;
