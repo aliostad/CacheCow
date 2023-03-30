@@ -1,32 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net452;net5.0</TargetFrameworks>
-		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;net5.0</TargetFrameworks>		
+		<TargetFrameworks>netstandard2.0;net452;net7.0</TargetFrameworks>
+		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;net7.0</TargetFrameworks>
 		<Summary>Server constructs for HTTP Caching</Summary>
 		<AssemblyName>CacheCow.Server</AssemblyName>
 		<PackageId>CacheCow.Server</PackageId>
 	</PropertyGroup>
 	<ItemGroup>
-	  <Compile Include="..\Common\TraceWriter.cs" Link="TraceWriter.cs" />
+		<Compile Include="..\Common\TraceWriter.cs" Link="TraceWriter.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.5" />
-	</ItemGroup>		
+	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
 		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
-    <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
-        <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    </ItemGroup>
-
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
+		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+	</ItemGroup>
 </Project>

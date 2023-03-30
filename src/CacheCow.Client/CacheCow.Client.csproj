@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net452;net5.0</TargetFrameworks>
-		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;net5.0</TargetFrameworks>		
+		<TargetFrameworks>netstandard2.0;net452;net7.0</TargetFrameworks>
+		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;net7.0</TargetFrameworks>
 		<Summary>Client constructs for HTTP Caching</Summary>
 		<AssemblyName>CacheCow.Client</AssemblyName>
 		<PackageId>CacheCow.Client</PackageId>
 	</PropertyGroup>
 	<ItemGroup>
-	  <Compile Include="..\Common\TraceWriter.cs" Link="TraceWriter.cs" />
+		<Compile Include="..\Common\TraceWriter.cs" Link="TraceWriter.cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
 	</ItemGroup>
 	<ItemGroup>
@@ -19,10 +19,10 @@
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
 		<Reference Include="System.Runtime.Caching" />
 	</ItemGroup>
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.1" />
-    </ItemGroup>
-    <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0'">
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
-    </ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.1" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net7.0'">
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
+	</ItemGroup>
 </Project>

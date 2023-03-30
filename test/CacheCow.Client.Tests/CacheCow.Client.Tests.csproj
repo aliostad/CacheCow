@@ -1,26 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net452;netcoreapp2.0;netcoreapp2.1;netcoreapp3.0;net5.0</TargetFrameworks>
-		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp2.0;netcoreapp3.0;net5.0</TargetFrameworks>		
+		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp2.0;netcoreapp3.0;net5.0</TargetFrameworks>
 		<Summary>Client constructs for HTTP Caching</Summary>
 		<AssemblyName>CacheCow.Client.Tests</AssemblyName>
 		<PackageId>CacheCow.Client.Tests</PackageId>
 	</PropertyGroup>
 	<ItemGroup>
-	  <Compile Remove="Data\Request.cs" />
-	  <Compile Remove="Data\Response.cs" />
+		<Compile Remove="Data\Request.cs" />
+		<Compile Remove="Data\Response.cs" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Compile Include="..\Common\DummyMessageHandler.cs" Link="DummyMessageHandler.cs" />
+		<Compile Include="..\Common\DummyMessageHandler.cs" Link="DummyMessageHandler.cs" />
 	</ItemGroup>
 	<ItemGroup>
-	  <EmbeddedResource Include="Data\Request.cs" />
-	  <Content Include="Data\Response.cs">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
+		<EmbeddedResource Include="Data\Request.cs" />
+		<Content Include="Data\Response.cs">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
 		<PackageReference Include="xunit" Version="2.3.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
@@ -28,10 +28,9 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj" />
-		<ProjectReference Include="..\..\src\CacheCow.Client\CacheCow.Client.csproj" />		
-	</ItemGroup>	
+		<ProjectReference Include="..\..\src\CacheCow.Client\CacheCow.Client.csproj" />
+	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
 		<Reference Include="System" />
-	</ItemGroup>	
+	</ItemGroup>
 </Project>
-

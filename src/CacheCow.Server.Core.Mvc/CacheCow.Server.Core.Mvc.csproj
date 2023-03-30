@@ -1,26 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
-		<Summary>Server constructs for HTTP Caching in ASP.NET Core MVC</Summary>
-		<AssemblyName>CacheCow.Server.Core.Mvc</AssemblyName>
-		<PackageId>CacheCow.Server.Core.Mvc</PackageId>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net7.0</TargetFrameworks>
+    <Summary>Server constructs for HTTP Caching in ASP.NET Core MVC</Summary>
+    <AssemblyName>CacheCow.Server.Core.Mvc</AssemblyName>
+    <PackageId>CacheCow.Server.Core.Mvc</PackageId>
+  </PropertyGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-        <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
-        <PackageReference Include="microsoft.extensions.configuration.binder" Version="2.0.2" />
-		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />		
-	</ItemGroup>
-    <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
-        <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
-        <PackageReference Include="microsoft.extensions.configuration.binder" Version="5.0.0" />
-        <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
-    </ItemGroup>
-	
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
+    <PackageReference Include="microsoft.extensions.configuration.binder" Version="2.0.2" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="microsoft.extensions.configuration.binder" Version="7.0.4" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj" />
     <ProjectReference Include="..\CacheCow.Server\CacheCow.Server.csproj" />
   </ItemGroup>
-
 </Project>

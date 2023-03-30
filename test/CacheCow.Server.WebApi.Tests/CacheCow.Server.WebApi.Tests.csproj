@@ -7,16 +7,16 @@
 		<AssemblyName>CacheCow.Server.WebApi.Tests</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
 		<PackageReference Include="xunit" Version="2.3.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-		<PackageReference Include="Moq" Version="4.8.2" />		
+		<PackageReference Include="Moq" Version="4.8.2" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj" />
 		<ProjectReference Include="..\..\src\CacheCow.Server.WebApi\CacheCow.Server.WebApi.csproj" />
 		<ProjectReference Include="..\..\src\CacheCow.Server\CacheCow.Server.csproj" />
 	</ItemGroup>
-  
+
 </Project>

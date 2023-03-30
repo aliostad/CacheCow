@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net461;net5.0</TargetFrameworks>
-		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;net5.0</TargetFrameworks>		
+		<TargetFrameworks>netstandard2.0;net461;net7.0</TargetFrameworks>
+		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;net5.0</TargetFrameworks>
 		<Summary>Redis Storage for HTTP Client Caching</Summary>
 		<AssemblyName>CacheCow.Client.RedisCacheStore</AssemblyName>
 		<PackageId>CacheCow.Client.RedisCacheStore</PackageId>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
-		<PackageReference Include="StackExchange.Redis" Version="2.2.88" />		
+		<PackageReference Include="StackExchange.Redis" Version="2.6.96" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\CacheCow.Client\CacheCow.Client.csproj" />
-	</ItemGroup>	
+	</ItemGroup>
 </Project>
