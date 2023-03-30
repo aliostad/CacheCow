@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using CacheCow.Common;
-#if NET452
+#if NET462
 using System.Web.Http.Controllers;
 #else
 using Microsoft.AspNetCore.Http;
@@ -22,7 +22,7 @@ namespace CacheCow.Server
         {
         }
 
-#if NET452
+#if NET462
         public Task<TimedEntityTagHeaderValue> QueryAsync(HttpActionContext context)
 #else
         public Task<TimedEntityTagHeaderValue> QueryAsync(HttpContext context)
@@ -32,7 +32,7 @@ namespace CacheCow.Server
         }
     }
 
-#if NET452
+#if NET462
 #else
     public class NullQueryProvider<T> : NullQueryProvider, ITimedETagQueryProvider<T>
     {

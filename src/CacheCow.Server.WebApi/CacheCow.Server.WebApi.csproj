@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net452</TargetFrameworks>
+		<TargetFrameworks>net462</TargetFrameworks>
 		<Summary>Server constructs for HTTP Caching for Web API</Summary>
 		<AssemblyName>CacheCow.Server.WebApi</AssemblyName>
 		<PackageId>CacheCow.Server.WebApi</PackageId>

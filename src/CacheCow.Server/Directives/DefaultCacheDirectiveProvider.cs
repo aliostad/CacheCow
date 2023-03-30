@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using CacheCow.Common;
-#if NET452
+#if NET462
 using System.Web.Http.Filters;
 using System.Web.Http.Controllers;
 #else
@@ -29,7 +29,7 @@ namespace CacheCow.Server
             return _timedETagExtractor.Extract(viewModel);
         }
 
-#if NET452
+#if NET462
         public Task<TimedEntityTagHeaderValue> QueryAsync(HttpActionContext context)
 #else
         public Task<TimedEntityTagHeaderValue> QueryAsync(HttpContext context)
@@ -44,7 +44,7 @@ namespace CacheCow.Server
             _queryProvider.Dispose();
         }
 
-#if NET452
+#if NET462
         public IEnumerable<string> GetVaryHeaders(HttpActionExecutedContext context)
 #else
         public IEnumerable<string> GetVaryHeaders(HttpContext context)
@@ -53,7 +53,7 @@ namespace CacheCow.Server
             return new[] { HttpHeaderNames.Accept };
         }
 
-#if NET452
+#if NET462
         public CacheControlHeaderValue GetCacheControl(HttpActionExecutedContext context, TimeSpan? configuredExpiry)
 #else
         public CacheControlHeaderValue GetCacheControl(HttpContext context, TimeSpan? configuredExpiry)

@@ -1,4 +1,4 @@
-﻿#if NET452
+﻿#if NET462
 #else
 using Microsoft.AspNetCore.Http;
 #endif
@@ -28,7 +28,7 @@ namespace CacheCow.Server.Headers
             return header;
         }
 
-#if NET452
+#if NET462
 #else
         /// <summary>
         /// Extracts CacheCowHeader (server) if one exists

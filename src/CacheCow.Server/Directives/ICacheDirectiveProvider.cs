@@ -1,4 +1,4 @@
-﻿#if NET452
+﻿#if NET462
 using System.Web.Http.Filters;
 #else
 using Microsoft.AspNetCore.Http;
@@ -16,7 +16,7 @@ namespace CacheCow.Server
     /// </summary>
     public interface ICacheDirectiveProvider : ITimedETagExtractor, ITimedETagQueryProvider
     {
-#if NET452
+#if NET462
         CacheControlHeaderValue GetCacheControl(HttpActionExecutedContext context, TimeSpan? configuredExpiry);
         IEnumerable<string> GetVaryHeaders(HttpActionExecutedContext context);
 #else

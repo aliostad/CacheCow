@@ -33,7 +33,7 @@ namespace CacheCow.Client.Tests
         [Fact]
         public async Task Simple_Caching_Example_From_Issue263()
         {
-#if NET452
+#if NET462
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 #endif
 
@@ -49,7 +49,7 @@ namespace CacheCow.Client.Tests
         [Fact] // Skip if the resource becomes unavailable
         public async Task Simple_Caching_Example_From_Issue267()
         {
-#if NET452
+#if NET462
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 #endif
 

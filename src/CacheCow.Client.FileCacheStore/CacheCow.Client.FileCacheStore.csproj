@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net452;net7.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net462;net7.0</TargetFrameworks>
 		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFrameworks>
 		<Summary>Addition file-based store for CacheCow HTTP-caching library</Summary>
 		<AssemblyName>CacheCow.Client.FileStore</AssemblyName>

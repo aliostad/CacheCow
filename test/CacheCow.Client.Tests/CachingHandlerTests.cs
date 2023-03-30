@@ -557,7 +557,7 @@ namespace CacheCow.Client.Tests
                 InnerHandler = compressionHandler, DefaultVaryHeaders = new[] {"Accept", "Accept-Encoding"}
             };
 
-#if NET452
+#if NET462
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 #endif
 

@@ -94,7 +94,7 @@ namespace CacheCow.Client.Tests
 			}
 		}
         // temporarily remove this test || NETCOREAPP2_0
-#if NET452
+#if NET462
 
         // Issue raised here https://github.com/dotnet/corefx/issues/31918
         [Fact]

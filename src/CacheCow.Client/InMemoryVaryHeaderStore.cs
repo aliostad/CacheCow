@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CacheCow.Common;
-#if NET452
+#if NET462
 using System.Runtime.Caching;
 #else
 using Microsoft.Extensions.Caching.Memory;
@@ -17,7 +17,7 @@ namespace CacheCow.Client
     {
         private const string CacheName = "###_IVaryHeaderStore_###";
         private readonly ConcurrentDictionary<string, string[]> _varyHeaderCache = new ConcurrentDictionary<string, string[]>();
-#if NET452
+#if NET462
         private MemoryCache _cache = new MemoryCache(CacheName);  
 #else
         private MemoryCache _cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
@@ -36,7 +36,7 @@ namespace CacheCow.Client
 
         public bool TryRemove(string uri)
         {
-#if NET452
+#if NET462
             return _cache.Remove(uri) != null;
 #endif
             _cache.Remove(uri);
@@ -46,7 +46,7 @@ namespace CacheCow.Client
         public void Clear()
         {
             ((IDisposable)_cache).Dispose();
-#if NET452
+#if NET462
             _cache = new MemoryCache(CacheName);  
 #else
             _cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));

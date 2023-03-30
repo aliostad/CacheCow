@@ -1,4 +1,4 @@
-﻿#if NET452
+﻿#if NET462
 using System.Net.Http;
 #else
 using Microsoft.AspNetCore.Http;
@@ -19,7 +19,7 @@ namespace CacheCow.Server
         /// </summary>
         /// <param name="request">request</param>
         /// <returns>Whether response for this request is Cachebale</returns>
-#if NET452
+#if NET462
         bool IsCacheable(HttpRequestMessage request);
 #else
         bool IsCacheable(HttpRequest request);
@@ -30,7 +30,7 @@ namespace CacheCow.Server
         /// </summary>
         /// <param name="response">request</param>
         /// <returns>Whether response for a request is Cachebale</returns>
-#if NET452
+#if NET462
         bool IsCacheable(HttpResponseMessage response);
 #else
         bool IsCacheable(HttpResponse response);

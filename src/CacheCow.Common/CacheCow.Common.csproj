@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net452;net7.0</TargetFrameworks>
-		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;net5.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net462;net7.0</TargetFrameworks>
+		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;net7.0</TargetFrameworks>
 		<Summary>Common constructs for HTTP Caching</Summary>
 		<AssemblyName>CacheCow.Common</AssemblyName>
 		<PackageId>CacheCow.Common</PackageId>
@@ -11,6 +11,6 @@
 		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
 	</ItemGroup>
 	<ItemGroup>
-		<Reference Include="System.Configuration" Condition="'$(TargetFramework)' == 'net452'" />
+		<Reference Include="System.Configuration" Condition="'$(TargetFramework)' == 'net462'" />
 	</ItemGroup>
 </Project>

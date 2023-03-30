@@ -34,7 +34,7 @@ namespace CacheCow.Client.Tests
         [Fact]
         public async Task IntegrationTest_Serialize_Deserialize()
         {
-#if NET452
+#if NET462
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 #endif
 

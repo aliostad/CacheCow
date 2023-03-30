@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net452;net7.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net462;net7.0</TargetFrameworks>
 		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;net7.0</TargetFrameworks>
 		<Summary>Server constructs for HTTP Caching</Summary>
 		<AssemblyName>CacheCow.Server</AssemblyName>
@@ -17,7 +17,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
 		<PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.5" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">

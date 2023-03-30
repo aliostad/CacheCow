@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using CacheCow.Common;
-#if NET452
+#if NET462
 using System.Net.Http;
 using System.Net;
 #else
@@ -16,7 +16,7 @@ namespace CacheCow.Server
     /// </summary>
     public class DefaultCacheabilityValidator : ICacheabilityValidator
     {
-#if NET452
+#if NET462
         public bool IsCacheable(HttpRequestMessage request)
         {
             // none-GET (HEAD is ignored here!! Need to change later!!)
@@ -61,7 +61,7 @@ namespace CacheCow.Server
         }
 #endif
 
-#if NET452
+#if NET462
         public bool IsCacheable(HttpResponseMessage response)
         {
             // cacheable statuses

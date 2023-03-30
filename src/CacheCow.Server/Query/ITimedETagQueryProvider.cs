@@ -1,5 +1,5 @@
 ﻿using CacheCow.Common;
-#if NET452
+#if NET462
 using System.Web.Http.Controllers;
 #else
 using Microsoft.AspNetCore.Http;
@@ -24,7 +24,7 @@ namespace CacheCow.Server
         /// <param name="context"></param>
         /// <returns></returns>
         /// 
-#if NET452
+#if NET462
         Task<TimedEntityTagHeaderValue> QueryAsync(HttpActionContext context);
 #else
         Task<TimedEntityTagHeaderValue> QueryAsync(HttpContext context);

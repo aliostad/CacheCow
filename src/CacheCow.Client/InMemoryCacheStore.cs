@@ -9,7 +9,7 @@ using CacheCow.Common;
 using System.Threading.Tasks;
 using CacheCow.Common.Helpers;
 
-#if NET452
+#if NET462
 using System.Runtime.Caching;
 #else
 using Microsoft.Extensions.Caching.Memory;
@@ -27,7 +27,7 @@ namespace CacheCow.Client
         private MessageContentHttpMessageSerializer _messageSerializer = new MessageContentHttpMessageSerializer(true);
         private readonly TimeSpan _minExpiry;
 
-#if NET452
+#if NET462
 #else
         private readonly IOptions<MemoryCacheOptions> _options;
 #endif
@@ -38,7 +38,7 @@ namespace CacheCow.Client
         }
 
         public InMemoryCacheStore(TimeSpan minExpiry) :
-#if NET452
+#if NET462
             this(minExpiry, new MemoryCache(CacheStoreEntryName))
 #else
             this(minExpiry, Options.Create(new MemoryCacheOptions()))
@@ -52,7 +52,7 @@ namespace CacheCow.Client
             _responseCache = cache;
         }
 
-#if NET452
+#if NET462
 #else
         /// <summary>
         /// To control cache options
@@ -104,7 +104,7 @@ namespace CacheCow.Client
         /// <inheritdoc />
         public Task<bool> TryRemoveAsync(CacheKey key)
         {
-#if NET452
+#if NET462
             return Task.FromResult(_responseCache.Remove(key.HashBase64) != null);
 #else
             _responseCache.Remove(key.HashBase64);
@@ -116,7 +116,7 @@ namespace CacheCow.Client
         public Task ClearAsync()
         {
             _responseCache.Dispose();
-#if NET452
+#if NET462
             _responseCache = new MemoryCache(CacheStoreEntryName);
 #else
             _responseCache = new MemoryCache(_options);

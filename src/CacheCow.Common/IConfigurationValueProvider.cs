@@ -1,6 +1,6 @@
 namespace CacheCow.Common
 {
-#if NET452
+#if NET462
 
     using System.Configuration;
 

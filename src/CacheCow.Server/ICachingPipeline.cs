@@ -1,4 +1,4 @@
-﻿#if NET452
+﻿#if NET462
 #else
 using Microsoft.AspNetCore.Http;
 using System;

@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net452</TargetFrameworks>
+		<TargetFrameworks>net462</TargetFrameworks>
 		<Summary>Tests for Server constructs for HTTP Caching for Web API</Summary>
 		<AssemblyName>CacheCow.Server.WebApi.Tests</AssemblyName>
 	</PropertyGroup>
@@ -11,7 +11,7 @@
 		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
 		<PackageReference Include="xunit" Version="2.3.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-		<PackageReference Include="Moq" Version="4.8.2" />
+		<PackageReference Include="Moq" Version="4.18.4" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj" />
