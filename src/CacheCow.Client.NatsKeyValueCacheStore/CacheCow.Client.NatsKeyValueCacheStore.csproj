@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Summary>NATS KeyValue Cache Store for CacheCow</Summary>
+    <AssemblyName>CacheCow.Client.NatsKeyValueStore</AssemblyName>
+    <PackageId>CacheCow.Client.NatsKeyValueStore</PackageId>
+    <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NATS.Client" Version="1.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CacheCow.Client\CacheCow.Client.csproj" />
+    <ProjectReference Include="..\CacheCow.Common\CacheCow.Common.csproj" />
+  </ItemGroup>
+
+</Project>

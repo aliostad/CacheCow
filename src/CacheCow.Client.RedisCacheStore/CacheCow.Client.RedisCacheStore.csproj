@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net462;net7.0</TargetFrameworks>
-		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;net5.0</TargetFrameworks>
+		<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0;net7.0</TargetFrameworks>
 		<Summary>Redis Storage for HTTP Client Caching</Summary>
 		<AssemblyName>CacheCow.Client.RedisCacheStore</AssemblyName>
 		<PackageId>CacheCow.Client.RedisCacheStore</PackageId>
