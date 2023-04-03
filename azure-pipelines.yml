@@ -17,12 +17,18 @@ jobs:
       vmImage: 'ubuntu-22.04'
     steps:
     - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk 3'
+      inputs:
+        packageType: sdk
+        version: 3.1.100
+    - task: UseDotNet@2
       displayName: 'Use .NET Core sdk 7'
       inputs:
         packageType: sdk
         version: 7.0.202
     - script: ./build.sh
       displayName: 'Run build and tests'
+
     - task: PublishTestResults@2
       displayName: 'Publish test results'
       inputs:
