@@ -6,6 +6,8 @@
 		<AssemblyName>CacheCow.Client.RedisCacheStore.Tests</AssemblyName>
 		<PackageId>CacheCow.Client.RedisCacheStore.Tests</PackageId>
 		<PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\..\src\Common\keyPair.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
 		<DocumentationFile />

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
-[assembly: InternalsVisibleTo("CacheCow.Server.Core.Mvc")]
+[assembly: InternalsVisibleTo("CacheCow.Server.Core.Mvc, PublicKey=0024000004800000940000000602000000240000525341310004000001000100e56aad7a2d4a1d0ac9e7d669b97415eba84c5aaaa0891b3f0552b5b30b83c33faeaac9f7c2ffb6bd418aaf7fcd2cc840c6cbc8af8a0573f03feabd475a90ce12fd74fbf2f19228faf5a19c95db64d4de1c1b8a9aecaad85a642becb40064b41378da410935de6143bfddacd72e7d2cea84536931e1faafb1d9920df9521810e0")]
 
 namespace CacheCow.Server
 {

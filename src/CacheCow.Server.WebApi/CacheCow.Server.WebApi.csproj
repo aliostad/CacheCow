@@ -5,6 +5,8 @@
 		<Summary>Server constructs for HTTP Caching for Web API</Summary>
 		<AssemblyName>CacheCow.Server.WebApi</AssemblyName>
 		<PackageId>CacheCow.Server.WebApi</PackageId>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\Common\keyPair.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="..\Common\TraceWriter.cs" Link="TraceWriter.cs" />

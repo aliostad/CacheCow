@@ -7,6 +7,8 @@
     <AssemblyName>CacheCow.Client.NatsKeyValueStore</AssemblyName>
     <PackageId>CacheCow.Client.NatsKeyValueStore</PackageId>
     <LangVersion>10.0</LangVersion>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Common\keyPair.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NATS.Client" Version="1.0.3" />

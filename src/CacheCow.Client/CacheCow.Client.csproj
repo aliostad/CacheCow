@@ -5,6 +5,8 @@
 		<Summary>Client constructs for HTTP Caching</Summary>
 		<AssemblyName>CacheCow.Client</AssemblyName>
 		<PackageId>CacheCow.Client</PackageId>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\Common\keyPair.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="..\Common\TraceWriter.cs" Link="TraceWriter.cs" />
