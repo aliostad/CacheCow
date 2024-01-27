@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <Summary>Server constructs for HTTP Caching in ASP.NET Core MVC</Summary>
     <AssemblyName>CacheCow.Server.Core.Mvc</AssemblyName>
     <PackageId>CacheCow.Server.Core.Mvc</PackageId>
@@ -12,7 +12,7 @@
     <PackageReference Include="microsoft.extensions.configuration.binder" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     <PackageReference Include="microsoft.extensions.configuration.binder" Version="7.0.4" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
