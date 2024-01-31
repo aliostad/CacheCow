@@ -3,7 +3,7 @@
 
 CacheCow
 ========
-An implementation of HTTP Caching in .NET Core and 4.52+ for HttpClient, ASP.NET Web API, ASP.NET MVC Core and [Carter](https://github.com/CarterCommunity/Carter/blob/master/README.md).
+An implementation of HTTP Caching in .NET Core and 4.5.2+ for HttpClient, ASP.NET Web API, ASP.NET MVC Core and [Carter](https://github.com/CarterCommunity/Carter/blob/master/README.md).
 
 This document covers topics below:
 
