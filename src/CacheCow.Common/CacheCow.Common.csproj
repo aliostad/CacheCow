@@ -5,6 +5,8 @@
 		<Summary>Common constructs for HTTP Caching</Summary>
 		<AssemblyName>CacheCow.Common</AssemblyName>
 		<PackageId>CacheCow.Common</PackageId>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\Common\keyPair.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

@@ -5,6 +5,8 @@
     <Summary>Server constructs for HTTP Caching in ASP.NET Core MVC</Summary>
     <AssemblyName>CacheCow.Server.Core.Mvc</AssemblyName>
     <PackageId>CacheCow.Server.Core.Mvc</PackageId>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Common\keyPair.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">

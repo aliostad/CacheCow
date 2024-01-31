@@ -5,6 +5,8 @@
 		<Summary>Redis Storage for HTTP Client Caching</Summary>
 		<AssemblyName>CacheCow.Client.RedisCacheStore</AssemblyName>
 		<PackageId>CacheCow.Client.RedisCacheStore</PackageId>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\Common\keyPair.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

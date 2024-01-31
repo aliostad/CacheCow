@@ -5,6 +5,8 @@
 		<TargetFrameworks>net462</TargetFrameworks>
 		<Summary>Tests for Server constructs for HTTP Caching for Web API</Summary>
 		<AssemblyName>CacheCow.Server.WebApi.Tests</AssemblyName>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\..\src\Common\keyPair.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
